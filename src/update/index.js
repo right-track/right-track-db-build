@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * Right Track Database Builde: start GTFS update checks
+ * @module /update
+ */
+
 const defaultUpdate = require('./default.js');
 const chalk = require('chalk');
 const log = console.log;
@@ -21,11 +26,13 @@ let CURRENT = 0;
 
 
 /**
- * Start the database update check and compilation process
- * @param {object} options The parsed CLI Options
- * @param {function} callback Final callback when everything is finished
+ * Start the database update check process.  This will check for a GTFS data
+ * update.  If an update is present, the new data will be downloaded and
+ * unpacked into the agency's GTFS directory.
+ * @param {Options} options The DB Build Options
+ * @param {mainCallback} callback Final callback when the update process is complete.
  */
-function run(options, callback) {
+function update(options, callback) {
 
   info("RUNNING AGENCY UPDATE CHECKS");
   log("------------------------------------------------");
@@ -166,4 +173,4 @@ function _shouldUseDefaultUpdateMethod(agency) {
 
 
 
-module.exports = run;
+module.exports = update;

@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * Right Track Database Builder: start database compilation
+ * @module /compile
+ */
+
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const config = require('../../config.json');
@@ -26,9 +31,9 @@ let CURRENT = -1;
 /**
  * Start the database compilation process
  * @param {Options} options DB Build Options
- * @param {function} callback Final callback function
+ * @param {mainCallback} callback Callback function when the database compilation is complete
  */
-function run(options, callback) {
+function compile(options, callback) {
   info("RUNNING DATABASE COMPILATION SCRIPTS");
   log("------------------------------------------------");
 
@@ -161,4 +166,4 @@ function _finish() {
 
 
 
-module.exports = run;
+module.exports = compile;

@@ -1,18 +1,32 @@
 'use strict';
 
+/**
+ * Database compilation utility functions
+ * @module /compile/utils
+ */
+
 const rl = require('readline');
 const fs = require('fs');
 const path = require('path');
 
 
-function init(db, table, gtfs_dir, callback) {
+/**
+ * Initialize the Table in the database.  This will drop an existing table,
+ * create a new one (along with any specified indices and/or foreign key
+ * relationships) and import the
+ * @param {sqlite3} db SQlite Database being built
+ * @param {RTTableSchema} table The Right Track Table Schema
+ * @param {string} source_dir The directory of the source file
+ * @param {function} callback Callback function(err) called when init is finished
+ */
+function init(db, table, source_dir, callback) {
   console.log("    ..." + table.name);
 
   // Create the Table
   create(db, table, function() {
 
     // Source File
-    let file = path.normalize(gtfs_dir + "/" + table.source);
+    let file = path.normalize(source_dir + "/" + table.source);
 
     // Make sure source exists
     if ( !fs.existsSync(file) ) {
@@ -29,6 +43,12 @@ function init(db, table, gtfs_dir, callback) {
 }
 
 
+/**
+ * Create the table in the database
+ * @param {sqlite3} db SQLite Database being built
+ * @param {RTTableSchema} table The Right Track Table Schema
+ * @param {function} callback Callback function(err) called when create is finished
+ */
 function create(db, table, callback) {
 
   // Drop Table
@@ -78,7 +98,13 @@ function create(db, table, callback) {
 }
 
 
-
+/**
+ * Load the source file into the database
+ * @param {sqlite3} db SQLite database being built
+ * @param {RTTableSchema} table The Right Track Table Schema
+ * @param {string} file Full path to source file
+ * @param {function} callback Callback function(err) called when load is finished
+ */
 function load(db, table, file, callback) {
   let readHeaders = false;
   let headers = [];
@@ -164,17 +190,23 @@ function load(db, table, file, callback) {
 }
 
 
-
-
-
-
+/**
+ * Split a line from a source file into separate fields.  Remove all
+ * double and single quotes from the field
+ * @param {string} str The line from the source file
+ * @returns {Array} List of parsed fields
+ * @private
+ */
 function _split(str) {
   let items = str.split(',');
   for ( let i = 0; i < items.length; i++ ) {
     let item = items[i];
-    if (item.charAt(0) === '"' && item.charAt(item.length -1) === '"') {
-      item = item.substr(1,item.length -2);
+    if ( item.indexOf("\"") > -1 ) {
+      item = item.replace(/"/g, "");
     }
+    // if (item.charAt(0) === '"' && item.charAt(item.length -1) === '"') {
+    //   item = item.substr(1,item.length -2);
+    // }
     if ( item.indexOf("'") > -1 ) {
       item = item.replace(/'/g, "");
     }

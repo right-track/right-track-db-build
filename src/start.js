@@ -1,7 +1,13 @@
 'use strict';
 
-const update = require('./update/run.js');
-const compile = require('./compile/run.js');
+/**
+ * Right Track Database Builder: start GTFS update and database compilation
+ * @module /start
+ */
+
+
+const update = require('./update/');
+const compile = require('./compile/');
 const chalk = require('chalk');
 const log = console.log;
 const info = function(text) {console.log(chalk.yellow(text))};
@@ -19,10 +25,10 @@ let started = new Date();
 
 
 /**
- * Start the entire update / compilation process with the provided options
+ * Start the entire update and compilation process with the provided options
  * @param {Options} options DB Build Options
  */
-function run(options) {
+function start(options) {
   OPTIONS = options;
   //_update();                  // TODO: uncomment
   _compile();   // TODO: remove
@@ -127,4 +133,4 @@ function _finished() {
 
 
 
-module.exports = run;
+module.exports = start;

@@ -8,26 +8,12 @@ process.title = require('../package.json').name;
 const path = require('path');
 const props = require('../package.json');
 const config = require('../config.json');
-const run = require('./run.js');
+const start = require('./start.js');
 const chalk = require('chalk');
 const log = console.log;
 const info = function(text) {console.log(chalk.yellow(text))};
 const error = function(text) {console.error(chalk.bold.red(text))};
 
-
-/**
- * Right Track DB Build Options
- * @typedef {Object} Options
- * @property {boolean} force Force update and compile flag
- * @property {Object[]} agencies List of agencies to check for updates & compile
- * @property {string} agencies[].require The agency module require name or path
- * @property {string} [agencies[].config] The agency module additional configuration file path
- * @property {string} [agencies[].notes] The agency update notes to be included in the database
- * @property {RightTrackAgency} agencies[].agency The `RightTrackAgency` Class for the agency
- * @property {boolean} agencies[].update The data update & database compilation flag
- * @property {string} post The path to the post-update script
- * @property {string[]} errors The list of errors encountered throughout the entire build process
- */
 
 
 /**
@@ -54,7 +40,7 @@ log("Started: " + started);
 _parseAgencies();
 
 // Start the Update Check & DB Compilation process
-run(OPTIONS);
+start(OPTIONS);
 
 
 
@@ -241,7 +227,7 @@ function _parseAgencies() {
 /**
  * Load the specified agency and read the agency config, if specified
  * @param {object} options agency options (as parsed from cli)
- * @returns {object} options with RightTrackAgency added
+ * @returns {object} agency options with RightTrackAgency added
  * @private
  */
 function _loadAgency(options) {
@@ -261,6 +247,7 @@ function _loadAgency(options) {
     // Add loaded agency to options
     options.agency = agency;
 
+    // Return the modified options
     return options;
   }
   catch(exception) {

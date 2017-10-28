@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * Right Track Database Builder: default agency GTFS update check
+ * @module /update/default
+ */
+
 const fs = require('fs');
 const path = require('path');
 const URL = require('url');
@@ -20,17 +25,27 @@ let ERRORS = [];
 
 
 /**
- * Check to see if we need to update the GTFS files and rebuild the database
+ * This is the built-in default agency update check.  This function is used
+ * if the agency configuration contains the property `build.updateURL`.
+ *
+ * • First, it performs a `HEAD` request on the update URL to get the server's
+ * `last-modified` header.  It will compare this date/time to the one saved
+ * in the agency's gtfs directory in the `lastModified.txt` file.
+ *
+ * • If the `lastModified.txt` file is not found or has an older date/time
+ * than the one provided in the server's `last-modified` header, it will
+ * download the zip file and unzip the contents into the agency's gtfs directory.
+ *
  * @param {boolean} force True to force the update of GTFS files
  * @param {RightTrackAgency} agency the Right Track Agency to update
- * @param {function} updateCallback callback function accepting update boolean
+ * @param {updateCallback} callback callback function when update is complete
  */
-function update(force, agency, updateCallback) {
+function defaultUpdate(force, agency, callback) {
   log("--> Checking for GTFS data update...");
 
   // Set agency and callback functions
   AGENCY = agency;
-  UPDATE_CALLBACK = updateCallback;
+  UPDATE_CALLBACK = callback;
   ERRORS = [];
 
   // If we are forced to update...
@@ -174,4 +189,4 @@ function _finish(update) {
 
 
 
-module.exports = update;
+module.exports = defaultUpdate;
