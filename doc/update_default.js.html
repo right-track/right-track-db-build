@@ -1,0 +1,251 @@
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>update/default.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils.html">/compile/utils</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils.html#~load">load</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">update/default.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * Right Track Database Builder: default agency GTFS update check
+ * @module /update/default
+ */
+
+const fs = require('fs');
+const path = require('path');
+const URL = require('url');
+const http = require('http');
+const Zip = require('adm-zip');
+const config = require('../../config.json');
+const log = console.log;
+
+
+// Agency Properties and callback functions
+let AGENCY = undefined;
+let UPDATE_CALLBACK = function() {};
+
+
+// List of Errors
+let ERRORS = [];
+
+
+
+/**
+ * This is the built-in default agency update check.  This function is used
+ * if the agency configuration contains the property `build.updateURL`.
+ *
+ * • First, it performs a `HEAD` request on the update URL to get the server's
+ * `last-modified` header.  It will compare this date/time to the one saved
+ * in the agency's gtfs directory in the `lastModified.txt` file.
+ *
+ * • If the `lastModified.txt` file is not found or has an older date/time
+ * than the one provided in the server's `last-modified` header, it will
+ * download the zip file and unzip the contents into the agency's gtfs directory.
+ *
+ * @param {boolean} force True to force the update of GTFS files
+ * @param {RightTrackAgency} agency the Right Track Agency to update
+ * @param {updateCallback} callback callback function when update is complete
+ */
+function defaultUpdate(force, agency, callback) {
+  log("--> Checking for GTFS data update...");
+
+  // Set agency and callback functions
+  AGENCY = agency;
+  UPDATE_CALLBACK = callback;
+  ERRORS = [];
+
+  // If we are forced to update...
+  if ( force ) {
+    return _updateFiles();
+  }
+
+  // Check the last update of the server
+  return _checkLastUpdate();
+
+}
+
+
+/**
+ * Check the remote source server if an update is available
+ * @private
+ */
+function _checkLastUpdate() {
+  // Parse the URL
+  let url = URL.parse(AGENCY.config.build.updateURL);
+
+  // Set request options
+  let options = {
+    method: 'HEAD',
+    host: url.host,
+    path: url.path
+  };
+
+  // Make the request
+  let req = http.request(options, function(res) {
+    let headers = res.headers;
+    let serverLastModified = new Date(headers['last-modified']);
+    _compareLastUpdate(serverLastModified);
+  });
+  req.end();
+}
+
+
+
+/**
+ * Compare the Server's last modified date with that saved on the local machine
+ * @param {Date} server The Last Modified Date from the Server
+ * @private
+ */
+function _compareLastUpdate(server) {
+  let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.lastModified);
+
+  // Check if our last modified file exists
+  if ( fs.existsSync(lastModifiedFile) ) {
+
+    let ts = fs.readFileSync(lastModifiedFile).toString().trim();
+    let local = new Date(ts);
+
+    log("    server: " + server);
+    log("    local: " + local);
+
+    // No update required...
+    if ( server &lt;= local ) {
+      return _finish(false);
+    }
+
+  }
+
+  // Update the GTFS Files
+  return _updateFiles();
+}
+
+
+/**
+ * Download the GTFS files from the source server
+ * @private
+ */
+function _updateFiles() {
+  log("--> Updating GTFS Files...");
+  _downloadZip();
+}
+
+/**
+ * Download the GTFS Zip File
+ * @private
+ */
+function _downloadZip() {
+  let gtfsZip = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.gtfsZip);
+
+  // Set output file
+  let zip = fs.createWriteStream(gtfsZip);
+
+  // Make the request
+  http.get(AGENCY.config.build.updateURL, function(response) {
+    let serverLastModified = response.headers['last-modified'];
+    response.pipe(zip);
+
+    zip.on('finish', function() {
+      zip.close(_unzipFiles(serverLastModified));
+    });
+  }).on('error', function(err) {
+    error("ERROR: Could not download GTFS zip file for agency &lt;" + AGENCY.id + ">");
+    error(err.message);
+    ERRORS.push("Could not download GTFS zip file for agency &lt;" + AGENCY.id + ">");
+    return _finish(false);
+  });
+
+}
+
+/**
+ * Unzip the GTFS Zip file into the GTFS Directory
+ * @param {Date} serverLastModified The last modified date of the server's files
+ * @private
+ */
+function _unzipFiles(serverLastModified) {
+  let gtfsDir = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.gtfsDir);
+  let gtfsZip = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.gtfsZip);
+  let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + config.locations.lastModified);
+
+  // Extract the files
+  let zip = new Zip(gtfsZip);
+  zip.extractAllTo(gtfsDir, true);
+
+  // Remove zip file
+  fs.unlink(gtfsZip, function() {});
+
+  // Update the lastModified file...
+  fs.writeFile(lastModifiedFile, serverLastModified, function() {
+
+    // Return with update flag
+    return _finish(true);
+
+  });
+}
+
+
+/**
+ * Function to call when the update process if finished
+ * @param {boolean} update Update requested flag
+ * @private
+ */
+function _finish(update) {
+  UPDATE_CALLBACK(ERRORS, update);
+}
+
+
+
+
+module.exports = defaultUpdate;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 28 2017 18:16:17 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

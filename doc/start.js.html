@@ -1,0 +1,195 @@
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>start.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils.html">/compile/utils</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils.html#~load">load</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">start.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * Right Track Database Builder: start GTFS update and database compilation
+ * @module /start
+ */
+
+
+const update = require('./update/');
+const compile = require('./compile/');
+const chalk = require('chalk');
+const log = console.log;
+const info = function(text) {console.log(chalk.yellow(text))};
+const error = function(text) {console.error(chalk.bold.red(text))};
+
+
+
+// Build Options
+let OPTIONS = undefined;
+
+// Start time (when the file is required)
+let started = new Date();
+
+
+
+
+/**
+ * Start the entire update and compilation process with the provided options
+ * @param {Options} options DB Build Options
+ */
+function start(options) {
+  OPTIONS = options;
+  //_update();                  // TODO: uncomment
+  _compile();   // TODO: remove
+}
+
+
+
+
+/**
+ * Start the update process
+ * @private
+ */
+function _update() {
+  update(OPTIONS, _updateFinished);
+}
+
+
+
+/**
+ * Callback function when update checks of all agencies are finished
+ * @param {Options} options The Build Options returned from the update script
+ * @private
+ */
+function _updateFinished(options) {
+  OPTIONS = options;
+
+  // Count the number of agencies that need to compile
+  let compileCount = 0;
+  for ( let i = 0; i &lt; OPTIONS.agencies.length; i++ ) {
+    if ( OPTIONS.agencies[i].update ) {
+      compileCount++;
+    }
+  }
+
+  log("------------------------------------------------");
+  log("Agencies to Compile: " + compileCount);
+  log("================================================");
+
+
+  // Start the compile process, if needed
+  if ( compileCount > 0 ) {
+    _compile();
+  }
+
+  // No compilation needed...
+  else {
+    _finished();
+  }
+
+}
+
+
+/**
+ * Start the compile process
+ * @private
+ */
+function _compile() {
+  compile(OPTIONS, _compileFinished);
+}
+
+
+/**
+ * Callback function when the compilation of all agencies is complete
+ * @param {Options} options The Build Options returned from the compile script
+ * @private
+ */
+function _compileFinished(options) {
+  OPTIONS = options;
+
+  log("================================================");
+
+  _finished();
+}
+
+
+/**
+ * Callback function when everything is finished
+ * @private
+ */
+function _finished() {
+  let exit = 0;
+  let finished = new Date();
+  let delta = new Date(Math.abs(finished.getTime() - started.getTime()));
+
+  info("UPDATE CHECK AND DATABASE COMPILATION FINISHED");
+  log("------------------------------------------------");
+  log("Finished: " + new Date());
+  log("Run time: " + delta.getUTCMinutes() + " mins " + delta.getUTCSeconds() + " secs");
+  log("================================================");
+
+  if ( OPTIONS.errors.length > 0 ) {
+    exit = 1;
+    error(OPTIONS.errors.length + " ERROR(S) LOGGED");
+    log("------------------------------------------------");
+    for ( let i = 0; i &lt; OPTIONS.errors.length; i++ ) {
+      error("--> " + OPTIONS.errors[i]);
+    }
+  }
+
+  process.exit(exit);
+}
+
+
+
+module.exports = start;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 28 2017 18:16:17 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

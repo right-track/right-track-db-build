@@ -1,0 +1,228 @@
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>compile/index.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils.html">/compile/utils</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils.html#~load">load</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">compile/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * Right Track Database Builder: start database compilation
+ * @module /compile
+ */
+
+const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
+const config = require('../../config.json');
+const gtfs = require('./gtfs');
+const chalk = require('chalk');
+const log = console.log;
+const info = function(text) {console.log(chalk.yellow(text))};
+const error = function(text) {console.error(chalk.bold.red(text))};
+
+
+
+// DB Build Options
+let OPTIONS = undefined;
+
+// Final callback when everything is finished
+let FINAL_CALLBACK = function() {};
+
+// Agency Index Counter
+let CURRENT = -1;
+
+
+
+
+/**
+ * Start the database compilation process
+ * @param {Options} options DB Build Options
+ * @param {mainCallback} callback Callback function when the database compilation is complete
+ */
+function compile(options, callback) {
+  info("RUNNING DATABASE COMPILATION SCRIPTS");
+  log("------------------------------------------------");
+
+  // Set properties
+  OPTIONS = options;
+  FINAL_CALLBACK = callback;
+
+  // Start with the first agency
+  _startNextAgency();
+}
+
+
+
+/**
+ * Start processing the next agency
+ * @private
+ */
+function _startNextAgency() {
+  // Move on to the next agency...
+  CURRENT++;
+
+  // Continue with the next agency if there are more
+  if ( CURRENT &lt; OPTIONS.agencies.length ) {
+    if ( OPTIONS.agencies[CURRENT].update ) {
+      _compile();
+    }
+    else {
+      _startNextAgency();
+    }
+  }
+
+  // All agencies are complete
+  else {
+    _finish();
+  }
+}
+
+
+
+/**
+ * Start with the Database compilation of the next agency.  This starts
+ * compiling the GTFS tables.
+ * @private
+ */
+function _compile() {
+  let agency = OPTIONS.agencies[CURRENT];
+
+  // Start compiling agency...
+  log("AGENCY: " + chalk.bgYellow.black(" " + agency.agency.id + " "));
+
+  // Open Database
+  let db = new sqlite3.Database(
+    path.normalize(agency.agency.moduleDirectory + "/" + config.locations.db),
+    function(err) {
+      if ( err ) {
+        error("ERROR: Could not open database for agency &lt;" + agency.agency.id + ">");
+        OPTIONS.errors.push("Could not open database for agency &lt;" + agency.agency.id + ">");
+        _finishAgency(db);
+      }
+
+      else {
+        _startGtfs(db, agency);
+      }
+    }
+  );
+
+  // DB Error Handler
+  db.on('error', function(err) {
+    error("ERROR: " + err.message + " &lt;" + agency.agency.id + ">");
+    OPTIONS.errors.push(err.message + " &lt;" + agency.agency.id + ">");
+  });
+
+}
+
+
+
+
+/**
+ * Start compiling the GTFS Tables for the agency
+ * @param db SQLite3 database to build
+ * @param agency The agency build options
+ * @private
+ */
+function _startGtfs(db, agency) {
+  gtfs(db, agency, _gtfsFinished);
+}
+
+/**
+ * Callback function for when the GTFS Tables have been built
+ * @param db SQLite database that was built
+ * @private
+ */
+function _gtfsFinished(db) {
+  _finishAgency(db, true);
+}
+
+
+
+
+/**
+ * Callback function for when the agency is finished compiling
+ * @param db SQLite database that was built
+ * @param compiled Successful compilation flag
+ * @private
+ */
+function _finishAgency(db, compiled=false) {
+
+  // Close database connection
+  if ( db !== undefined ) {
+    db.close();
+  }
+
+  // Flag the agency as compiled
+  OPTIONS.agencies[CURRENT].compile = compiled;
+
+  // Continue to the next agency
+  _startNextAgency();
+}
+
+
+
+
+/**
+ * Callback function for when all agencies have finished compiling
+ * @private
+ */
+function _finish() {
+  FINAL_CALLBACK(OPTIONS);
+}
+
+
+
+module.exports = compile;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 28 2017 18:16:17 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
