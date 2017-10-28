@@ -1,0 +1,14 @@
+{
+    "options": {
+        "force": false,
+        "agencies": [],
+        "errors": []
+    },
+    "locations": {
+        "buildDir": "./db-build/",
+        "db": "./db-build/database.db",
+        "gtfsDir": "./db-build/gtfs/",
+        "lastModified": "./db-build/gtfs/lastModified.txt",
+        "gtfsZip": "./db-build/gtfs/gtfs.zip"
+    }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "right-track-db-build",
+  "version": "0.0.1",
+  "description": "Right Track DB Generator",
+  "author": "David Waring <dev@davidwaring.net> (https://davidwaring.net)",
+  "license": "MIT",
+  "main": "src/cli.js",
+  "scripts": {
+    "docs": "jsdoc -c jsdoc.json --readme README.md --template $NODE_PATH/docdash"
+  },
+  "dependencies": {
+    "adm-zip": "^0.4.7",
+    "chalk": "^2.2.0",
+    "right-track-agency": "~1.1.0",
+    "sqlite3": "^3.1.13"
+  },
+  "homepage": "https://righttrack.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/right-track/right-track-db-build.git"
+  },
+  "bugs": {
+    "url": "https://github.com/right-track/right-track-db-build/issues",
+    "email": "dev@davidwaring.net"
+  }
+}
