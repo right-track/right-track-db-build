@@ -194,11 +194,12 @@ function load(db, table, file, callback) {
 
 /**
  * Add the specified values into the table
- * @param {sqlite3} db The SQLite database being built
+ * @param {sqlite3} db SQLite database being built
  * @param {RTTableSchema} table The Right Track Table Schema
  * @param {object[]} values List of data to add to table.  Each object is a set
  * of data keypairs where the property name is the column header name and the
- * value is the data value to add.
+ * value is the data value to add.  Property names must match field names as
+ * specified in the `RTTableSchema`.
  * @param {function} callback Callback function(err) called when the data has been added
  */
 function add(db, table, values, callback) {
@@ -220,7 +221,7 @@ function add(db, table, values, callback) {
           let field = _findField(property, table.fields);
 
           if ( field !== undefined ) {
-            columns += property + ", ";
+            columns += field.name + ", ";
             if ( field.type.toUpperCase() === "TEXT" ) {
               data += "'" + value[property] + "', ";
             }

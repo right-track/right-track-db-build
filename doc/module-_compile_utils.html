@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils.html">/compile/utils</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils.html#~load">load</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils.html">/compile/utils</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils.html#~add">add</a></li><li data-type='method'><a href="module-_compile_utils.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils.html#~load">load</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <div id="main">
@@ -151,7 +151,7 @@
 
     
 
-    <h4 class="name" id="~create"><span class="type-signature">(inner) </span>create<span class="signature">(db, table, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~add"><span class="type-signature">(inner) </span>add<span class="signature">(db, table, values, callback)</span><span class="type-signature"></span></h4>
 
     
 
@@ -163,7 +163,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compile_utils.js.html">compile/utils.js</a>, <a href="compile_utils.js.html#line52">line 52</a>
+        <a href="compile_utils.js.html">compile/utils.js</a>, <a href="compile_utils.js.html#line205">line 205</a>
     </li></ul></dd>
     
 
@@ -203,7 +203,212 @@
 
 
 <div class="description">
-    <p>Create the table in the database</p>
+    <p>Add the specified values into the table</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>db</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">sqlite3</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>SQLite database being built</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>table</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#RTTableSchema">RTTableSchema</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The Right Track Table Schema</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>values</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;object></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>List of data to add to table.  Each object is a set
+of data keypairs where the property name is the column header name and the
+value is the data value to add.  Property names must match field names as
+specified in the <code>RTTableSchema</code>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Callback function(err) called when the data has been added</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~create"><span class="type-signature">(inner) </span>create<span class="signature">(db, table, callback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="compile_utils.js.html">compile/utils.js</a>, <a href="compile_utils.js.html#line51">line 51</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Create the table in the database, along with indices and foreign keys</p>
 </div>
 
 
@@ -384,7 +589,7 @@
 <div class="description">
     <p>Initialize the Table in the database.  This will drop an existing table,
 create a new one (along with any specified indices and/or foreign key
-relationships) and import the</p>
+relationships) and import the data from the specified the source file.</p>
 </div>
 
 
@@ -749,7 +954,7 @@ relationships) and import the</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Oct 28 2017 18:16:17 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 30 2017 13:53:19 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

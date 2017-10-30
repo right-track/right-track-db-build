@@ -12,7 +12,8 @@ const TABLE = {
     {
       "name": "service_id",
       "type": "TEXT",
-      "attributes": "NOT NULL"
+      "attributes": "NOT NULL",
+      "index": true
     },
     {
       "name": "date",

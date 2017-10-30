@@ -55,6 +55,7 @@ const TABLE = {
     {
       "name": "wheelchair_accessible",
       "type": "INTEGER",
+      "attributes": "DEFAULT 0",
       "source_name": "wheelchair_boarding"
     },
     {

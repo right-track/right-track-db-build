@@ -24,6 +24,7 @@ let CALLBACK = function() {};
  * @param {object} agency The agency build options
  * @param {function} callback Callback function (with no arguments) called when
  * all GTFS builders have finished
+ * @private
  */
 function buildGTFS(db, agency, callback) {
   console.log("--> Building GTFS Tables:");
