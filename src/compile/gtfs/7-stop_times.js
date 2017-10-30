@@ -34,6 +34,7 @@ const TABLE = {
       "name": "stop_id",
       "type": "TEXT",
       "attributes": "NOT NULL",
+      "index": true,
       "foreignKey": {
         "table": "gtfs_stops",
         "field": "stop_id"
@@ -68,11 +69,13 @@ const TABLE = {
     },
     {
       "name": "arrival_time_seconds",
-      "type": "INTEGER"
+      "type": "INTEGER",
+      "index": true
     },
     {
       "name": "departure_time_seconds",
-      "type": "INTEGER"
+      "type": "INTEGER",
+      "index": true
     }
   ]
 };
@@ -95,7 +98,7 @@ function run(db, gtfs_dir, callback) {
 
 
 function _calcArrivalSecs(db, callback) {
-  console.log("       ...checking arrival seconds");
+  console.log("        ... Calculating arrival seconds");
 
   db.all("SELECT DISTINCT arrival_time FROM " + TABLE.name + ";",
     function(err, rows) {
@@ -128,7 +131,7 @@ function _updateArrivalRow(db, rows, count, callback) {
 
 
 function _calcDepartureSecs(db, callback) {
-  console.log("       ...checking departure seconds");
+  console.log("        ... Calculating departure seconds");
 
   db.all("SELECT DISTINCT departure_time FROM " + TABLE.name + ";",
     function(err, rows) {

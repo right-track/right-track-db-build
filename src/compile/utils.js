@@ -20,7 +20,6 @@ const path = require('path');
  * @param {function} callback Callback function(err) called when init is finished
  */
 function init(db, table, source_dir, callback) {
-  console.log("    ..." + table.name);
 
   // Create the Table
   create(db, table, function() {
@@ -50,6 +49,7 @@ function init(db, table, source_dir, callback) {
  * @param {function} callback Callback function(err) called when create is finished
  */
 function create(db, table, callback) {
+  console.log("        ... Creating " + table.name);
 
   // Drop Table
   let drop = "DROP TABLE IF EXISTS " + table.name + ";";
@@ -106,6 +106,8 @@ function create(db, table, callback) {
  * @param {function} callback Callback function(err) called when load is finished
  */
 function load(db, table, file, callback) {
+  console.log("        ... Importing " + path.basename(file));
+
   let readHeaders = false;
   let headers = [];
 

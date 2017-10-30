@@ -75,7 +75,7 @@ function run(db, gtfs_dir, callback) {
  * @private
  */
 function _checkRouteNames(db, callback) {
-  console.log("       ...checking route short names");
+  console.log("        ... Checking route short names");
 
   let sql = "";
   db.each("SELECT route_short_name, route_long_name FROM " + TABLE.name + ";",

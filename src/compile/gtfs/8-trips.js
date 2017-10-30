@@ -77,7 +77,7 @@ function run(db, gtfs_dir, callback) {
 
 
 function _checkTripHeadsigns(db, callback) {
-  console.log("       ...checking trip headsigns");
+  console.log("        ... Checking trip headsigns");
 
   db.all("SELECT trip_id FROM " + TABLE.name + ";",
     function(err, rows) {
