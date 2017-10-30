@@ -35,7 +35,7 @@
 /**
  * Right Track Table Schema
  * @typedef {Object} RTTableSchema
- * @property {string} source Name of source file
+ * @property {string} [source] Name of source file
  * @property {string} name Name of table in the final database
  * @property {Object[]} fields List of table fields
  * @property {string} fields[].name Name of field (will be column name in final table and must source file header name unless `source_name` is specified)

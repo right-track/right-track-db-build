@@ -13,7 +13,7 @@ const path = require('path');
 /**
  * Initialize the Table in the database.  This will drop an existing table,
  * create a new one (along with any specified indices and/or foreign key
- * relationships) and import the
+ * relationships) and import the data from the specified the source file.
  * @param {sqlite3} db SQlite Database being built
  * @param {RTTableSchema} table The Right Track Table Schema
  * @param {string} source_dir The directory of the source file
@@ -43,7 +43,7 @@ function init(db, table, source_dir, callback) {
 
 
 /**
- * Create the table in the database
+ * Create the table in the database, along with indices and foreign keys
  * @param {sqlite3} db SQLite Database being built
  * @param {RTTableSchema} table The Right Track Table Schema
  * @param {function} callback Callback function(err) called when create is finished
@@ -193,6 +193,74 @@ function load(db, table, file, callback) {
 
 
 /**
+ * Add the specified values into the table
+ * @param {sqlite3} db The SQLite database being built
+ * @param {RTTableSchema} table The Right Track Table Schema
+ * @param {object[]} values List of data to add to table.  Each object is a set
+ * of data keypairs where the property name is the column header name and the
+ * value is the data value to add.
+ * @param {function} callback Callback function(err) called when the data has been added
+ */
+function add(db, table, values, callback) {
+  console.log("        ... Adding data to " + table.name);
+  db.serialize(function() {
+    db.exec("BEGIN TRANSACTION");
+
+    // Loop through all of the values to add
+    for ( let i = 0; i < values.length; i++ ) {
+      let value = values[i];
+      let columns = "";
+      let data = "";
+
+      // Loop through value's properties
+      for ( let property in value ) {
+        if ( value.hasOwnProperty(property) ) {
+
+          // Check field is set in table schema
+          let field = _findField(property, table.fields);
+
+          if ( field !== undefined ) {
+            columns += property + ", ";
+            if ( field.type.toUpperCase() === "TEXT" ) {
+              data += "'" + value[property] + "', ";
+            }
+            else {
+              data += value[property] + ", ";
+            }
+          }
+          else {
+            console.log("WARNING: Field " + property + " not found in table schema for table " + table.name);
+          }
+
+        }
+      }
+
+      // Trim last commas and spaces
+      if ( columns.indexOf(", ") > -1 ) {
+        columns = columns.substring(0, columns.length - 2);
+      }
+      if ( data.indexOf(", ") > -1 ) {
+        data = data.substring(0, data.length - 2);
+      }
+
+      // Build and run SQL statement
+      let sql = "INSERT INTO " + table.name + " (" + columns + ") VALUES (" + data + ");";
+      db.exec(sql);
+    }
+
+    db.exec("COMMIT", function() {
+      callback();
+    });
+  });
+}
+
+
+
+
+// ==== HELPER FUNCTIONS ===== //
+
+
+/**
  * Split a line from a source file into separate fields.  Remove all
  * double and single quotes from the field
  * @param {string} str The line from the source file
@@ -206,9 +274,6 @@ function _split(str) {
     if ( item.indexOf("\"") > -1 ) {
       item = item.replace(/"/g, "");
     }
-    // if (item.charAt(0) === '"' && item.charAt(item.length -1) === '"') {
-    //   item = item.substr(1,item.length -2);
-    // }
     if ( item.indexOf("'") > -1 ) {
       item = item.replace(/'/g, "");
     }
@@ -218,6 +283,15 @@ function _split(str) {
 }
 
 
+/**
+ * Find the data field in the table schema based on the
+ * name or source_name of the field
+ * @param {string} name Lookup table field name
+ * @param {object[]} fields RT Table Schema fields
+ * @returns {object|undefined} RT Table Schema for matching field
+ * or undefined if no match found.
+ * @private
+ */
 function _findField(name, fields) {
   for ( let i = 0; i < fields.length; i++ ) {
     let field = fields[i];
@@ -235,5 +309,8 @@ function _findField(name, fields) {
 
 
 module.exports = {
-  init: init
+  init: init,
+  create: create,
+  load: load,
+  add: add
 };
