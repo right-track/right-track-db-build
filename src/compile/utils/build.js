@@ -1,41 +1,39 @@
 'use strict';
 
 /**
- * Database compilation utility functions
- * @module /compile/utils
+ * #### Database Building Utility Functions
+ *
+ * These functions can be used to:
+ * - create a new table based on a supplied Right Track Table Schema
+ * - load the table with the data from the specified source file
+ * - add a specified set of initial data to a table
+ * @module /compile/utils/build
  */
 
 const rl = require('readline');
 const fs = require('fs');
 const path = require('path');
+const config = require('../../../config.json');
+const chalk = require('chalk');
+const error = function(text) {console.error(chalk.bold.red(text))};
 
 
 /**
  * Initialize the Table in the database.  This will drop an existing table,
  * create a new one (along with any specified indices and/or foreign key
- * relationships) and import the data from the specified the source file.
+ * relationships) and import the data from the table's source file.
  * @param {sqlite3} db SQlite Database being built
  * @param {RTTableSchema} table The Right Track Table Schema
- * @param {string} source_dir The directory of the source file
+ * @param {RightTrackAgency} agency The `RightTrackAgency` Class of the Agency DB being built
  * @param {function} callback Callback function(err) called when init is finished
  */
-function init(db, table, source_dir, callback) {
+function init(db, table, agency, callback) {
 
   // Create the Table
   create(db, table, function() {
 
-    // Source File
-    let file = path.normalize(source_dir + "/" + table.source);
-
-    // Make sure source exists
-    if ( !fs.existsSync(file) ) {
-      callback(new Error("Source file does not exist"));
-    }
-
-    // Import the GTFS file
-    else {
-      load(db, table, file, callback);
-    }
+    // Load the source file into the table
+    load(db, table, agency, callback);
 
   });
 
@@ -102,12 +100,32 @@ function create(db, table, callback) {
  * Load the source file into the database
  * @param {sqlite3} db SQLite database being built
  * @param {RTTableSchema} table The Right Track Table Schema
- * @param {string} file Full path to source file
+ * @param {Object} agency Agency Build Options
  * @param {function} callback Callback function(err) called when load is finished
  */
-function load(db, table, file, callback) {
+function load(db, table, agency, callback) {
+
+  // Determine source file
+  let sourceDirectory = _parseConfigValue(table.sourceDirectory);
+  let sourceFile = _parseConfigValue(table.sourceFile);
+
+  // Add agency module directory to relative paths
+  if ( _isRelativePath(sourceDirectory) ) {
+    sourceDirectory = path.normalize(agency.agency.moduleDirectory + "/" + sourceDirectory);
+  }
+
+  // Build File Path
+  let file = path.normalize(sourceDirectory + "/" + sourceFile);
+
+  // Make sure file actually exists
+  if ( !fs.existsSync(file) ) {
+    return callback(new Error("Source file does not exist (" + file + ")"));
+  }
+
   console.log("        ... Importing " + path.basename(file));
 
+
+  // Source File Headers
   let readHeaders = false;
   let headers = [];
 
@@ -259,6 +277,76 @@ function add(db, table, values, callback) {
 
 
 // ==== HELPER FUNCTIONS ===== //
+
+
+/**
+ * Check if the directory is a relative path (begins with './' or '../')
+ * @param {string} directory Path to directory
+ * @return {boolean} True if the directory is a relative path
+ * @private
+ */
+function _isRelativePath(directory) {
+  if ( typeof directory === 'string' ) {
+    if ( directory.charAt(0) === '.' ) {
+      if ( directory.charAt(1) === '/' ) {
+        return true;
+      }
+      if ( directory.charAt(1) === '.' ) {
+        if ( directory.charAt(2) === '/' ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  else {
+    return false;
+  }
+}
+
+
+/**
+ * Parse the specified String for values in the configuration file.  The
+ * configuration property will be in the format `{{property.name}}`.
+ * @param {string} str The String to parse
+ * @returns {string} The parsed String
+ * @private
+ */
+function _parseConfigValue(str) {
+  if ( str.indexOf("{{") > -1 && str.indexOf("}}") > -1 ) {
+    return _parseConfigObject(str, config);
+  }
+  else {
+    return str;
+  }
+}
+
+/**
+ * Parse the string for properties specified with the specified configuration object
+ * @param {string} str The String to parse
+ * @param {object} config The configuration object being parsed
+ * @param {string} parent The name of the parent
+ * @returns {string} The parsed String
+ * @private
+ */
+function _parseConfigObject(str, config, parent="") {
+  for ( let property in config ) {
+    if ( config.hasOwnProperty(property) ) {
+      if ( typeof config[property] === 'object' ) {
+        if ( parent !== "" ) {
+          parent = parent + ".";
+        }
+        str = _parseConfigObject(str, config[property], parent + property);
+      }
+      else {
+        let name = parent + "." + property;
+        let value = config[property];
+        str = str.replace("{{" + name + "}}", value);
+      }
+    }
+  }
+  return str;
+}
 
 
 /**

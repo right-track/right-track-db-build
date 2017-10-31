@@ -4,7 +4,7 @@
   "description": "Right Track DB Generator",
   "author": "David Waring <dev@davidwaring.net> (https://davidwaring.net)",
   "license": "MIT",
-  "main": "src/index.js",
+  "main": "src/start.js",
   "bin": "src/cli.js",
   "scripts": {
     "docs": "jsdoc -c jsdoc.json --readme README.md --template $NODE_PATH/docdash"

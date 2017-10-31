@@ -8,12 +8,11 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const config = require('../../config.json');
-const gtfs = require('./gtfs');
+const buildDirectory = require('./utils/buildDirectory.js');
 const chalk = require('chalk');
 const log = console.log;
 const info = function(text) {console.log(chalk.yellow(text))};
 const error = function(text) {console.error(chalk.bold.red(text))};
-
 
 
 // DB Build Options
@@ -23,7 +22,8 @@ let OPTIONS = undefined;
 let FINAL_CALLBACK = function() {};
 
 // Agency Index Counter
-let CURRENT = -1;
+let AGENCY = -1;
+
 
 
 
@@ -53,11 +53,11 @@ function compile(options, callback) {
  */
 function _startNextAgency() {
   // Move on to the next agency...
-  CURRENT++;
+  AGENCY++;
 
   // Continue with the next agency if there are more
-  if ( CURRENT < OPTIONS.agencies.length ) {
-    if ( OPTIONS.agencies[CURRENT].update ) {
+  if ( AGENCY < OPTIONS.agencies.length ) {
+    if ( OPTIONS.agencies[AGENCY].update ) {
       _compile();
     }
     else {
@@ -79,7 +79,7 @@ function _startNextAgency() {
  * @private
  */
 function _compile() {
-  let agency = OPTIONS.agencies[CURRENT];
+  let agency = OPTIONS.agencies[AGENCY];
 
   // Start compiling agency...
   log("AGENCY: " + chalk.bgYellow.black(" " + agency.agency.id + " "));
@@ -95,7 +95,7 @@ function _compile() {
       }
 
       else {
-        _startGtfs(db, agency);
+        _build(db, agency);
       }
     }
   );
@@ -108,29 +108,25 @@ function _compile() {
 
 }
 
-
-
-
 /**
- * Start compiling the GTFS Tables for the agency
- * @param db SQLite3 database to build
- * @param agency The agency build options
+ * Build the Database tables by calling the build scripts in the
+ * gtfs and rt directories
+ * @param {sqlite3} db The SQLite Database being built
+ * @param {object} agency The Agency Build Options
  * @private
  */
-function _startGtfs(db, agency) {
-  gtfs(db, agency, _gtfsFinished);
+function _build(db, agency) {
+
+  let gtfsDirectory = path.normalize(__dirname + '/gtfs/');
+  let rtDirectory = path.normalize(__dirname + '/rt/');
+
+  buildDirectory(db, agency, gtfsDirectory, function() {
+    buildDirectory(db, agency, rtDirectory, function() {
+      _finishAgency(db, true);
+    });
+  });
+
 }
-
-/**
- * Callback function for when the GTFS Tables have been built
- * @param db SQLite database that was built
- * @private
- */
-function _gtfsFinished(db) {
-  _finishAgency(db, true);
-}
-
-
 
 
 /**
@@ -142,15 +138,14 @@ function _gtfsFinished(db) {
 function _finishAgency(db, compiled=false) {
 
   // Close database connection
-  if ( db !== undefined ) {
-    db.close();
-  }
+  db.close();
 
   // Flag the agency as compiled
-  OPTIONS.agencies[CURRENT].compile = compiled;
+  OPTIONS.agencies[AGENCY].compile = compiled;
 
   // Continue to the next agency
   _startNextAgency();
+
 }
 
 

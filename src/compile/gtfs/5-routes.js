@@ -1,13 +1,14 @@
 'use strict';
 
-const utils = require('../utils.js');
+const build = require('../utils/build.js');
 const chalk = require('chalk');
 const error = function(text) {console.error(chalk.bold.red(text))};
 
 
 // TABLE STRUCTURE
 const TABLE = {
-  source: "routes.txt",
+  sourceDirectory: "{{locations.gtfsDir}}",
+  sourceFile: "routes.txt",
   name: "gtfs_routes",
   fields: [
     {
@@ -58,8 +59,8 @@ const TABLE = {
 
 
 
-function run(db, gtfs_dir, callback) {
-  utils.init(db, TABLE, gtfs_dir, function(err) {
+function buildTable(db, agency, callback) {
+  build.init(db, TABLE, agency, function(err) {
     if ( err ) {
       error("       WARNING: " + err.message);
     }
@@ -102,4 +103,4 @@ function _checkRouteNames(db, callback) {
 
 
 
-module.exports = run;
+module.exports = buildTable;

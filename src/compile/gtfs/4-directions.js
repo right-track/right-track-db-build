@@ -1,11 +1,12 @@
 'use strict';
 
-const utils = require('../utils.js');
+const build = require('../utils/build.js');
 
 
 // TABLE STRUCTURE
 const TABLE = {
-  name: "gtfs_directions",
+  sourceDirectory: "{{locations.gtfsDir}}",
+  sourceFile: "gtfs_directions",
   fields: [
     {
       "name": "direction_id",
@@ -32,12 +33,12 @@ const VALUES = [
 ];
 
 
-function run(db, gtfs_dir, callback) {
-  utils.create(db, TABLE, function() {
-    utils.add(db, TABLE, VALUES, callback);
+function buildTable(db, agency, callback) {
+  build.create(db, TABLE, function() {
+    build.add(db, TABLE, VALUES, callback);
   });
 }
 
 
 
-module.exports = run;
+module.exports = buildTable;
