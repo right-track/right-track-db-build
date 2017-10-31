@@ -3,7 +3,17 @@
 /**
  * ### Console output helper
  *
- * Display output text to the console in a number of predefined styles
+ * Display output text to the console in a number of predefined styles.
+ *
+ * This module exports the log function which includes the other documented
+ * functions as properties of itself.
+ *
+ * Usage:
+ * ```
+ * const log = require('./log.js');
+ * log("Log a general message");
+ * log.info("Log an informational message");
+ * ```
  * @module helpers/log
  */
 
@@ -20,6 +30,8 @@ let log = function(text) {
 /**
  * Log an information message to the console / stdout
  * @param {string} text Message
+ * @name info
+ * @function
  */
 log.info = function(text) {
   console.log(chalk.yellow(text))
@@ -28,7 +40,9 @@ log.info = function(text) {
 /**
  * Log a warning message to the console / stderr (by default)
  * @param {string} text Message
- * @param {boolean} toStdErr Set to false to print to stdout
+ * @param {boolean} [toStdErr=true] Set to false to print to stdout
+ * @name warning
+ * @function
  */
 log.warning = function(text, toStdErr=true) {
   let raw = chalk.bold.red(text);
@@ -43,7 +57,9 @@ log.warning = function(text, toStdErr=true) {
 /**
  * Log an error message to the console / stderr (by default)
  * @param {string} text Message
- * @param {boolean} toStdErr Set to false to print to stdout
+ * @param {boolean} [toStdErr=true] Set to false to print to stdout
+ * @name error
+ * @function
  */
 log.error = function(text, toStdErr=true) {
   let raw = chalk.bold.bgRed.white(" " + text + " ");
@@ -59,9 +75,13 @@ log.error = function(text, toStdErr=true) {
 /**
  * Explicitly define the console output style.  The components of
  * the output are specified as a list of objects with the properties:
- * "text": The text to display
- * "chalk": <optional> The chalk style components (ex: bgYellow.black)
+ * - "text": The text to display
+ * - "chalk": The chalk style components (ex: bgYellow.black)
  * @param {Object[]} parts List of output style components
+ * @param {string} parts[].text The text to output
+ * @param {string} [parts[].chalk] The chalk style components (ex: bgYellow.black)
+ * @name raw
+ * @function
  */
 log.raw = function(parts) {
   let raw = "";
