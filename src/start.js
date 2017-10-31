@@ -36,6 +36,14 @@ let started = undefined;
 function start() {
   started = new Date();
   errors.reset();
+
+  // Make sure there is at least one agency configured
+  if ( options.agencyCount() === 0 ) {
+    log.error("ERROR: No agencies specified.");
+    log.error("Specify the agencies to include with the --agency flag");
+    process.exit(1);
+  }
+
   _update();
 }
 
@@ -131,12 +139,11 @@ function _finished() {
   let warnings = errors.getWarnings();
   if ( warnings.length > 0 ) {
     exit = 2;
-    log.warning(warnings.length + " WARNING(S) LOGGED");
-    log.warning("------------------------------------------------");
+    log.warning(warnings.length + " WARNING(S) LOGGED", false);
     for ( let i = 0; i < warnings.length; i++ ) {
-      log.warning("--> " + warnings[i].message);
+      log.warning("--> " + warnings[i].message, false);
       if ( warnings[i].details ) {
-        log.warning("    " + warnings[i].details);
+        log.warning("    " + warnings[i].details + " <" + warnings[i].agencyId + ">", false);
       }
     }
   }
@@ -145,12 +152,11 @@ function _finished() {
   let errs = errors.getErrors();
   if ( errs.length > 0 ) {
     exit = 1;
-    log.error(errs.length + " ERROR(S) LOGGED");
-    log.error("------------------------------------------------");
+    log.error(errs.length + " ERROR(S) LOGGED", false);
     for ( let i = 0; i < errs.length; i++ ) {
-      log.error("--> " + errs[i].message);
+      log.error("--> " + errs[i].message, false);
       if ( errs[i].details ) {
-        log.error("    " + errs[i].details);
+        log.error("    " + errs[i].details + " <" + errs[i].agencyId + ">", false);
       }
     }
   }
