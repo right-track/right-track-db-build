@@ -1,8 +1,7 @@
 {
     "options": {
         "force": false,
-        "agencies": [],
-        "errors": []
+        "agencies": []
     },
     "locations": {
         "buildDir": "./db-build/",

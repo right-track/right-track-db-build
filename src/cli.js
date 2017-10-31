@@ -1,28 +1,30 @@
 #!/usr/bin/env node
 'use strict';
 
+/**
+ * ### Command Line Interface
+ *
+ * This module acts as the command line interface for the database builder and
+ * parses the command line arguments and options to build the Database Build
+ * Options ({@link Options}) that are passed to the {@link module:start|start}
+ * module.
+ *
+ * See `node ./src/cli.js --usage` for the script's command line usage.
+ * @module cli
+ */
+
+
+
 // Set process title
 process.title = require('../package.json').name;
 
 
+const fs = require('fs');
 const path = require('path');
 const props = require('../package.json');
-const config = require('../config.json');
+const options = require('./helpers/options.js');
+const log = require('./helpers/log.js');
 const start = require('./start.js');
-const chalk = require('chalk');
-const log = console.log;
-const info = function(text) {console.log(chalk.yellow(text))};
-const error = function(text) {console.error(chalk.bold.red(text))};
-
-
-
-/**
- * The default DB Build Options
- * @type {Options} DB Build Options
- * @private
- */
-let OPTIONS = config.options;
-
 
 
 
@@ -32,7 +34,7 @@ _parseArgs();
 
 // Print start information
 let started = new Date();
-info("======== RIGHT TRACK DATABASE GENERATOR ========");
+log.info("======== RIGHT TRACK DATABASE GENERATOR ========");
 log("Version: " + props.version);
 log("Started: " + started);
 
@@ -40,7 +42,7 @@ log("Started: " + started);
 _parseAgencies();
 
 // Start the Update Check & DB Compilation process
-start(OPTIONS);
+start();
 
 
 
@@ -54,9 +56,6 @@ function _parseArgs() {
 
   // Get cli arguments
   let args = process.argv.slice(2);
-
-  // Agency counter
-  let count = OPTIONS.agencies.length-1;
 
   // Parse arguments
   for ( let i = 0; i < args.length; i++ ) {
@@ -76,46 +75,52 @@ function _parseArgs() {
 
     // --force / -f
     else if ( arg === '--force' || arg === '-f' ) {
-      OPTIONS.force = true;
+      options.setForce();
     }
 
     // --agency / -a
     else if ( arg === '--agency' || arg === '-a' ) {
       i++;
       if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+        log.error("ERROR: agency declaration not defined");
         _usage();
-        process.exit(0);
+        process.exit(1);
       }
       else {
-        count++;
-        OPTIONS.agencies[count] = {};
-        OPTIONS.agencies[count].require = args[i];
-        OPTIONS.agencies[count].update = false;
-        OPTIONS.agencies[count].compile = false;
+        options.addAgency(args[i]);
       }
     }
 
     // --config / -c
     else if ( arg === '--config' || arg === '-c' ) {
       i++;
-      if ( count < 0 || args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+        log.error("ERROR: config file for agency is not defined");
         _usage();
-        process.exit(0);
+        process.exit(1);
       }
       else {
-        OPTIONS.agencies[count].config = args[i];
+        if ( fs.existsSync(args[i]) ) {
+          options.addAgencyConfig(args[i]);
+        }
+        else {
+          log.error("ERROR: config file does not exist (" + args[i] + ")");
+          log.error("Make sure the file path to the config file is correct");
+          process.exit(1);
+        }
       }
     }
 
     // --notes / -n
     else if ( arg === '--notes' || arg === '-n' ) {
       i++;
-      if ( count < 0 || args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+        log.error("ERROR: notes for agency are not defined");
         _usage();
-        process.exit(0);
+        process.exit(1);
       }
       else {
-        OPTIONS.agencies[count].notes = args[i];
+        options.addAgencyNotes(args[i]);
       }
     }
 
@@ -123,26 +128,34 @@ function _parseArgs() {
     else if ( arg === '--post' || arg === '-p' ) {
       i++;
       if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+        log.error("ERROR: post script is not defined");
         _usage();
-        process.exit(0);
+        process.exit(1);
       }
       else {
-        OPTIONS.post = args[i];
+        if ( fs.existsSync(args[i]) ) {
+          options.setPost(args[i]);
+        }
+        else {
+          log.error("ERROR: post script file does not exist (" + args[i] + ")");
+          log.error("Make sure the file path to the post script is correct");
+          process.exit(1);
+        }
       }
     }
 
   }
 
   // Make sure at least one agency is provided
-  if ( count === -1 ) {
+  if ( options.agencyCount() < 1 ) {
     _usage();
     process.exit(0);
   }
 
   // Flag agencies for update when force is set
-  if ( OPTIONS.force ) {
-    for ( let i = 0; i < OPTIONS.agencies.length; i++ ) {
-      OPTIONS.agencies[i].update = true;
+  if ( options.force() ) {
+    for ( let i = 0; i < options.agencyCount(); i++ ) {
+      options.setAgencyUpdate(i, true);
     }
   }
 
@@ -156,59 +169,59 @@ function _parseArgs() {
 function _parseAgencies() {
 
   log("================================================");
-  info("PARSING AGENCIES");
-
-  // Temp agencies
-  let agencies = [];
+  log.info("PARSING AGENCIES");
 
   // Parse each of the agencies
-  for ( let i = 0; i < OPTIONS.agencies.length; i++ ) {
-    let agency = OPTIONS.agencies[i];
+  for ( let i = 0; i < options.agencyCount(); i++ ) {
     let require = undefined;
 
     log("------------------------------------------------");
-    log("AGENCY: " + chalk.bgYellow.black(" " + agency.require + " "));
-
+    log.raw([
+      {
+        "text": "AGENCY:"
+      },
+      {
+        "text": " " + options.agency(i).require + " ",
+        "chalk": "bgYellow.black"
+      }
+    ]);
 
     // Relative path
-    if ( _isRelativePath(agency.require) ) {
-      require = _makeAbsolutePath(agency.require);
+    if ( _isRelativePath(options.agency(i).require) ) {
+      require = _makeAbsolutePath(options.agency(i).require);
+      if ( !fs.existsSync(require) ) {
+        log.error("ERROR: Agency module path not found (" + require + ")");
+        log.error("Make sure the module path is correct and properly referenced.");
+        process.exit(1);
+      }
     }
 
     // Try finding the module by name
     else {
-      require = _lookupModule(agency.require);
+      require = _lookupModule(options.agency(i).require);
     }
 
 
     // Unknown agency
     if ( require === undefined ) {
-      error("ERROR: Undefined agency <" + agency.require +">.");
-      error("Make sure the agency module is installed and properly referenced.");
-      OPTIONS.errors.push("Undefined agency <" + agency.require + ">");
+      log.error("ERROR: Undefined agency <" + options.agency(i).require +">.");
+      log.error("Make sure the agency module is installed and properly referenced.");
+      process.exit(1);
     }
 
-    // Found agency: load the agency, add its options to the list
-    else {
-      agency.require = require;
-      let loaded = _loadAgency(agency);
-      if ( loaded !== undefined ) {
-        agencies.push(loaded);
-      }
-    }
+    // Found agency: load the agency
+    options.agency(i).require = require;
+    _loadAgency(i);
 
   }
 
-  // Replace agencies
-  OPTIONS.agencies = agencies;
-
   // Check for duplicate agency declarations
   let locations = [];
-  for ( let i = 0; i < OPTIONS.agencies.length; i++ ) {
-    let agency = OPTIONS.agencies[i];
+  for ( let i = 0; i < options.agencyCount(); i++ ) {
+    let agency = options.agency(i);
     if ( locations.includes(agency.agency.moduleDirectory) ) {
-      error("ERROR: Duplicate agency declaration");
-      error("       Module location: " + agency.agency.moduleDirectory);
+      log.error("ERROR: Duplicate agency declaration");
+      log.error("Module location: " + agency.agency.moduleDirectory);
       process.exit(1);
     }
     else {
@@ -218,7 +231,7 @@ function _parseAgencies() {
 
   // Output parsed info
   log("------------------------------------------------");
-  log("Agencies Parsed: " + OPTIONS.agencies.length);
+  log("Agencies Parsed: " + options.agencyCount());
   log("================================================");
 
 }
@@ -226,34 +239,30 @@ function _parseAgencies() {
 
 /**
  * Load the specified agency and read the agency config, if specified
- * @param {object} options agency options (as parsed from cli)
- * @returns {object} agency options with RightTrackAgency added
+ * @param {object} i Index of agency to load
  * @private
  */
-function _loadAgency(options) {
+function _loadAgency(i) {
 
-  log("==> LOADING MODULE: " + options.require);
+  log("==> LOADING MODULE: " + options.agency(i).require);
 
   // Load agency & read agency config
   try {
-    let agency = require(options.require);
-    if ( options.config !== undefined ) {
-      agency.readConfig(options.config);
+    let agency = require(options.agency(i).require);
+    if ( options.agency(i).config !== undefined ) {
+      agency.readConfig(options.agency(i).config);
     }
 
     // Test the getConfig function
     agency.getConfig();
 
     // Add loaded agency to options
-    options.agency = agency;
-
-    // Return the modified options
-    return options;
+    options.agency(i).agency = agency;
   }
   catch(exception) {
-    error("ERROR: could not load agency <" + options.require + ">");
-    OPTIONS.errors.push("Could not load agency <" + options.require + ">");
-    return undefined;
+    log.error("ERROR: could not load agency module <" + options.agency(i).require + ">");
+    log.error("Make sure the module is a Right Track Agency module");
+    process.exit(1);
   }
 
 }
