@@ -19,11 +19,10 @@
  */
 
 /**
- * Main process callback function
- * @callback mainCallback
- * @param {Options} options The DB Build Options, which may have been
- * modified (ie, flagging an agency with an update, adding errors to
- * the list) by the calling function.
+ * Start process callback function.
+ * These callback functions are used to return to the main update / compilation
+ * process started by the {@link module:start|start} module.
+ * @callback startCallback
  */
 
 /**
