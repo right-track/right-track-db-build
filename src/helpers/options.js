@@ -112,6 +112,14 @@ function force() {
 }
 
 /**
+ * Get the Post-compile script location
+ * @returns {string}
+ */
+function post() {
+  return OPTIONS.post;
+}
+
+/**
  * Get the number of agencies added to the Database Build Options
  * @returns {int}
  */
@@ -139,6 +147,7 @@ module.exports = {
   addAgencyNotes: addAgencyNotes,
   get: get,
   force: force,
+  post: post,
   agencyCount: agencyCount,
   agency: agency
 };
