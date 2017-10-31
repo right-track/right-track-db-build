@@ -19,13 +19,22 @@
 
 const chalk = require('chalk');
 
+
+
 /**
  * Log a general message to the console / stdout
  * @param {string} text Message
+ * @property {function} info See {@link info}
+ * @property {function} warning See {@link warning}
+ * @property {function} error See {@link error}
+ * @property {function} raw See {@link raw}
  */
 let log = function(text) {
   console.log(text);
 };
+
+
+
 
 /**
  * Log an information message to the console / stdout
