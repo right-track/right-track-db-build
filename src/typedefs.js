@@ -5,16 +5,17 @@
 /**
  * Right Track DB Build Options
  * @typedef {Object} Options
- * @property {boolean} force Force update and compile flag
+ * @property {boolean} force=false Force update and compile flag
+ * @property {string} [post] The path to the post-update script
  * @property {Object[]} agencies List of agencies to check for updates & compile
  * @property {string} agencies[].require The agency module require name or path
  * @property {string} [agencies[].config] The agency module additional configuration file path
  * @property {string} [agencies[].notes] The agency update notes to be included in the database
  * @property {RightTrackAgency} agencies[].agency The `RightTrackAgency` Class for the agency
- * @property {boolean} agencies[].update The GTFS data update flag (true when the GTFS data has been updated)
- * @property {boolean} agencies[].compile The DB compilation flag (true when the DB has been compiled)
- * @property {string} post The path to the post-update script
- * @property {string[]} errors The list of errors encountered throughout the entire build process
+ * @property {boolean} agencies[].update=false The GTFS data update flag (true when a GTFS data update is requested)
+ * @property {boolean} agencies[].updateComplete=false The GTFS data update success flag (true when GTFS data is successfully updated)
+ * @property {boolean} agencies[].compile=false The DB compilation flag (true when the DB compilation is requested)
+ * @property {boolean} agencies[].compileComplete=false The DB compilation success flag (true when DB is successfully compiled)
  */
 
 /**
@@ -46,4 +47,13 @@
  * @property {Object} [fields[].foreignKey] Set a foreign key relationship with this field
  * @property {string} fields[].foreignKey.table Foreign Table Name
  * @property {string} fields[].foreignKey.field Foreign Field Name
+ */
+
+/**
+ * Right Track Database Builder Exception (Warning/Error)
+ * @typedef {Object} RTException
+ * @property {int} type The type of Exception (Warning or Error)
+ * @property {string} message The Exception message
+ * @property {string} [details] The Exception details
+ * @property {string} [agencyId] The Agency Code of the Agency that invoked the Exception
  */
