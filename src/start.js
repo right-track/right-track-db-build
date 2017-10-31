@@ -30,7 +30,8 @@ let started = undefined;
 // ==== MAIN ENTRY POINT ==== //
 
 /**
- * Start the entire update and compilation process with the provided options
+ * Start the entire update and compilation process with the options
+ * set in the {@link module:helpers/options|options} module
  */
 function start() {
   started = new Date();

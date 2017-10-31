@@ -155,7 +155,8 @@ function _parseArgs() {
   // Flag agencies for update when force is set
   if ( options.force() ) {
     for ( let i = 0; i < options.agencyCount(); i++ ) {
-      options.setAgencyUpdate(i, true);
+      options.agency(i).update = true;
+      options.agency(i).compile = true;
     }
   }
 
@@ -239,7 +240,7 @@ function _parseAgencies() {
 
 /**
  * Load the specified agency and read the agency config, if specified
- * @param {object} i Index of agency to load
+ * @param {int} i Index of agency to load
  * @private
  */
 function _loadAgency(i) {

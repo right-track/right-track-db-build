@@ -20,33 +20,45 @@ let OPTIONS = config.options;
 
 
 
-let options = function(options=undefined) {
-  if ( options ) {
-    OPTIONS = options;
-  }
-  else {
-    return OPTIONS;
-  }
-};
-
-
 
 // ==== SETTERS ==== //
 
-options.setForce = function(force=true) {
+/**
+ * Set the Right Track Database Build Options
+ * @param {Options} options The Build Options
+ */
+function set(options) {
+  if ( options ) {
+    OPTIONS = options;
+  }
+}
+
+/**
+ * Set the force update and compilation flag
+ * @param force
+ */
+function setForce(force=true) {
   OPTIONS.force = force;
-};
+}
 
 
-options.setPost = function(script) {
+/**
+ * Set the Database Post-Compile Script to run after the
+ * database update and compilation process is complete
+ * @param {string} script Path to post-compile script
+ */
+function setPost(script) {
   if ( script ) {
     OPTIONS.post = script;
   }
-};
+}
 
 
-
-options.addAgency = function(require) {
+/**
+ * Add a new agency to the Database Build Options
+ * @param {string} require Right Track Agency `require` location
+ */
+function addAgency(require) {
   if ( require ) {
     let agency = {};
     agency.require = require;
@@ -57,67 +69,76 @@ options.addAgency = function(require) {
 
     OPTIONS.agencies.push(agency);
   }
-};
+}
 
-options.addAgencyConfig = function(config) {
+/**
+ * Add an agency configuration file to the most recently added Agency
+ * @param {string} config Path to agency configuration file
+ */
+function addAgencyConfig(config) {
   if ( config && OPTIONS.agencies.length > 0 ) {
     OPTIONS.agencies[OPTIONS.agencies.length-1].config = config;
   }
-};
+}
 
-options.addAgencyNotes = function(notes) {
+/**
+ * Add database compilation notes to the most recently added Agency
+ * @param {string} notes Database compilation notes
+ */
+function addAgencyNotes(notes) {
   if ( notes && OPTIONS.agencies.length > 0 ) {
     OPTIONS.agencies[OPTIONS.agencies.length-1].notes = notes;
   }
-};
-
-
-
-options.setAgencyUpdate = function(index, update=true) {
-  if ( index >= 0 && index < OPTIONS.agencies.length ) {
-    OPTIONS.agencies[index].update = update;
-  }
-};
-
-options.setAgencyUpdateComplete = function(index, complete=true) {
-  if ( index >= 0 && index < OPTIONS.agencies.length ) {
-    OPTIONS.agencies[index].updateComplete = complete;
-  }
-};
-
-options.setAgencyCompile = function(index, compile=true) {
-  if ( index >= 0 && index < OPTIONS.agencies.length ) {
-    OPTIONS.agencies[index].compile = compile;
-  }
-};
-
-options.setAgencyCompileComplete = function(index, complete=true) {
-  if ( index >= 0 && index < OPTIONS.agencies.length ) {
-    OPTIONS.agencies[index].compileComplete = complete;
-  }
-};
-
+}
 
 
 
 // ==== GETTERS ==== //
 
-options.get = function() {
+/**
+ * Get the Database Build Options
+ * @returns {Options}
+ */
+function get() {
   return OPTIONS;
-};
+}
 
-options.force = function() {
+/**
+ * Get the Force flag
+ * @returns {boolean}
+ */
+function force() {
   return OPTIONS.force;
-};
+}
 
-options.agencyCount = function() {
+/**
+ * Get the number of agencies added to the Database Build Options
+ * @returns {int}
+ */
+function agencyCount() {
   return OPTIONS.agencies.length;
-};
+}
 
-options.agency = function(index) {
+/**
+ * Get the agency's build options
+ * @param {int} index Agency index
+ * @returns {object} Agency Build Options
+ */
+function agency(index) {
   return OPTIONS.agencies[index];
+}
+
+
+
+module.exports = {
+  set: set,
+  setForce: setForce,
+  setPost: setPost,
+  addAgency: addAgency,
+  addAgencyConfig: addAgencyConfig,
+  addAgencyNotes: addAgencyNotes,
+  get: get,
+  force: force,
+  agencyCount: agencyCount,
+  agency: agency
 };
-
-
-
-module.exports = options;
