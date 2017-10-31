@@ -71,7 +71,7 @@ const TABLE = {
 function buildTable(db, agency, callback) {
   build.init(db, TABLE, agency, function(err) {
     if ( err ) {
-      error("       WARNING: " + err.message);
+      error("        WARNING: " + err.message);
     }
     _checkTripHeadsigns(db, callback);
   });

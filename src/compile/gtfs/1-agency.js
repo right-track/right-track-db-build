@@ -8,7 +8,7 @@ const error = function(text) {console.error(chalk.bold.red(text))};
 // TABLE STRUCTURE
 const TABLE = {
   sourceDirectory: "{{locations.gtfsDir}}",
-  sourceFile: "agencys.txt",
+  sourceFile: "agency.txt",
   name: "gtfs_agency",
   fields: [
     {
