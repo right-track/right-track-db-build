@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>compile/utils.js - Documentation</title>
+    <title>compile/utils/build.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -24,12 +24,12 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils.html">/compile/utils</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils.html#~add">add</a></li><li data-type='method'><a href="module-_compile_utils.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils.html#~load">load</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils_build.html">/compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-_compile_utils_buildDirectory.html">/compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <div id="main">
     
-    <h1 class="page-title">compile/utils.js</h1>
+    <h1 class="page-title">compile/utils/build.js</h1>
     
 
     
@@ -42,41 +42,39 @@
             <pre class="prettyprint source linenums"><code>'use strict';
 
 /**
- * Database compilation utility functions
- * @module /compile/utils
+ * #### Database Building Utility Functions
+ *
+ * These functions can be used to:
+ * - create a new table based on a supplied Right Track Table Schema
+ * - load the table with the data from the specified source file
+ * - add a specified set of initial data to a table
+ * @module /compile/utils/build
  */
 
 const rl = require('readline');
 const fs = require('fs');
 const path = require('path');
+const config = require('../../../config.json');
+const chalk = require('chalk');
+const error = function(text) {console.error(chalk.bold.red(text))};
 
 
 /**
  * Initialize the Table in the database.  This will drop an existing table,
  * create a new one (along with any specified indices and/or foreign key
- * relationships) and import the data from the specified the source file.
+ * relationships) and import the data from the table's source file.
  * @param {sqlite3} db SQlite Database being built
  * @param {RTTableSchema} table The Right Track Table Schema
- * @param {string} source_dir The directory of the source file
+ * @param {RightTrackAgency} agency The `RightTrackAgency` Class of the Agency DB being built
  * @param {function} callback Callback function(err) called when init is finished
  */
-function init(db, table, source_dir, callback) {
+function init(db, table, agency, callback) {
 
   // Create the Table
   create(db, table, function() {
 
-    // Source File
-    let file = path.normalize(source_dir + "/" + table.source);
-
-    // Make sure source exists
-    if ( !fs.existsSync(file) ) {
-      callback(new Error("Source file does not exist"));
-    }
-
-    // Import the GTFS file
-    else {
-      load(db, table, file, callback);
-    }
+    // Load the source file into the table
+    load(db, table, agency, callback);
 
   });
 
@@ -143,12 +141,32 @@ function create(db, table, callback) {
  * Load the source file into the database
  * @param {sqlite3} db SQLite database being built
  * @param {RTTableSchema} table The Right Track Table Schema
- * @param {string} file Full path to source file
+ * @param {Object} agency Agency Build Options
  * @param {function} callback Callback function(err) called when load is finished
  */
-function load(db, table, file, callback) {
+function load(db, table, agency, callback) {
+
+  // Determine source file
+  let sourceDirectory = _parseConfigValue(table.sourceDirectory);
+  let sourceFile = _parseConfigValue(table.sourceFile);
+
+  // Add agency module directory to relative paths
+  if ( _isRelativePath(sourceDirectory) ) {
+    sourceDirectory = path.normalize(agency.agency.moduleDirectory + "/" + sourceDirectory);
+  }
+
+  // Build File Path
+  let file = path.normalize(sourceDirectory + "/" + sourceFile);
+
+  // Make sure file actually exists
+  if ( !fs.existsSync(file) ) {
+    return callback(new Error("Source file does not exist (" + file + ")"));
+  }
+
   console.log("        ... Importing " + path.basename(file));
 
+
+  // Source File Headers
   let readHeaders = false;
   let headers = [];
 
@@ -303,6 +321,76 @@ function add(db, table, values, callback) {
 
 
 /**
+ * Check if the directory is a relative path (begins with './' or '../')
+ * @param {string} directory Path to directory
+ * @return {boolean} True if the directory is a relative path
+ * @private
+ */
+function _isRelativePath(directory) {
+  if ( typeof directory === 'string' ) {
+    if ( directory.charAt(0) === '.' ) {
+      if ( directory.charAt(1) === '/' ) {
+        return true;
+      }
+      if ( directory.charAt(1) === '.' ) {
+        if ( directory.charAt(2) === '/' ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  else {
+    return false;
+  }
+}
+
+
+/**
+ * Parse the specified String for values in the configuration file.  The
+ * configuration property will be in the format `{{property.name}}`.
+ * @param {string} str The String to parse
+ * @returns {string} The parsed String
+ * @private
+ */
+function _parseConfigValue(str) {
+  if ( str.indexOf("{{") > -1 &amp;&amp; str.indexOf("}}") > -1 ) {
+    return _parseConfigObject(str, config);
+  }
+  else {
+    return str;
+  }
+}
+
+/**
+ * Parse the string for properties specified with the specified configuration object
+ * @param {string} str The String to parse
+ * @param {object} config The configuration object being parsed
+ * @param {string} parent The name of the parent
+ * @returns {string} The parsed String
+ * @private
+ */
+function _parseConfigObject(str, config, parent="") {
+  for ( let property in config ) {
+    if ( config.hasOwnProperty(property) ) {
+      if ( typeof config[property] === 'object' ) {
+        if ( parent !== "" ) {
+          parent = parent + ".";
+        }
+        str = _parseConfigObject(str, config[property], parent + property);
+      }
+      else {
+        let name = parent + "." + property;
+        let value = config[property];
+        str = str.replace("{{" + name + "}}", value);
+      }
+    }
+  }
+  return str;
+}
+
+
+/**
  * Split a line from a source file into separate fields.  Remove all
  * double and single quotes from the field
  * @param {string} str The line from the source file
@@ -367,7 +455,7 @@ module.exports = {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 30 2017 13:53:19 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 30 2017 20:54:44 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

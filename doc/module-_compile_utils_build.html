@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>/compile/utils - Documentation</title>
+    <title>/compile/utils/build - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -23,12 +23,12 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils.html">/compile/utils</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils.html#~add">add</a></li><li data-type='method'><a href="module-_compile_utils.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils.html#~load">load</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils_build.html">/compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-_compile_utils_buildDirectory.html">/compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <div id="main">
     
-    <h1 class="page-title">/compile/utils</h1>
+    <h1 class="page-title">/compile/utils/build</h1>
     
 
     
@@ -50,7 +50,12 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>Database compilation utility functions</p></div>
+            <div class="description"><h4>Database Building Utility Functions</h4><p>These functions can be used to:</p>
+<ul>
+<li>create a new table based on a supplied Right Track Table Schema</li>
+<li>load the table with the data from the specified source file</li>
+<li>add a specified set of initial data to a table</li>
+</ul></div>
         
 
         
@@ -64,7 +69,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compile_utils.js.html">compile/utils.js</a>, <a href="compile_utils.js.html#line3">line 3</a>
+        <a href="compile_utils_build.js.html">compile/utils/build.js</a>, <a href="compile_utils_build.js.html#line3">line 3</a>
     </li></ul></dd>
     
 
@@ -163,7 +168,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compile_utils.js.html">compile/utils.js</a>, <a href="compile_utils.js.html#line205">line 205</a>
+        <a href="compile_utils_build.js.html">compile/utils/build.js</a>, <a href="compile_utils_build.js.html#line223">line 223</a>
     </li></ul></dd>
     
 
@@ -368,7 +373,7 @@ specified in the <code>RTTableSchema</code>.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compile_utils.js.html">compile/utils.js</a>, <a href="compile_utils.js.html#line51">line 51</a>
+        <a href="compile_utils_build.js.html">compile/utils/build.js</a>, <a href="compile_utils_build.js.html#line49">line 49</a>
     </li></ul></dd>
     
 
@@ -535,7 +540,7 @@ specified in the <code>RTTableSchema</code>.</p></td>
 
     
 
-    <h4 class="name" id="~init"><span class="type-signature">(inner) </span>init<span class="signature">(db, table, source_dir, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~init"><span class="type-signature">(inner) </span>init<span class="signature">(db, table, agency, callback)</span><span class="type-signature"></span></h4>
 
     
 
@@ -547,7 +552,7 @@ specified in the <code>RTTableSchema</code>.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compile_utils.js.html">compile/utils.js</a>, <a href="compile_utils.js.html#line22">line 22</a>
+        <a href="compile_utils_build.js.html">compile/utils/build.js</a>, <a href="compile_utils_build.js.html#line30">line 30</a>
     </li></ul></dd>
     
 
@@ -589,7 +594,7 @@ specified in the <code>RTTableSchema</code>.</p></td>
 <div class="description">
     <p>Initialize the Table in the database.  This will drop an existing table,
 create a new one (along with any specified indices and/or foreign key
-relationships) and import the data from the specified the source file.</p>
+relationships) and import the data from the table's source file.</p>
 </div>
 
 
@@ -673,13 +678,13 @@ relationships) and import the data from the specified the source file.</p>
 
         <tr>
             
-                <td class="name"><code>source_dir</code></td>
+                <td class="name"><code>agency</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">RightTrackAgency</span>
 
 
             
@@ -689,7 +694,7 @@ relationships) and import the data from the specified the source file.</p>
 
             
 
-            <td class="description last"><p>The directory of the source file</p></td>
+            <td class="description last"><p>The <code>RightTrackAgency</code> Class of the Agency DB being built</p></td>
         </tr>
 
     
@@ -739,7 +744,7 @@ relationships) and import the data from the specified the source file.</p>
 
     
 
-    <h4 class="name" id="~load"><span class="type-signature">(inner) </span>load<span class="signature">(db, table, file, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~load"><span class="type-signature">(inner) </span>load<span class="signature">(db, table, agency, callback)</span><span class="type-signature"></span></h4>
 
     
 
@@ -751,7 +756,7 @@ relationships) and import the data from the specified the source file.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compile_utils.js.html">compile/utils.js</a>, <a href="compile_utils.js.html#line108">line 108</a>
+        <a href="compile_utils_build.js.html">compile/utils/build.js</a>, <a href="compile_utils_build.js.html#line106">line 106</a>
     </li></ul></dd>
     
 
@@ -875,13 +880,13 @@ relationships) and import the data from the specified the source file.</p>
 
         <tr>
             
-                <td class="name"><code>file</code></td>
+                <td class="name"><code>agency</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">Object</span>
 
 
             
@@ -891,7 +896,7 @@ relationships) and import the data from the specified the source file.</p>
 
             
 
-            <td class="description last"><p>Full path to source file</p></td>
+            <td class="description last"><p>Agency Build Options</p></td>
         </tr>
 
     
@@ -954,7 +959,7 @@ relationships) and import the data from the specified the source file.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 30 2017 13:53:19 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 30 2017 20:54:44 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
