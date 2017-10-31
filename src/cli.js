@@ -24,7 +24,7 @@ const path = require('path');
 const props = require('../package.json');
 const options = require('./helpers/options.js');
 const log = require('./helpers/log.js');
-const start = require('./start.js');
+const run = require('./run.js');
 
 
 
@@ -42,7 +42,7 @@ log("Started: " + started);
 _parseAgencies();
 
 // Start the Update Check & DB Compilation process
-start();
+run();
 
 
 

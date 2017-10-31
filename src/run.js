@@ -7,7 +7,7 @@
  * Build processes.  The `start()` function will start the update checks and
  * database compilation processes for the agency specified in the Database
  * Build Options ({@link Options}).
- * @module start
+ * @module run
  */
 
 

@@ -19,10 +19,10 @@
  */
 
 /**
- * Start process callback function.
+ * Main process callback function.
  * These callback functions are used to return to the main update / compilation
- * process started by the {@link module:start|start} module.
- * @callback startCallback
+ * process started by the {@link module:run|run} module.
+ * @callback runCallback
  */
 
 /**
