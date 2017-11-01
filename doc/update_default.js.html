@@ -24,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils_build.html">/compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-_compile_utils_buildDirectory.html">/compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-cli.html">cli</a></li><li><a href="module-compile.html">compile</a><ul class='methods'><li data-type='method'><a href="module-compile.html#~compile">compile</a></li></ul></li><li><a href="module-compile_utils_build.html">compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-compile_utils_buildDirectory.html">compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-helpers_errors.html">helpers/errors</a><ul class='methods'><li data-type='method'><a href="module-helpers_errors.html#~error">error</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrorCount">getErrorCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrors">getErrors</a></li><li data-type='method'><a href="module-helpers_errors.html#~getExceptions">getExceptions</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarningCount">getWarningCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarnings">getWarnings</a></li><li data-type='method'><a href="module-helpers_errors.html#~reset">reset</a></li><li data-type='method'><a href="module-helpers_errors.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_log.html">helpers/log</a><ul class='methods'><li data-type='method'><a href="module-helpers_log.html#~error">error</a></li><li data-type='method'><a href="module-helpers_log.html#~info">info</a></li><li data-type='method'><a href="module-helpers_log.html#~log">log</a></li><li data-type='method'><a href="module-helpers_log.html#~raw">raw</a></li><li data-type='method'><a href="module-helpers_log.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_options.html">helpers/options</a><ul class='methods'><li data-type='method'><a href="module-helpers_options.html#~addAgency">addAgency</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyConfig">addAgencyConfig</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyNotes">addAgencyNotes</a></li><li data-type='method'><a href="module-helpers_options.html#~agency">agency</a></li><li data-type='method'><a href="module-helpers_options.html#~agencyCount">agencyCount</a></li><li data-type='method'><a href="module-helpers_options.html#~get">get</a></li><li data-type='method'><a href="module-helpers_options.html#~set">set</a></li></ul></li><li><a href="module-run.html">run</a><ul class='methods'><li data-type='method'><a href="module-run.html#~start">start</a></li></ul></li><li><a href="module-update.html">update</a><ul class='methods'><li data-type='method'><a href="module-update.html#~update">update</a></li></ul></li><li><a href="module-update_default.html">update/default</a><ul class='methods'><li data-type='method'><a href="module-update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <div id="main">
@@ -42,8 +42,11 @@
             <pre class="prettyprint source linenums"><code>'use strict';
 
 /**
- * Right Track Database Builder: default agency GTFS update check
- * @module /update/default
+ * ### Default Update Check
+ *
+ * The default update check is used when the Right Track Agency configuration
+ * has the property: `build.updateURL`.
+ * @module update/default
  */
 
 const fs = require('fs');
@@ -52,16 +55,29 @@ const URL = require('url');
 const http = require('http');
 const Zip = require('adm-zip');
 const config = require('../../config.json');
-const log = console.log;
+const log = require('../helpers/log.js');
+const errors = require('../helpers/errors.js');
 
 
-// Agency Properties and callback functions
-let AGENCY = undefined;
-let UPDATE_CALLBACK = function() {};
+/**
+ * Agency Build Options
+ * @type {object}
+ * @private
+ */
+let AGENCY = {};
+
+/**
+ * Agency update callback function
+ * @type {updateCallback}
+ * @private
+ */
+let UPDATE_CALLBACK = function(requested, successful) {};
 
 
-// List of Errors
-let ERRORS = [];
+// Update flags
+let UPDATE_REQUESTED = false;
+let UPDATE_SUCCESSFUL = false;
+
 
 
 
@@ -77,20 +93,20 @@ let ERRORS = [];
  * than the one provided in the server's `last-modified` header, it will
  * download the zip file and unzip the contents into the agency's gtfs directory.
  *
- * @param {boolean} force True to force the update of GTFS files
- * @param {RightTrackAgency} agency the Right Track Agency to update
+ * @param {Object} agencyOptions Agency Build Options
  * @param {updateCallback} callback callback function when update is complete
+ * @type {updateFunction}
  */
-function defaultUpdate(force, agency, callback) {
+function defaultUpdate(agencyOptions, callback) {
   log("--> Checking for GTFS data update...");
 
   // Set agency and callback functions
-  AGENCY = agency;
+  AGENCY = agencyOptions.agency;
   UPDATE_CALLBACK = callback;
-  ERRORS = [];
 
-  // If we are forced to update...
-  if ( force ) {
+  // If an update is already flagged...
+  if ( agencyOptions.update ) {
+    UPDATE_REQUESTED = true;
     return _updateFiles();
   }
 
@@ -145,12 +161,13 @@ function _compareLastUpdate(server) {
 
     // No update required...
     if ( server &lt;= local ) {
-      return _finish(false);
+      return _finish();
     }
 
   }
 
   // Update the GTFS Files
+  UPDATE_REQUESTED = true;
   return _updateFiles();
 }
 
@@ -183,10 +200,10 @@ function _downloadZip() {
       zip.close(_unzipFiles(serverLastModified));
     });
   }).on('error', function(err) {
-    error("ERROR: Could not download GTFS zip file for agency &lt;" + AGENCY.id + ">");
-    error(err.message);
-    ERRORS.push("Could not download GTFS zip file for agency &lt;" + AGENCY.id + ">");
-    return _finish(false);
+    let msg = "Could not download GTFS zip file for agency";
+    log.error("ERROR: " + msg);
+    errors.error(msg, err.message, AGENCY.id);
+    return _finish();
   });
 
 }
@@ -212,7 +229,8 @@ function _unzipFiles(serverLastModified) {
   fs.writeFile(lastModifiedFile, serverLastModified, function() {
 
     // Return with update flag
-    return _finish(true);
+    UPDATE_SUCCESSFUL = true;
+    return _finish();
 
   });
 }
@@ -220,11 +238,10 @@ function _unzipFiles(serverLastModified) {
 
 /**
  * Function to call when the update process if finished
- * @param {boolean} update Update requested flag
  * @private
  */
-function _finish(update) {
-  UPDATE_CALLBACK(ERRORS, update);
+function _finish() {
+  UPDATE_CALLBACK(UPDATE_REQUESTED, UPDATE_SUCCESSFUL);
 }
 
 
@@ -242,7 +259,7 @@ module.exports = defaultUpdate;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 30 2017 20:54:44 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 01 2017 12:51:52 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

@@ -24,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils_build.html">/compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-_compile_utils_buildDirectory.html">/compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-cli.html">cli</a></li><li><a href="module-compile.html">compile</a><ul class='methods'><li data-type='method'><a href="module-compile.html#~compile">compile</a></li></ul></li><li><a href="module-compile_utils_build.html">compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-compile_utils_buildDirectory.html">compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-helpers_errors.html">helpers/errors</a><ul class='methods'><li data-type='method'><a href="module-helpers_errors.html#~error">error</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrorCount">getErrorCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrors">getErrors</a></li><li data-type='method'><a href="module-helpers_errors.html#~getExceptions">getExceptions</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarningCount">getWarningCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarnings">getWarnings</a></li><li data-type='method'><a href="module-helpers_errors.html#~reset">reset</a></li><li data-type='method'><a href="module-helpers_errors.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_log.html">helpers/log</a><ul class='methods'><li data-type='method'><a href="module-helpers_log.html#~error">error</a></li><li data-type='method'><a href="module-helpers_log.html#~info">info</a></li><li data-type='method'><a href="module-helpers_log.html#~log">log</a></li><li data-type='method'><a href="module-helpers_log.html#~raw">raw</a></li><li data-type='method'><a href="module-helpers_log.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_options.html">helpers/options</a><ul class='methods'><li data-type='method'><a href="module-helpers_options.html#~addAgency">addAgency</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyConfig">addAgencyConfig</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyNotes">addAgencyNotes</a></li><li data-type='method'><a href="module-helpers_options.html#~agency">agency</a></li><li data-type='method'><a href="module-helpers_options.html#~agencyCount">agencyCount</a></li><li data-type='method'><a href="module-helpers_options.html#~get">get</a></li><li data-type='method'><a href="module-helpers_options.html#~set">set</a></li></ul></li><li><a href="module-run.html">run</a><ul class='methods'><li data-type='method'><a href="module-run.html#~start">start</a></li></ul></li><li><a href="module-update.html">update</a><ul class='methods'><li data-type='method'><a href="module-update.html#~update">update</a></li></ul></li><li><a href="module-update_default.html">update/default</a><ul class='methods'><li data-type='method'><a href="module-update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <div id="main">
@@ -42,58 +42,52 @@
             <pre class="prettyprint source linenums"><code>'use strict';
 
 /**
- * Right Track Database Builde: start GTFS update checks
- * @module /update
+ * ### GTFS Data Update Checker
+ *
+ * This module runs the agency update checks.  The agencies to check are set
+ * in the build options and are returned from the {@link module:helpers/options|options}
+ * module.  Depending on the Agency settings, this will either run the default
+ * update function or the agency-specific update function.
+ * @module update
  */
 
+const config = require('../../config.json');
+const errors = require('../helpers/errors.js');
+const log = require('../helpers/log.js');
+const options = require('../helpers/options.js');
 const defaultUpdate = require('./default.js');
-const chalk = require('chalk');
-const log = console.log;
-const info = function(text) {console.log(chalk.yellow(text))};
-const error = function(text) {console.error(chalk.bold.red(text))};
 
 
-
-// Build Options
-let OPTIONS = undefined;
-
-// Final callback function
+/**
+ * Final callback to return to the run script
+ * @type {runCallback}
+ * @private
+ */
 let FINAL_CALLBACK = function() {};
 
 // Agency counter
-let CURRENT = 0;
+let AGENCY = 0;
 
 
 
 
 /**
  * Start the database update check process.  This will check for a GTFS data
- * update.  If an update is present, the new data will be downloaded and
- * unpacked into the agency's GTFS directory.
- * @param {Options} options The DB Build Options
- * @param {mainCallback} callback Final callback when the update process is complete.
+ * update for all agencies specified in the Database Build Options ({@link Options}).
+ * If an update is present, the new data will be downloaded and unpacked into
+ * the agency's GTFS directory.
+ * @param {runCallback} callback Final callback when the update process is complete.
  */
-function update(options, callback) {
+function update(callback) {
 
-  info("RUNNING AGENCY UPDATE CHECKS");
+  log.info("RUNNING AGENCY UPDATE CHECKS");
   log("------------------------------------------------");
 
-  // Set properties
-  OPTIONS = options;
+  // Set final callback
   FINAL_CALLBACK = callback;
 
-  // Make sure there is at least one agency provided
-  if ( OPTIONS.agencies.length === 0 ) {
-    error("ERROR: No agencies specified.");
-    error("Specify the agencies to include with the --agency flag");
-    OPTIONS.errors.push("No agencies specified");
-    _finish()
-  }
-
   // Start the first agency
-  else {
-    _startNextAgency();
-  }
+  _startNextAgency();
 
 }
 
@@ -104,31 +98,47 @@ function update(options, callback) {
  * @private
  */
 function _startNextAgency() {
+  let agencyOptions = options.agency(AGENCY);
 
   // Get the agency options
-  let agency = OPTIONS.agencies[CURRENT];
-  log("AGENCY: " + chalk.bgYellow.black(" " + agency.agency.id + " "));
+  log.raw([
+    {
+      "text": "AGENCY:"
+    },
+    {
+      "text": " " + agencyOptions.agency.id + " ",
+      "chalk": "bgYellow.black"
+    }
+  ]);
 
   // Use default update check method...
-  if ( _shouldUseDefaultUpdateMethod(agency) ) {
+  if ( _shouldUseDefaultUpdateMethod(agencyOptions) ) {
     log("--> Using default update script...");
-    defaultUpdate(OPTIONS.force, agency.agency, _agencyUpdateComplete);
+    defaultUpdate(agencyOptions, _agencyUpdateComplete);
   }
 
   // Use an agency-specific update method
   else {
+    let update = undefined;
+    let exception = undefined;
+    log("--> Using custom update script...");
 
-    // Look for the agency's update script
+    // Try to load the agency update script
     try {
-      log("--> Using custom update script...");
-      let update = require(agency.require + "/db-build/src/update.js");
-      update(OPTIONS.force, _agencyUpdateComplete);
+      update = require(agencyOptions.require + "/" + config.locations.updateScript);
+    }
+    catch(err) {
+      exception = err;
     }
 
-    // Agency does not have update script...
-    catch(exception) {
-      error("ERROR: could not run agency update script");
-      OPTIONS.errors.push("Could not run agency update script &lt;" + agency.agency.id + ">");
+    // Run the update script
+    if ( update !== undefined ) {
+      update(agencyOptions, _agencyUpdateComplete);
+    }
+    else {
+      let msg = "Could not run agency update script";
+      log.error("ERROR: " + msg);
+      errors.error(msg, exception.message, agencyOptions.agency.id);
       _agencyComplete();
     }
 
@@ -138,21 +148,47 @@ function _startNextAgency() {
 
 /**
  * Function to call when an agency is finished with the update check
- * @param {string[]} errors List of errors encountered while updating
- * @param {boolean} update True when a database update is requested
+ * @param {boolean} requested Update requested flag
+ * @param {boolean} successful Update successful flag
+ * @type {updateCallback}
  * @private
  */
-function _agencyUpdateComplete(errors, update) {
-  OPTIONS.errors = OPTIONS.errors.concat(errors);
-  OPTIONS.agencies[CURRENT].update = update;
+function _agencyUpdateComplete(requested, successful) {
+  options.agency(AGENCY).update = requested;
+  options.agency(AGENCY).updateComplete = successful;
 
-  if ( update ) {
-    log("--> DB Update Requested: " + chalk.bgGreen.black.bold(" YES "));
+  let details = {};
+  if ( requested &amp;&amp; successful ) {
+    options.agency(AGENCY).compile = true;
+
+    details = {
+      "text": " YES ",
+      "chalk": "bgGreen.black.bold"
+    };
+  }
+  else if ( requested &amp;&amp; !successful ) {
+    details = {
+      "text": " UNSUCCESSFUL ",
+      "chalk": "bgRed.white.bold"
+    };
+    errors.error("Agency Update Check Unsuccessful", undefined, options.agency(AGENCY).agency.id);
   }
   else {
-    log("--> DB Update Requested: " + chalk.bgRed.white.bold(" NO "));
+    details = {
+      "text": " No Update ",
+      "chalk": "bgWhite.black.bold"
+    };
   }
 
+  // Log update status
+  log.raw([
+    {
+      "text": "--> GTFS Data Update:"
+    },
+    details
+  ]);
+
+  // Complete the agency update check
   _agencyComplete();
 }
 
@@ -163,10 +199,10 @@ function _agencyUpdateComplete(errors, update) {
  * @private
  */
 function _agencyComplete() {
-  CURRENT++;
+  AGENCY++;
 
   // Continue with the next agency if there are more
-  if ( CURRENT &lt; OPTIONS.agencies.length ) {
+  if ( AGENCY &lt; options.agencyCount() ) {
     log("------------------------------------------------");
     _startNextAgency();
   }
@@ -184,7 +220,7 @@ function _agencyComplete() {
  * @private
  */
 function _finish() {
-  FINAL_CALLBACK(OPTIONS);
+  FINAL_CALLBACK();
 }
 
 
@@ -226,7 +262,7 @@ module.exports = update;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 30 2017 20:54:44 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 01 2017 12:51:52 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

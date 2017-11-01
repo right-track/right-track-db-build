@@ -24,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils_build.html">/compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-_compile_utils_buildDirectory.html">/compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-cli.html">cli</a></li><li><a href="module-compile.html">compile</a><ul class='methods'><li data-type='method'><a href="module-compile.html#~compile">compile</a></li></ul></li><li><a href="module-compile_utils_build.html">compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-compile_utils_buildDirectory.html">compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-helpers_errors.html">helpers/errors</a><ul class='methods'><li data-type='method'><a href="module-helpers_errors.html#~error">error</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrorCount">getErrorCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrors">getErrors</a></li><li data-type='method'><a href="module-helpers_errors.html#~getExceptions">getExceptions</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarningCount">getWarningCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarnings">getWarnings</a></li><li data-type='method'><a href="module-helpers_errors.html#~reset">reset</a></li><li data-type='method'><a href="module-helpers_errors.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_log.html">helpers/log</a><ul class='methods'><li data-type='method'><a href="module-helpers_log.html#~error">error</a></li><li data-type='method'><a href="module-helpers_log.html#~info">info</a></li><li data-type='method'><a href="module-helpers_log.html#~log">log</a></li><li data-type='method'><a href="module-helpers_log.html#~raw">raw</a></li><li data-type='method'><a href="module-helpers_log.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_options.html">helpers/options</a><ul class='methods'><li data-type='method'><a href="module-helpers_options.html#~addAgency">addAgency</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyConfig">addAgencyConfig</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyNotes">addAgencyNotes</a></li><li data-type='method'><a href="module-helpers_options.html#~agency">agency</a></li><li data-type='method'><a href="module-helpers_options.html#~agencyCount">agencyCount</a></li><li data-type='method'><a href="module-helpers_options.html#~get">get</a></li><li data-type='method'><a href="module-helpers_options.html#~set">set</a></li></ul></li><li><a href="module-run.html">run</a><ul class='methods'><li data-type='method'><a href="module-run.html#~start">start</a></li></ul></li><li><a href="module-update.html">update</a><ul class='methods'><li data-type='method'><a href="module-update.html#~update">update</a></li></ul></li><li><a href="module-update_default.html">update/default</a><ul class='methods'><li data-type='method'><a href="module-update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <div id="main">
@@ -48,30 +48,31 @@
  *
  * This will run all .js files in the specified directory that export
  * a `buildTable` function.
- * @module /compile/utils/buildDirectory
+ * @module compile/utils/buildDirectory
  */
 
 const fs = require('fs');
 const path = require('path');
+const log = require('../../helpers/log.js');
 
 
 /**
  * Run all of the build table scripts in the specified directory.  This will find
  * all .js files that export a `buildTable` function and run the scripts in
  * alphabetical order of the scripts' filenames.
- * @param {sqlite3} db The SQLite database being built
- * @param {Object} agency The Agency Build Options
+ * @param {Object} db The SQLite database being built
+ * @param {Object} agencyOptions The Agency Build Options
  * @param {string} directory The path to the directory containing the build scripts
  * @param {function} callback Callback function() called when all build scripts have finished
  */
-function buildDirectory(db, agency, directory, callback) {
-  console.log("--> Processing Build Scripts From Directory: " + path.basename(directory));
+function buildDirectory(db, agencyOptions, directory, callback) {
+  log("--> Processing Build Scripts From Directory: " + path.basename(directory));
 
   // Get the builders in the directory
   let builders = _getBuildFunctions(directory);
 
   // Start running the builders
-  _runBuilder(0, builders, db, agency, callback);
+  _runBuilder(0, builders, db, agencyOptions, callback);
 
 }
 
@@ -81,23 +82,23 @@ function buildDirectory(db, agency, directory, callback) {
  * all build scripts have been run, call the callback function.
  * @param {int} index Index of build script to run
  * @param {object[]} builders List of Builders
- * @param {sqlite3} db The SQLite Database being built
- * @param {Object} agency Agency Build Options
+ * @param {object} db The SQLite Database being built
+ * @param {object} agencyOptions Agency Build Options
  * @param {function} callback Callback function() called when all build scripts have finished
  * @private
  */
-function _runBuilder(index, builders, db, agency, callback) {
+function _runBuilder(index, builders, db, agencyOptions, callback) {
 
   // Run the builder
   if ( index &lt; builders.length ) {
     let builder = builders[index];
-    console.log("    --> " + builder.file);
+    log("    --> " + builder.file);
 
     // Run the build script
-    builder.build(db, agency, function() {
+    builder.build(db, agencyOptions, function() {
 
       // Start the Next Builder when this one is finished
-      _runBuilder(index+1, builders, db, agency, callback);
+      _runBuilder(index+1, builders, db, agencyOptions, callback);
 
     });
 
@@ -161,7 +162,7 @@ module.exports = buildDirectory;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 30 2017 20:54:44 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 01 2017 12:51:52 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

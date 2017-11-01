@@ -1,9 +1,10 @@
+
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Home - Documentation</title>
+    <title>helpers/errors.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,57 +29,169 @@
 
 <div id="main">
     
+    <h1 class="page-title">helpers/errors.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * ### Right Track Exception Handler
+ *
+ * This module helps to handle and log exceptions that occur during
+ * the Right Track Database update and compilation process.
+ * @module helpers/errors
+ */
+
+
+/**
+ * Right Track Exception Type: Error
+ * @type {int}
+ * @default
+ */
+const EXCEPTION_TYPE_ERROR = 1;
+
+/**
+ * Right Track Exception Type: Warning
+ * @type {int}
+ * @default 0
+ */
+const EXCEPTION_TYPE_WARNING = 0;
+
+
+/**
+ * List of accumulated exceptions
+ * @type {Array}
+ * @private
+ */
+let EXCEPTIONS = [];
 
 
 
+/**
+ * Reset the list of Right Track Exceptions
+ */
+function reset() {
+  EXCEPTIONS = [];
+}
+
+
+/**
+ * Add an Error to the list of Right Track Exceptions
+ * @param {string} message Error Message
+ * @param {string|undefined} details Error Details
+ * @param {string|undefined} agencyId Agency Code of Agency invoking the Error
+ */
+function error(message, details, agencyId) {
+  EXCEPTIONS.push(
+    {
+      "type": EXCEPTION_TYPE_ERROR,
+      "message": message,
+      "details": details,
+      "agencyId": agencyId
+    }
+  );
+}
+
+
+/**
+ * Add a Warning to the list of Right Track Exceptions
+ * @param {string} message Warning Message
+ * @param {string|undefined} details Warning Details
+ * @param {string|undefined} agencyId Agency Code of Agency invoking the Warning
+ */
+function warning(message, details, agencyId) {
+  EXCEPTIONS.push(
+    {
+      "type": EXCEPTION_TYPE_WARNING,
+      "message": message,
+      "details": details,
+      "agencyId": agencyId
+    }
+  );
+}
+
+
+/**
+ * Get the list of all Right Track Exceptions
+ * @returns {Array}
+ */
+function getExceptions() {
+  return EXCEPTIONS;
+}
+
+
+/**
+ * Get the list of all Right Track Errors
+ * @returns {Array}
+ */
+function getErrors() {
+  return _getExceptionsByType(EXCEPTION_TYPE_ERROR);
+}
+
+/**
+ * Get the number of Right Track Errors
+ * @returns {Number}
+ */
+function getErrorCount() {
+  return getErrors().length;
+}
+
+
+/**
+ * Get the list of all Right Track Warnings
+ * @returns {Array}
+ */
+function getWarnings() {
+  return _getExceptionsByType(EXCEPTION_TYPE_WARNING);
+}
+
+/**
+ * Get the number of Right Track Warnings
+ * @returns {Number}
+ */
+function getWarningCount() {
+  return getWarnings().length;
+}
+
+
+/**
+ * Get the list of all Right Track Exceptions matching the exception type
+ * @param {int} type Right Track Exception Type
+ * @returns {Array}
+ * @private
+ */
+function _getExceptionsByType(type) {
+  let rtn = [];
+  for ( let i = 0; i &lt; EXCEPTIONS.length; i++ ) {
+    let exception = EXCEPTIONS[i];
+    if ( exception.type === type ) {
+      rtn.push(exception);
+    }
+  }
+  return rtn;
+}
 
 
 
-
-
-
-    
-
-
-    <section class="readme">
-        <article><h1>Right Track Database Builder</h1><p><strong>node module:</strong> <a href="https://www.npmjs.com/package/right-track-db-build">right-track-db-build</a><br><strong>GitHub repo:</strong> <a href="https://github.com/right-track/right-track-db-build">right-track/right-track-db-build</a></p>
-<hr>
-<p>This project is still being actively developed and modified.  For the more
-stable previous version (shell script based), see the <a href="https://github.com/dwaring87/right-track-db">dwaring87/right-track-db</a> 
-project. </p>
-<h3>Usage</h3><p>The command line utility has the following usage:</p>
-<pre class="prettyprint source lang-text"><code>Right Track DB Generator
-Module: right-track-db-build
-Version: 0.0.1
-----------------------------
-Usage:
-  right-track-db-build [options] --agency &lt;declaration> [agency options] ...
-options:
-  --force|-f       Force a GTFS update and database compilation
-  --help|-h        Display this usage information
-  --post|-p &lt;file> Define script to run after update & compilation
-  --version|-v     Display the DB Build script version
-agency declaration:
-  Declare an agency to check for GTFS updates/compile database.  The agency
-  can be declared by module name, agency id or file path.  For example:
-  --agency right-track-agency-mnr
-  --agency mnr
-  --agency ./path/to/right-track-agency-mnr
-agency options:
-  These options have to be proceeded by an agency declaration (--agency &lt;...>)
-  --config|-c &lt;file>
-     Specify the path to an optional agency configuration file
-  --notes|-n &lt;notes>
-     Specify agency update notes to be included in the new database</code></pre></article>
+module.exports = {
+  reset: reset,
+  error: error,
+  warning: warning,
+  getExceptions: getExceptions,
+  getErrors: getErrors,
+  getErrorCount: getErrorCount,
+  getWarnings: getWarnings,
+  getWarningCount: getWarningCount
+};</code></pre>
+        </article>
     </section>
-
-
 
 
 

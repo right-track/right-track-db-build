@@ -6,6 +6,7 @@ const build = require('../utils/build.js');
 /**
  * gtfs_directions table definition
  * @type {RTTableSchema}
+ * @private
  */
 const TABLE = {
   sourceDirectory: "{{locations.gtfsDir}}",
@@ -26,6 +27,7 @@ const TABLE = {
 /**
  * Initial values for table
  * @type {RTTableValues}
+ * @private
  */
 const VALUES = [
   {

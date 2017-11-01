@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Home - Documentation</title>
+    <title>update - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,57 +28,272 @@
 
 <div id="main">
     
+    <h1 class="page-title">update</h1>
+    
 
     
 
 
 
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><h3>GTFS Data Update Checker</h3><p>This module runs the agency update checks.  The agencies to check are set
+in the build options and are returned from the <a href="module-helpers_options.html">options</a>
+module.  Depending on the Agency settings, this will either run the default
+update function or the agency-specific update function.</p></div>
+        
+
+        
+            
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="update_index.js.html">update/index.js</a>, <a href="update_index.js.html#line3">line 3</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~update"><span class="type-signature">(inner) </span>update<span class="signature">(callback)</span><span class="type-signature"></span></h4>
+
     
 
 
 
 
+<dl class="details">
 
-
-
-
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="update_index.js.html">update/index.js</a>, <a href="update_index.js.html#line40">line 40</a>
+    </li></ul></dd>
+    
 
     
 
+    
 
-    <section class="readme">
-        <article><h1>Right Track Database Builder</h1><p><strong>node module:</strong> <a href="https://www.npmjs.com/package/right-track-db-build">right-track-db-build</a><br><strong>GitHub repo:</strong> <a href="https://github.com/right-track/right-track-db-build">right-track/right-track-db-build</a></p>
-<hr>
-<p>This project is still being actively developed and modified.  For the more
-stable previous version (shell script based), see the <a href="https://github.com/dwaring87/right-track-db">dwaring87/right-track-db</a> 
-project. </p>
-<h3>Usage</h3><p>The command line utility has the following usage:</p>
-<pre class="prettyprint source lang-text"><code>Right Track DB Generator
-Module: right-track-db-build
-Version: 0.0.1
-----------------------------
-Usage:
-  right-track-db-build [options] --agency &lt;declaration> [agency options] ...
-options:
-  --force|-f       Force a GTFS update and database compilation
-  --help|-h        Display this usage information
-  --post|-p &lt;file> Define script to run after update & compilation
-  --version|-v     Display the DB Build script version
-agency declaration:
-  Declare an agency to check for GTFS updates/compile database.  The agency
-  can be declared by module name, agency id or file path.  For example:
-  --agency right-track-agency-mnr
-  --agency mnr
-  --agency ./path/to/right-track-agency-mnr
-agency options:
-  These options have to be proceeded by an agency declaration (--agency &lt;...>)
-  --config|-c &lt;file>
-     Specify the path to an optional agency configuration file
-  --notes|-n &lt;notes>
-     Specify agency update notes to be included in the new database</code></pre></article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
 
 
+
+
+
+<div class="description">
+    <p>Start the database update check process.  This will check for a GTFS data
+update for all agencies specified in the Database Build Options (<a href="global.html#Options">Options</a>).
+If an update is present, the new data will be downloaded and unpacked into
+the agency's GTFS directory.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#runCallback">runCallback</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Final callback when the update process is complete.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

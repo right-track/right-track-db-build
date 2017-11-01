@@ -1,0 +1,171 @@
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>typedefs.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-cli.html">cli</a></li><li><a href="module-compile.html">compile</a><ul class='methods'><li data-type='method'><a href="module-compile.html#~compile">compile</a></li></ul></li><li><a href="module-compile_utils_build.html">compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-compile_utils_buildDirectory.html">compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-helpers_errors.html">helpers/errors</a><ul class='methods'><li data-type='method'><a href="module-helpers_errors.html#~error">error</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrorCount">getErrorCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrors">getErrors</a></li><li data-type='method'><a href="module-helpers_errors.html#~getExceptions">getExceptions</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarningCount">getWarningCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarnings">getWarnings</a></li><li data-type='method'><a href="module-helpers_errors.html#~reset">reset</a></li><li data-type='method'><a href="module-helpers_errors.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_log.html">helpers/log</a><ul class='methods'><li data-type='method'><a href="module-helpers_log.html#~error">error</a></li><li data-type='method'><a href="module-helpers_log.html#~info">info</a></li><li data-type='method'><a href="module-helpers_log.html#~log">log</a></li><li data-type='method'><a href="module-helpers_log.html#~raw">raw</a></li><li data-type='method'><a href="module-helpers_log.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_options.html">helpers/options</a><ul class='methods'><li data-type='method'><a href="module-helpers_options.html#~addAgency">addAgency</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyConfig">addAgencyConfig</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyNotes">addAgencyNotes</a></li><li data-type='method'><a href="module-helpers_options.html#~agency">agency</a></li><li data-type='method'><a href="module-helpers_options.html#~agencyCount">agencyCount</a></li><li data-type='method'><a href="module-helpers_options.html#~get">get</a></li><li data-type='method'><a href="module-helpers_options.html#~set">set</a></li></ul></li><li><a href="module-run.html">run</a><ul class='methods'><li data-type='method'><a href="module-run.html#~start">start</a></li></ul></li><li><a href="module-update.html">update</a><ul class='methods'><li data-type='method'><a href="module-update.html#~update">update</a></li></ul></li><li><a href="module-update_default.html">update/default</a><ul class='methods'><li data-type='method'><a href="module-update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">typedefs.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+// TYPE DEFINITIONS //
+
+/**
+ * Right Track DB Build Options
+ *
+ * These options are set from the command line arguments and are used to
+ * determine which Agencies to check for updates and compile databases for.  The
+ * options are set, modified and returned via the {@link module:helpers/options|options}
+ * module.
+ * @typedef {Object} Options
+ * @property {boolean} force=false Force update and compile flag
+ * @property {string} [post] The path to the post-update script
+ * @property {Object[]} agencies List of agencies to check for updates &amp; compile
+ * @property {string} agencies[].require The agency module require name or path
+ * @property {string} [agencies[].config] The agency module additional configuration file path
+ * @property {string} [agencies[].notes] The agency update notes to be included in the database
+ * @property {RightTrackAgency} agencies[].agency The `RightTrackAgency` Class for the agency
+ * @property {boolean} agencies[].update=false The GTFS data update flag (true when a GTFS data update is requested)
+ * @property {boolean} agencies[].updateComplete=false The GTFS data update success flag (true when GTFS data is successfully updated)
+ * @property {boolean} agencies[].compile=false The DB compilation flag (true when the DB compilation is requested)
+ * @property {boolean} agencies[].compileComplete=false The DB compilation success flag (true when DB is successfully compiled)
+ */
+
+/**
+ * Main process callback function.
+ *
+ * This callback function is used to return to the main update / compilation
+ * process started by the {@link module:run|run} module.
+ * @callback runCallback
+ */
+
+/**
+ * Agency Update Check function.
+ *
+ * This function is used to check the agency for a GTFS data update.  If an
+ * update is found it will download the new data and place the GTFS files
+ * in the agency's GTFS directory.  Once complete, this function will call
+ * the {@link updateCallback} callback function with the status of the update
+ * checks (an update was requested, and if the update was successful)
+ * @typedef {function} updateFunction
+ * @param {Object} agencyOptions Agency build options (from {@link Options})
+ * @param {updateCallback} callback The update callback function
+ */
+
+/**
+ * Update callback function.
+ *
+ * This function is used to return the status of an agency update check:
+ * whether an update is found and has been requested and whether the update
+ * was successful and the new GTFS files have been downloaded.
+ * @callback updateCallback
+ * @param {boolean} requested Update requested flag (true when a GTFS data update was requested)
+ * @param {boolean} successful Update success flag (true when a GTFS data update was successful)
+ */
+
+/**
+ * Right Track Table Schema.
+ *
+ * This defines the Right Track Database table's properties, including table
+ * fields and their types, foreign keys, and indices.
+ * @typedef {Object} RTTableSchema
+ * @property {string|undefined} [sourceDirectory] Path to the directory containing the source file
+ * @property {string|undefined} [sourceFile] Name of the source file
+ * @property {string} name Name of table in the final database
+ * @property {Object[]} fields List of table fields
+ * @property {string} fields[].name Name of field (will be column name in final table and must match source file header name unless `source_name` is specified)
+ * @property {string} fields[].type Data Type of field (TEXT, INTEGER, etc)
+ * @property {string} [fields[].attributes] Additional attributes of field (PRIMARY KEY, NOT NULL, etc)
+ * @property {string} [fields[].source_name] Source file header for field (if different than `name`)
+ * @property {boolean} [fields[].index] Set to true to make an index for this field
+ * @property {Object} [fields[].foreignKey] Set a foreign key relationship with this field
+ * @property {string} fields[].foreignKey.table Foreign Table Name
+ * @property {string} fields[].foreignKey.field Foreign Field Name
+ */
+
+/**
+ * Right Track Table Initial Values
+ *
+ * This defines the initial values that will be loaded into a table.
+ * @typedef {Object[]} RTTableValues
+ * @property {string} RTTableValues[].key Name of table column
+ * @property {object} RTTableValues[].value  Value of data item
+ */
+
+/**
+ * Build Table function.
+ *
+ * This function is used to build a table in the Right Track Database.
+ * @typedef {function} buildTable
+ * @param {object} db The SQLite database being built
+ * @param {object} agencyOptions The Agency Build Options
+ * @param {buildTableCallback} callback The build table callback function
+ */
+
+/**
+ * Build Table callback function.
+ *
+ * This function is used when the build table script is complete.
+ * @callback buildTableCallback
+ */
+
+/**
+ * Right Track Database Builder Exception (Warning/Error)
+ * @typedef {Object} RTException
+ * @property {int} type The type of Exception (Warning or Error)
+ * @property {string} message The Exception message
+ * @property {string} [details] The Exception details
+ * @property {string} [agencyId] The Agency Code of the Agency that invoked the Exception
+ */
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 01 2017 12:51:52 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

@@ -20,6 +20,7 @@ const buildDirectory = require('./utils/buildDirectory.js');
 /**
  * Final callback to return to the run script
  * @type {runCallback}
+ * @private
  */
 let FINAL_CALLBACK = function() {};
 

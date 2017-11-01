@@ -24,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-_compile.html">/compile</a><ul class='methods'><li data-type='method'><a href="module-_compile.html#~compile">compile</a></li></ul></li><li><a href="module-_compile_utils_build.html">/compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-_compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-_compile_utils_buildDirectory.html">/compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-_compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-_start.html">/start</a><ul class='methods'><li data-type='method'><a href="module-_start.html#~start">start</a></li></ul></li><li><a href="module-_update.html">/update</a><ul class='methods'><li data-type='method'><a href="module-_update.html#~update">update</a></li></ul></li><li><a href="module-_update_default.html">/update/default</a><ul class='methods'><li data-type='method'><a href="module-_update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-cli.html">cli</a></li><li><a href="module-compile.html">compile</a><ul class='methods'><li data-type='method'><a href="module-compile.html#~compile">compile</a></li></ul></li><li><a href="module-compile_utils_build.html">compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-compile_utils_buildDirectory.html">compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-helpers_errors.html">helpers/errors</a><ul class='methods'><li data-type='method'><a href="module-helpers_errors.html#~error">error</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrorCount">getErrorCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrors">getErrors</a></li><li data-type='method'><a href="module-helpers_errors.html#~getExceptions">getExceptions</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarningCount">getWarningCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarnings">getWarnings</a></li><li data-type='method'><a href="module-helpers_errors.html#~reset">reset</a></li><li data-type='method'><a href="module-helpers_errors.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_log.html">helpers/log</a><ul class='methods'><li data-type='method'><a href="module-helpers_log.html#~error">error</a></li><li data-type='method'><a href="module-helpers_log.html#~info">info</a></li><li data-type='method'><a href="module-helpers_log.html#~log">log</a></li><li data-type='method'><a href="module-helpers_log.html#~raw">raw</a></li><li data-type='method'><a href="module-helpers_log.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_options.html">helpers/options</a><ul class='methods'><li data-type='method'><a href="module-helpers_options.html#~addAgency">addAgency</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyConfig">addAgencyConfig</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyNotes">addAgencyNotes</a></li><li data-type='method'><a href="module-helpers_options.html#~agency">agency</a></li><li data-type='method'><a href="module-helpers_options.html#~agencyCount">agencyCount</a></li><li data-type='method'><a href="module-helpers_options.html#~get">get</a></li><li data-type='method'><a href="module-helpers_options.html#~set">set</a></li></ul></li><li><a href="module-run.html">run</a><ul class='methods'><li data-type='method'><a href="module-run.html#~start">start</a></li></ul></li><li><a href="module-update.html">update</a><ul class='methods'><li data-type='method'><a href="module-update.html#~update">update</a></li></ul></li><li><a href="module-update_default.html">update/default</a><ul class='methods'><li data-type='method'><a href="module-update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <div id="main">
@@ -42,24 +42,27 @@
             <pre class="prettyprint source linenums"><code>'use strict';
 
 /**
- * Right Track Database Builder: start database compilation
- * @module /compile
+ * ### Right Track Database Compiler
+ *
+ * This module starts the database compilation process.  It will run the
+ * build scripts found in the `./gtfs/` and `./rt/` directories.
+ * @module compile
  */
 
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const errors = require('../helpers/errors.js');
+const log = require('../helpers/log.js');
+const options = require('../helpers/options.js');
 const config = require('../../config.json');
 const buildDirectory = require('./utils/buildDirectory.js');
-const chalk = require('chalk');
-const log = console.log;
-const info = function(text) {console.log(chalk.yellow(text))};
-const error = function(text) {console.error(chalk.bold.red(text))};
 
 
-// DB Build Options
-let OPTIONS = undefined;
-
-// Final callback when everything is finished
+/**
+ * Final callback to return to the run script
+ * @type {runCallback}
+ * @private
+ */
 let FINAL_CALLBACK = function() {};
 
 // Agency Index Counter
@@ -71,15 +74,13 @@ let AGENCY = -1;
 
 /**
  * Start the database compilation process
- * @param {Options} options DB Build Options
- * @param {mainCallback} callback Callback function when the database compilation is complete
+ * @param {runCallback} callback Callback function when the database compilation is complete
  */
-function compile(options, callback) {
-  info("RUNNING DATABASE COMPILATION SCRIPTS");
+function compile(callback) {
+  log.info("RUNNING DATABASE COMPILATION SCRIPTS");
   log("------------------------------------------------");
 
   // Set properties
-  OPTIONS = options;
   FINAL_CALLBACK = callback;
 
   // Start with the first agency
@@ -97,8 +98,8 @@ function _startNextAgency() {
   AGENCY++;
 
   // Continue with the next agency if there are more
-  if ( AGENCY &lt; OPTIONS.agencies.length ) {
-    if ( OPTIONS.agencies[AGENCY].update ) {
+  if ( AGENCY &lt; options.agencyCount() ) {
+    if ( options.agency(AGENCY).compile ) {
       _compile();
     }
     else {
@@ -120,49 +121,58 @@ function _startNextAgency() {
  * @private
  */
 function _compile() {
-  let agency = OPTIONS.agencies[AGENCY];
+  let agencyOptions = options.agency(AGENCY);
 
   // Start compiling agency...
-  log("AGENCY: " + chalk.bgYellow.black(" " + agency.agency.id + " "));
+  log.raw([
+    {
+      "text": "AGENCY:"
+    },
+    {
+      "text": " " + agencyOptions.agency.id + " ",
+      "chalk": "bgYellow.black"
+    }
+  ]);
 
   // Open Database
   let db = new sqlite3.Database(
-    path.normalize(agency.agency.moduleDirectory + "/" + config.locations.db),
+    path.normalize(agencyOptions.agency.moduleDirectory + "/" + config.locations.db),
     function(err) {
       if ( err ) {
-        error("ERROR: Could not open database for agency &lt;" + agency.agency.id + ">");
-        OPTIONS.errors.push("Could not open database for agency &lt;" + agency.agency.id + ">");
+        let msg = "Could not open agency database";
+        log.error("ERROR: " + msg);
+        errors.error(msg, err.message, agencyOptions.agency.id);
         _finishAgency(db);
       }
 
       else {
-        _build(db, agency);
+        _build(db, agencyOptions);
       }
     }
   );
 
   // DB Error Handler
   db.on('error', function(err) {
-    error("ERROR: " + err.message + " &lt;" + agency.agency.id + ">");
-    OPTIONS.errors.push(err.message + " &lt;" + agency.agency.id + ">");
+    log.error("ERROR: " + err.message);
+    errors.error(err.message, err.stack, agencyOptions.agency.id);
   });
 
 }
 
 /**
- * Build the Database tables by calling the build scripts in the
- * gtfs and rt directories
- * @param {sqlite3} db The SQLite Database being built
- * @param {object} agency The Agency Build Options
+ * Build the Database tables by calling the build scripts in the gtfs and
+ * rt directories
+ * @param {Object} db The SQLite Database being built
+ * @param {object} agencyOptions The Agency Build Options
  * @private
  */
-function _build(db, agency) {
+function _build(db, agencyOptions) {
 
   let gtfsDirectory = path.normalize(__dirname + '/gtfs/');
   let rtDirectory = path.normalize(__dirname + '/rt/');
 
-  buildDirectory(db, agency, gtfsDirectory, function() {
-    buildDirectory(db, agency, rtDirectory, function() {
+  buildDirectory(db, agencyOptions, gtfsDirectory, function() {
+    buildDirectory(db, agencyOptions, rtDirectory, function() {
       _finishAgency(db, true);
     });
   });
@@ -172,8 +182,8 @@ function _build(db, agency) {
 
 /**
  * Callback function for when the agency is finished compiling
- * @param db SQLite database that was built
- * @param compiled Successful compilation flag
+ * @param {object} db SQLite database that was built
+ * @param {boolean} [compiled=false] Successful compilation flag
  * @private
  */
 function _finishAgency(db, compiled=false) {
@@ -182,7 +192,7 @@ function _finishAgency(db, compiled=false) {
   db.close();
 
   // Flag the agency as compiled
-  OPTIONS.agencies[AGENCY].compile = compiled;
+  options.agency(AGENCY).compileComplete = compiled;
 
   // Continue to the next agency
   _startNextAgency();
@@ -197,7 +207,7 @@ function _finishAgency(db, compiled=false) {
  * @private
  */
 function _finish() {
-  FINAL_CALLBACK(OPTIONS);
+  FINAL_CALLBACK();
 }
 
 
@@ -214,7 +224,7 @@ module.exports = compile;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 30 2017 20:54:44 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 01 2017 12:51:52 GMT-0400 (EDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

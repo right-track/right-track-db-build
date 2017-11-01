@@ -7,7 +7,7 @@
  * - create a new table based on a supplied Right Track Table Schema
  * - load the table with the data from the specified source file
  * - add a specified set of initial data to a table
- * @module /compile/utils/build
+ * @module compile/utils/build
  */
 
 const rl = require('readline');
