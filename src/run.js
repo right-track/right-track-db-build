@@ -146,7 +146,7 @@ function _finished() {
     for ( let i = 0; i < warnings.length; i++ ) {
       log.warning("--> " + warnings[i].message + " <" + warnings[i].agencyId + ">", false);
       if ( warnings[i].details ) {
-        log.warning("    " + warnings[i].details, false);
+        log("    " + warnings[i].details);
       }
     }
   }
@@ -159,7 +159,7 @@ function _finished() {
     for ( let i = 0; i < errs.length; i++ ) {
       log.error("--> " + errs[i].message + " <" + errs[i].agencyId + ">", false);
       if ( errs[i].details ) {
-        log.error("    " + errs[i].details, false);
+        log("    " + errs[i].details);
       }
     }
   }

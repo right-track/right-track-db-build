@@ -19,11 +19,11 @@ const errors = require('../helpers/errors.js');
 
 
 /**
- * Agency Build Options
- * @type {object}
+ * Agency RightTrackAgency Class
+ * @type {RightTrackAgency}
  * @private
  */
-let AGENCY = {};
+let AGENCY = undefined;
 
 /**
  * Agency update callback function
@@ -96,6 +96,13 @@ function _checkLastUpdate() {
     let serverLastModified = new Date(headers['last-modified']);
     _compareLastUpdate(serverLastModified);
   });
+  req.on('error', function(err) {
+    let msg = "Could not make HEAD request to agency update url";
+    log.error("ERROR: " + msg);
+    log.error("Check the network settings and agency update url");
+    errors.error(msg, err.stack, AGENCY.id);
+    return _finish();
+  });
   req.end();
 }
 
@@ -161,7 +168,7 @@ function _downloadZip() {
   }).on('error', function(err) {
     let msg = "Could not download GTFS zip file for agency";
     log.error("ERROR: " + msg);
-    errors.error(msg, err.message, AGENCY.id);
+    errors.error(msg, err.stack, AGENCY.id);
     return _finish();
   });
 

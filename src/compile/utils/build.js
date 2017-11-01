@@ -109,7 +109,7 @@ function load(db, table, agencyOptions, callback) {
   if ( table.sourceDirectory === undefined || table.sourceFile === undefined ) {
     let msg = "Source directory and/or file are not defined for table " + table.name;
     log.warning("        WARNING: " + msg);
-    errors.warning(msg, undefined, agencyOptions.agency.id);
+    errors.warning(msg, "Directory: " + table.sourceDirectory + " and File: " + table.sourceFile, agencyOptions.agency.id);
     return callback();
   }
 
@@ -127,9 +127,9 @@ function load(db, table, agencyOptions, callback) {
 
   // Make sure file actually exists
   if ( !fs.existsSync(file) ) {
-    let msg = "Source file does not exist (" + file + ")";
+    let msg = "Source file does not exist (" + sourceFile + ")";
     log.warning("        WARNING: " + msg);
-    errors.warning(msg, undefined, agencyOptions.agency.id);
+    errors.warning(msg, "File Location: " + file, agencyOptions.agency.id);
     return callback();
   }
 
