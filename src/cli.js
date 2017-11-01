@@ -6,8 +6,7 @@
  *
  * This module acts as the command line interface for the database builder and
  * parses the command line arguments and options to build the Database Build
- * Options ({@link Options}) that are passed to the {@link module:start|start}
- * module.
+ * Options ({@link Options}) that are used by the {@link module:run|run} module.
  *
  * See `node ./src/cli.js --usage` for the script's command line usage.
  * @module cli
@@ -75,7 +74,7 @@ function _parseArgs() {
 
     // --force / -f
     else if ( arg === '--force' || arg === '-f' ) {
-      options.setForce();
+      options.set().force = true;
     }
 
     // --agency / -a
@@ -134,7 +133,7 @@ function _parseArgs() {
       }
       else {
         if ( fs.existsSync(args[i]) ) {
-          options.setPost(args[i]);
+          options.set().post = args[i];
         }
         else {
           log.error("ERROR: post script file does not exist (" + args[i] + ")");
@@ -153,10 +152,9 @@ function _parseArgs() {
   }
 
   // Flag agencies for update when force is set
-  if ( options.force() ) {
+  if ( options.get().force ) {
     for ( let i = 0; i < options.agencyCount(); i++ ) {
       options.agency(i).update = true;
-      options.agency(i).compile = true;
     }
   }
 

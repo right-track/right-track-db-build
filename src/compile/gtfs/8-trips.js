@@ -1,11 +1,13 @@
 'use strict';
 
 const build = require('../utils/build.js');
-const chalk = require('chalk');
-const error = function(text) {console.error(chalk.bold.red(text))};
+const log = require('../../helpers/log.js');
 
-
-// TABLE STRUCTURE
+/**
+ * gtfs_trips table definition
+ * @type {RTTableSchema}
+ * @private
+ */
 const TABLE = {
   sourceDirectory: "{{locations.gtfsDir}}",
   sourceFile: "trips.txt",
@@ -67,19 +69,28 @@ const TABLE = {
 };
 
 
-
+/**
+ * Build gtfs_trips table
+ * @type {buildTable}
+ * @private
+ */
 function buildTable(db, agency, callback) {
-  build.init(db, TABLE, agency, function(err) {
-    if ( err ) {
-      error("        WARNING: " + err.message);
-    }
-    _checkTripHeadsigns(db, callback);
+  build.init(db, TABLE, agency, function() {
+    _checkTripHeadsigns(db, function() {
+      callback();
+    });
   });
 }
 
 
+/**
+ * Check the trip headsigns.  Set them to "To <destination>"
+ * @param db
+ * @param callback
+ * @private
+ */
 function _checkTripHeadsigns(db, callback) {
-  console.log("        ... Checking trip headsigns");
+  log("        ... Checking trip headsigns");
 
   db.all("SELECT trip_id FROM " + TABLE.name + ";",
     function(err, rows) {
@@ -94,6 +105,14 @@ function _checkTripHeadsigns(db, callback) {
   );
 }
 
+/**
+ * Update the trip_headsign field for the specified row
+ * @param db
+ * @param rows
+ * @param count
+ * @param callback
+ * @private
+ */
 function _updateTripRow(db, rows, count, callback) {
   if ( count < rows.length ) {
     let trip_id = rows[count].trip_id;

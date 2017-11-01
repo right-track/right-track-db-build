@@ -14,26 +14,26 @@ const rl = require('readline');
 const fs = require('fs');
 const path = require('path');
 const config = require('../../../config.json');
-const chalk = require('chalk');
-const error = function(text) {console.error(chalk.bold.red(text))};
+const log = require('../../helpers/log.js');
+const errors = require('../../helpers/errors.js');
 
 
 /**
  * Initialize the Table in the database.  This will drop an existing table,
  * create a new one (along with any specified indices and/or foreign key
  * relationships) and import the data from the table's source file.
- * @param {sqlite3} db SQlite Database being built
+ * @param {object} db SQLite Database being built
  * @param {RTTableSchema} table The Right Track Table Schema
- * @param {RightTrackAgency} agency The `RightTrackAgency` Class of the Agency DB being built
- * @param {function} callback Callback function(err) called when init is finished
+ * @param {object} agencyOptions The Agency Build Options
+ * @param {buildTableCallback} callback Callback function called when init is finished
  */
-function init(db, table, agency, callback) {
+function init(db, table, agencyOptions, callback) {
 
   // Create the Table
   create(db, table, function() {
 
     // Load the source file into the table
-    load(db, table, agency, callback);
+    load(db, table, agencyOptions, callback);
 
   });
 
@@ -42,12 +42,12 @@ function init(db, table, agency, callback) {
 
 /**
  * Create the table in the database, along with indices and foreign keys
- * @param {sqlite3} db SQLite Database being built
+ * @param {object} db SQLite Database being built
  * @param {RTTableSchema} table The Right Track Table Schema
- * @param {function} callback Callback function(err) called when create is finished
+ * @param {buildTableCallback} callback Callback function called when create is finished
  */
 function create(db, table, callback) {
-  console.log("        ... Creating " + table.name);
+  log("        ... Creating " + table.name);
 
   // Drop Table
   let drop = "DROP TABLE IF EXISTS " + table.name + ";";
@@ -98,12 +98,20 @@ function create(db, table, callback) {
 
 /**
  * Load the source file into the database
- * @param {sqlite3} db SQLite database being built
+ * @param {object} db SQLite database being built
  * @param {RTTableSchema} table The Right Track Table Schema
- * @param {Object} agency Agency Build Options
- * @param {function} callback Callback function(err) called when load is finished
+ * @param {Object} agencyOptions Agency Build Options
+ * @param {buildTableCallback} callback Callback function called when load is finished
  */
-function load(db, table, agency, callback) {
+function load(db, table, agencyOptions, callback) {
+
+  // Make sure source directory and files are defined
+  if ( table.sourceDirectory === undefined || table.sourceFile === undefined ) {
+    let msg = "Source directory and/or file are not defined for table " + table.name;
+    log.warning("        WARNING: " + msg);
+    errors.warning(msg, undefined, agencyOptions.agency.id);
+    return callback();
+  }
 
   // Determine source file
   let sourceDirectory = _parseConfigValue(table.sourceDirectory);
@@ -111,7 +119,7 @@ function load(db, table, agency, callback) {
 
   // Add agency module directory to relative paths
   if ( _isRelativePath(sourceDirectory) ) {
-    sourceDirectory = path.normalize(agency.agency.moduleDirectory + "/" + sourceDirectory);
+    sourceDirectory = path.normalize(agencyOptions.agency.moduleDirectory + "/" + sourceDirectory);
   }
 
   // Build File Path
@@ -119,10 +127,16 @@ function load(db, table, agency, callback) {
 
   // Make sure file actually exists
   if ( !fs.existsSync(file) ) {
-    return callback(new Error("Source file does not exist (" + file + ")"));
+    let msg = "Source file does not exist (" + file + ")";
+    log.warning("        WARNING: " + msg);
+    errors.warning(msg, undefined, agencyOptions.agency.id);
+    return callback();
   }
 
-  console.log("        ... Importing " + path.basename(file));
+
+
+  // Start the import...
+  log("        ... Importing " + path.basename(file));
 
 
   // Source File Headers
@@ -212,16 +226,16 @@ function load(db, table, agency, callback) {
 
 /**
  * Add the specified values into the table
- * @param {sqlite3} db SQLite database being built
+ * @param {object} db SQLite database being built
  * @param {RTTableSchema} table The Right Track Table Schema
  * @param {object[]} values List of data to add to table.  Each object is a set
  * of data keypairs where the property name is the column header name and the
  * value is the data value to add.  Property names must match field names as
  * specified in the `RTTableSchema`.
- * @param {function} callback Callback function(err) called when the data has been added
+ * @param {buildTableCallback} callback Callback function called when the data has been added
  */
 function add(db, table, values, callback) {
-  console.log("        ... Adding data to " + table.name);
+  log("        ... Adding data to " + table.name);
   db.serialize(function() {
     db.exec("BEGIN TRANSACTION");
 
@@ -248,7 +262,9 @@ function add(db, table, values, callback) {
             }
           }
           else {
-            console.log("WARNING: Field " + property + " not found in table schema for table " + table.name);
+            let msg = "Field " + property + " not found in table schema for table " + table.name;
+            log.warning("        WARNING: " + msg);
+            errors.warning(msg, "DB File: " + db.filename, undefined);
           }
 
         }
@@ -376,7 +392,7 @@ function _split(str) {
  * Find the data field in the table schema based on the
  * name or source_name of the field
  * @param {string} name Lookup table field name
- * @param {object[]} fields RT Table Schema fields
+ * @param {Object[]} fields RT Table Schema fields
  * @returns {object|undefined} RT Table Schema for matching field
  * or undefined if no match found.
  * @private

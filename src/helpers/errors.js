@@ -44,8 +44,8 @@ function reset() {
 /**
  * Add an Error to the list of Right Track Exceptions
  * @param {string} message Error Message
- * @param {string} details Error Details
- * @param {string} agencyId Agency Code of Agency invoking the Error
+ * @param {string|undefined} details Error Details
+ * @param {string|undefined} agencyId Agency Code of Agency invoking the Error
  */
 function error(message, details, agencyId) {
   EXCEPTIONS.push(
@@ -62,8 +62,8 @@ function error(message, details, agencyId) {
 /**
  * Add a Warning to the list of Right Track Exceptions
  * @param {string} message Warning Message
- * @param {string} details Warning Details
- * @param {string} agencyId Agency Code of Agency invoking the Warning
+ * @param {string|undefined} details Warning Details
+ * @param {string|undefined} agencyId Agency Code of Agency invoking the Warning
  */
 function warning(message, details, agencyId) {
   EXCEPTIONS.push(

@@ -62,6 +62,7 @@ function _update() {
 
 /**
  * Callback function when update checks of all agencies are finished
+ * @type {runCallback}
  * @private
  */
 function _updateFinished() {
@@ -69,7 +70,7 @@ function _updateFinished() {
   // Count the number of agencies that need to compile
   let compileCount = 0;
   for ( let i = 0; i < options.agencyCount(); i++ ) {
-    if ( options.agency(i).update ) {
+    if ( options.agency(i).compile ) {
       compileCount++;
     }
   }
@@ -107,6 +108,7 @@ function _compile() {
 
 /**
  * Callback function when the compilation of all agencies is complete
+ * @type {runCallback}
  * @private
  */
 function _compileFinished() {
@@ -121,6 +123,7 @@ function _compileFinished() {
 
 /**
  * Callback function when everything is finished
+ * @type {runCallback}
  * @private
  */
 function _finished() {
@@ -141,9 +144,9 @@ function _finished() {
     exit = 2;
     log.warning(warnings.length + " WARNING(S) LOGGED", false);
     for ( let i = 0; i < warnings.length; i++ ) {
-      log.warning("--> " + warnings[i].message, false);
+      log.warning("--> " + warnings[i].message + " <" + warnings[i].agencyId + ">", false);
       if ( warnings[i].details ) {
-        log.warning("    " + warnings[i].details + " <" + warnings[i].agencyId + ">", false);
+        log.warning("    " + warnings[i].details, false);
       }
     }
   }
@@ -154,9 +157,9 @@ function _finished() {
     exit = 1;
     log.error(errs.length + " ERROR(S) LOGGED", false);
     for ( let i = 0; i < errs.length; i++ ) {
-      log.error("--> " + errs[i].message, false);
+      log.error("--> " + errs[i].message + " <" + errs[i].agencyId + ">", false);
       if ( errs[i].details ) {
-        log.error("    " + errs[i].details + " <" + errs[i].agencyId + ">", false);
+        log.error("    " + errs[i].details, false);
       }
     }
   }

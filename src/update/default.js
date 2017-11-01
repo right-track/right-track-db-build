@@ -1,8 +1,11 @@
 'use strict';
 
 /**
- * Right Track Database Builder: default agency GTFS update check
- * @module /update/default
+ * ### Default Update Check
+ *
+ * The default update check is used when the Right Track Agency configuration
+ * has the property: `build.updateURL`.
+ * @module update/default
  */
 
 const fs = require('fs');
@@ -11,16 +14,29 @@ const URL = require('url');
 const http = require('http');
 const Zip = require('adm-zip');
 const config = require('../../config.json');
-const log = console.log;
+const log = require('../helpers/log.js');
+const errors = require('../helpers/errors.js');
 
 
-// Agency Properties and callback functions
-let AGENCY = undefined;
-let UPDATE_CALLBACK = function() {};
+/**
+ * Agency Build Options
+ * @type {object}
+ * @private
+ */
+let AGENCY = {};
+
+/**
+ * Agency update callback function
+ * @type {updateCallback}
+ * @private
+ */
+let UPDATE_CALLBACK = function(requested, successful) {};
 
 
-// List of Errors
-let ERRORS = [];
+// Update flags
+let UPDATE_REQUESTED = false;
+let UPDATE_SUCCESSFUL = false;
+
 
 
 
@@ -36,20 +52,20 @@ let ERRORS = [];
  * than the one provided in the server's `last-modified` header, it will
  * download the zip file and unzip the contents into the agency's gtfs directory.
  *
- * @param {boolean} force True to force the update of GTFS files
- * @param {RightTrackAgency} agency the Right Track Agency to update
+ * @param {Object} agencyOptions Agency Build Options
  * @param {updateCallback} callback callback function when update is complete
+ * @type {updateFunction}
  */
-function defaultUpdate(force, agency, callback) {
+function defaultUpdate(agencyOptions, callback) {
   log("--> Checking for GTFS data update...");
 
   // Set agency and callback functions
-  AGENCY = agency;
+  AGENCY = agencyOptions.agency;
   UPDATE_CALLBACK = callback;
-  ERRORS = [];
 
-  // If we are forced to update...
-  if ( force ) {
+  // If an update is already flagged...
+  if ( agencyOptions.update ) {
+    UPDATE_REQUESTED = true;
     return _updateFiles();
   }
 
@@ -104,12 +120,13 @@ function _compareLastUpdate(server) {
 
     // No update required...
     if ( server <= local ) {
-      return _finish(false);
+      return _finish();
     }
 
   }
 
   // Update the GTFS Files
+  UPDATE_REQUESTED = true;
   return _updateFiles();
 }
 
@@ -142,10 +159,10 @@ function _downloadZip() {
       zip.close(_unzipFiles(serverLastModified));
     });
   }).on('error', function(err) {
-    error("ERROR: Could not download GTFS zip file for agency <" + AGENCY.id + ">");
-    error(err.message);
-    ERRORS.push("Could not download GTFS zip file for agency <" + AGENCY.id + ">");
-    return _finish(false);
+    let msg = "Could not download GTFS zip file for agency";
+    log.error("ERROR: " + msg);
+    errors.error(msg, err.message, AGENCY.id);
+    return _finish();
   });
 
 }
@@ -171,7 +188,8 @@ function _unzipFiles(serverLastModified) {
   fs.writeFile(lastModifiedFile, serverLastModified, function() {
 
     // Return with update flag
-    return _finish(true);
+    UPDATE_SUCCESSFUL = true;
+    return _finish();
 
   });
 }
@@ -179,11 +197,10 @@ function _unzipFiles(serverLastModified) {
 
 /**
  * Function to call when the update process if finished
- * @param {boolean} update Update requested flag
  * @private
  */
-function _finish(update) {
-  UPDATE_CALLBACK(ERRORS, update);
+function _finish() {
+  UPDATE_CALLBACK(UPDATE_REQUESTED, UPDATE_SUCCESSFUL);
 }
 
 

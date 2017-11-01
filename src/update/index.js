@@ -1,58 +1,52 @@
 'use strict';
 
 /**
- * Right Track Database Builde: start GTFS update checks
- * @module /update
+ * ### GTFS Data Update Checker
+ *
+ * This module runs the agency update checks.  The agencies to check are set
+ * in the build options and are returned from the {@link module:helpers/options|options}
+ * module.  Depending on the Agency settings, this will either run the default
+ * update function or the agency-specific update function.
+ * @module update
  */
 
+const config = require('../../config.json');
+const errors = require('../helpers/errors.js');
+const log = require('../helpers/log.js');
+const options = require('../helpers/options.js');
 const defaultUpdate = require('./default.js');
-const chalk = require('chalk');
-const log = console.log;
-const info = function(text) {console.log(chalk.yellow(text))};
-const error = function(text) {console.error(chalk.bold.red(text))};
 
 
-
-// Build Options
-let OPTIONS = undefined;
-
-// Final callback function
+/**
+ * Final callback to return to the run script
+ * @type {runCallback}
+ * @private
+ */
 let FINAL_CALLBACK = function() {};
 
 // Agency counter
-let CURRENT = 0;
+let AGENCY = 0;
 
 
 
 
 /**
  * Start the database update check process.  This will check for a GTFS data
- * update.  If an update is present, the new data will be downloaded and
- * unpacked into the agency's GTFS directory.
- * @param {Options} options The DB Build Options
- * @param {mainCallback} callback Final callback when the update process is complete.
+ * update for all agencies specified in the Database Build Options ({@link Options}).
+ * If an update is present, the new data will be downloaded and unpacked into
+ * the agency's GTFS directory.
+ * @param {runCallback} callback Final callback when the update process is complete.
  */
-function update(options, callback) {
+function update(callback) {
 
-  info("RUNNING AGENCY UPDATE CHECKS");
+  log.info("RUNNING AGENCY UPDATE CHECKS");
   log("------------------------------------------------");
 
-  // Set properties
-  OPTIONS = options;
+  // Set final callback
   FINAL_CALLBACK = callback;
 
-  // Make sure there is at least one agency provided
-  if ( OPTIONS.agencies.length === 0 ) {
-    error("ERROR: No agencies specified.");
-    error("Specify the agencies to include with the --agency flag");
-    OPTIONS.errors.push("No agencies specified");
-    _finish()
-  }
-
   // Start the first agency
-  else {
-    _startNextAgency();
-  }
+  _startNextAgency();
 
 }
 
@@ -63,31 +57,47 @@ function update(options, callback) {
  * @private
  */
 function _startNextAgency() {
+  let agencyOptions = options.agency(AGENCY);
 
   // Get the agency options
-  let agency = OPTIONS.agencies[CURRENT];
-  log("AGENCY: " + chalk.bgYellow.black(" " + agency.agency.id + " "));
+  log.raw([
+    {
+      "text": "AGENCY:"
+    },
+    {
+      "text": " " + agencyOptions.agency.id + " ",
+      "chalk": "bgYellow.black"
+    }
+  ]);
 
   // Use default update check method...
-  if ( _shouldUseDefaultUpdateMethod(agency) ) {
+  if ( _shouldUseDefaultUpdateMethod(agencyOptions) ) {
     log("--> Using default update script...");
-    defaultUpdate(OPTIONS.force, agency.agency, _agencyUpdateComplete);
+    defaultUpdate(agencyOptions, _agencyUpdateComplete);
   }
 
   // Use an agency-specific update method
   else {
+    let update = undefined;
+    let exception = undefined;
+    log("--> Using custom update script...");
 
-    // Look for the agency's update script
+    // Try to load the agency update script
     try {
-      log("--> Using custom update script...");
-      let update = require(agency.require + "/db-build/src/update.js");
-      update(OPTIONS.force, _agencyUpdateComplete);
+      update = require(agencyOptions.require + "/" + config.locations.updateScript);
+    }
+    catch(err) {
+      exception = err;
     }
 
-    // Agency does not have update script...
-    catch(exception) {
-      error("ERROR: could not run agency update script");
-      OPTIONS.errors.push("Could not run agency update script <" + agency.agency.id + ">");
+    // Run the update script
+    if ( update !== undefined ) {
+      update(agencyOptions, _agencyUpdateComplete);
+    }
+    else {
+      let msg = "Could not run agency update script";
+      log.error("ERROR: " + msg);
+      errors.error(msg, exception.message, agencyOptions.agency.id);
       _agencyComplete();
     }
 
@@ -97,21 +107,47 @@ function _startNextAgency() {
 
 /**
  * Function to call when an agency is finished with the update check
- * @param {string[]} errors List of errors encountered while updating
- * @param {boolean} update True when a database update is requested
+ * @param {boolean} requested Update requested flag
+ * @param {boolean} successful Update successful flag
+ * @type {updateCallback}
  * @private
  */
-function _agencyUpdateComplete(errors, update) {
-  OPTIONS.errors = OPTIONS.errors.concat(errors);
-  OPTIONS.agencies[CURRENT].update = update;
+function _agencyUpdateComplete(requested, successful) {
+  options.agency(AGENCY).update = requested;
+  options.agency(AGENCY).updateComplete = successful;
 
-  if ( update ) {
-    log("--> DB Update Requested: " + chalk.bgGreen.black.bold(" YES "));
+  let details = {};
+  if ( requested && successful ) {
+    options.agency(AGENCY).compile = true;
+
+    details = {
+      "text": " YES ",
+      "chalk": "bgGreen.black.bold"
+    };
+  }
+  else if ( requested && !successful ) {
+    details = {
+      "text": " UNSUCCESSFUL ",
+      "chalk": "bgRed.white.bold"
+    };
+    errors.error("Agency Update Check Unsuccessful", undefined, options.agency(AGENCY).agency.id);
   }
   else {
-    log("--> DB Update Requested: " + chalk.bgRed.white.bold(" NO "));
+    details = {
+      "text": " No Update ",
+      "chalk": "bgWhite.black.bold"
+    };
   }
 
+  // Log update status
+  log.raw([
+    {
+      "text": "--> GTFS Data Update:"
+    },
+    details
+  ]);
+
+  // Complete the agency update check
   _agencyComplete();
 }
 
@@ -122,10 +158,10 @@ function _agencyUpdateComplete(errors, update) {
  * @private
  */
 function _agencyComplete() {
-  CURRENT++;
+  AGENCY++;
 
   // Continue with the next agency if there are more
-  if ( CURRENT < OPTIONS.agencies.length ) {
+  if ( AGENCY < options.agencyCount() ) {
     log("------------------------------------------------");
     _startNextAgency();
   }
@@ -143,7 +179,7 @@ function _agencyComplete() {
  * @private
  */
 function _finish() {
-  FINAL_CALLBACK(OPTIONS);
+  FINAL_CALLBACK();
 }
 
 

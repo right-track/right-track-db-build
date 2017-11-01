@@ -1,11 +1,13 @@
 'use strict';
 
 const build = require('../utils/build.js');
-const chalk = require('chalk');
-const error = function(text) {console.error(chalk.bold.red(text))};
+const log = require('../../helpers/log.js');
 
-
-// TABLE STRUCTURE
+/**
+ * gtfs_stop_times table definition
+ * @type {RTTableSchema}
+ * @private
+ */
 const TABLE = {
   sourceDirectory: "{{locations.gtfsDir}}",
   sourceFile: "stop_times.txt",
@@ -82,24 +84,30 @@ const TABLE = {
 };
 
 
-
+/**
+ * Build gtfs_stop_times table
+ * @type {buildTable}
+ * @private
+ */
 function buildTable(db, agency, callback) {
-  build.init(db, TABLE, agency, function(err) {
-    if ( err ) {
-      error("        WARNING: " + err.message);
-    }
-
-    // Calculate arrival and departure seconds
+  build.init(db, TABLE, agency, function() {
     _calcArrivalSecs(db, function() {
-      _calcDepartureSecs(db, callback);
+      _calcDepartureSecs(db, function() {
+        callback();
+      });
     });
-
   });
 }
 
 
+/**
+ * Calculate the arrival_time_seconds field from the arrival_time field
+ * @param db
+ * @param callback
+ * @private
+ */
 function _calcArrivalSecs(db, callback) {
-  console.log("        ... Calculating arrival seconds");
+  log("        ... Calculating arrival seconds");
 
   db.all("SELECT DISTINCT arrival_time FROM " + TABLE.name + ";",
     function(err, rows) {
@@ -115,6 +123,14 @@ function _calcArrivalSecs(db, callback) {
 
 }
 
+/**
+ * Update specified row with the arrival_time_seconds
+ * @param db
+ * @param rows
+ * @param count
+ * @param callback
+ * @private
+ */
 function _updateArrivalRow(db, rows, count, callback) {
   if ( count < rows.length ) {
     let time = rows[count].arrival_time;
@@ -131,8 +147,14 @@ function _updateArrivalRow(db, rows, count, callback) {
 }
 
 
+/**
+ * Calculate the departure_time_seconds field from the departure_time field
+ * @param db
+ * @param callback
+ * @private
+ */
 function _calcDepartureSecs(db, callback) {
-  console.log("        ... Calculating departure seconds");
+  log("        ... Calculating departure seconds");
 
   db.all("SELECT DISTINCT departure_time FROM " + TABLE.name + ";",
     function(err, rows) {
@@ -148,6 +170,14 @@ function _calcDepartureSecs(db, callback) {
 
 }
 
+/**
+ * Update the specified row with the departure_time_seconds
+ * @param db
+ * @param rows
+ * @param count
+ * @param callback
+ * @private
+ */
 function _updateDepartureRow(db, rows, count, callback) {
   if ( count < rows.length ) {
     let time = rows[count].departure_time;
@@ -164,9 +194,12 @@ function _updateDepartureRow(db, rows, count, callback) {
 }
 
 
-
-
-
+/**
+ * Convert time in HH:mm:ss format to # of seconds since midnight
+ * @param time
+ * @returns {number}
+ * @private
+ */
 function _convertTimeToSecs(time) {
   let parts = time.split(':');
   return parts[0]*3600+parts[1]*60+parts[2]*1;

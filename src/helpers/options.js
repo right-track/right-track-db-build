@@ -8,15 +8,12 @@
  * @module helpers/options
  */
 
-const config = require('../../config.json');
-
-
 /**
  * Database Build Options
  * Load the default options from the config file
  * @private
  */
-let OPTIONS = config.options;
+let OPTIONS = require('../../config.json').options;
 
 
 
@@ -25,32 +22,14 @@ let OPTIONS = config.options;
 
 /**
  * Set the Right Track Database Build Options
- * @param {Options} options The Build Options
+ * @param {Options} [options] The Build Options
+ * @returns {Options} The Build Options
  */
 function set(options) {
   if ( options ) {
     OPTIONS = options;
   }
-}
-
-/**
- * Set the force update and compilation flag
- * @param force
- */
-function setForce(force=true) {
-  OPTIONS.force = force;
-}
-
-
-/**
- * Set the Database Post-Compile Script to run after the
- * database update and compilation process is complete
- * @param {string} script Path to post-compile script
- */
-function setPost(script) {
-  if ( script ) {
-    OPTIONS.post = script;
-  }
+  return OPTIONS;
 }
 
 
@@ -104,22 +83,6 @@ function get() {
 }
 
 /**
- * Get the Force flag
- * @returns {boolean}
- */
-function force() {
-  return OPTIONS.force;
-}
-
-/**
- * Get the Post-compile script location
- * @returns {string}
- */
-function post() {
-  return OPTIONS.post;
-}
-
-/**
  * Get the number of agencies added to the Database Build Options
  * @returns {int}
  */
@@ -140,14 +103,10 @@ function agency(index) {
 
 module.exports = {
   set: set,
-  setForce: setForce,
-  setPost: setPost,
   addAgency: addAgency,
   addAgencyConfig: addAgencyConfig,
   addAgencyNotes: addAgencyNotes,
   get: get,
-  force: force,
-  post: post,
   agencyCount: agencyCount,
   agency: agency
 };

@@ -7,30 +7,31 @@
  *
  * This will run all .js files in the specified directory that export
  * a `buildTable` function.
- * @module /compile/utils/buildDirectory
+ * @module compile/utils/buildDirectory
  */
 
 const fs = require('fs');
 const path = require('path');
+const log = require('../../helpers/log.js');
 
 
 /**
  * Run all of the build table scripts in the specified directory.  This will find
  * all .js files that export a `buildTable` function and run the scripts in
  * alphabetical order of the scripts' filenames.
- * @param {sqlite3} db The SQLite database being built
- * @param {Object} agency The Agency Build Options
+ * @param {Object} db The SQLite database being built
+ * @param {Object} agencyOptions The Agency Build Options
  * @param {string} directory The path to the directory containing the build scripts
  * @param {function} callback Callback function() called when all build scripts have finished
  */
-function buildDirectory(db, agency, directory, callback) {
-  console.log("--> Processing Build Scripts From Directory: " + path.basename(directory));
+function buildDirectory(db, agencyOptions, directory, callback) {
+  log("--> Processing Build Scripts From Directory: " + path.basename(directory));
 
   // Get the builders in the directory
   let builders = _getBuildFunctions(directory);
 
   // Start running the builders
-  _runBuilder(0, builders, db, agency, callback);
+  _runBuilder(0, builders, db, agencyOptions, callback);
 
 }
 
@@ -40,23 +41,23 @@ function buildDirectory(db, agency, directory, callback) {
  * all build scripts have been run, call the callback function.
  * @param {int} index Index of build script to run
  * @param {object[]} builders List of Builders
- * @param {sqlite3} db The SQLite Database being built
- * @param {Object} agency Agency Build Options
+ * @param {object} db The SQLite Database being built
+ * @param {object} agencyOptions Agency Build Options
  * @param {function} callback Callback function() called when all build scripts have finished
  * @private
  */
-function _runBuilder(index, builders, db, agency, callback) {
+function _runBuilder(index, builders, db, agencyOptions, callback) {
 
   // Run the builder
   if ( index < builders.length ) {
     let builder = builders[index];
-    console.log("    --> " + builder.file);
+    log("    --> " + builder.file);
 
     // Run the build script
-    builder.build(db, agency, function() {
+    builder.build(db, agencyOptions, function() {
 
       // Start the Next Builder when this one is finished
-      _runBuilder(index+1, builders, db, agency, callback);
+      _runBuilder(index+1, builders, db, agencyOptions, callback);
 
     });
 

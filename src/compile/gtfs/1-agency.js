@@ -1,11 +1,12 @@
 'use strict';
 
 const build = require('../utils/build.js');
-const chalk = require('chalk');
-const error = function(text) {console.error(chalk.bold.red(text))};
 
-
-// TABLE STRUCTURE
+/**
+ * gtfs_agency table definition
+ * @type {RTTableSchema}
+ * @private
+ */
 const TABLE = {
   sourceDirectory: "{{locations.gtfsDir}}",
   sourceFile: "agency.txt",
@@ -47,12 +48,13 @@ const TABLE = {
 };
 
 
-
-function buildTable(db, agency, callback) {
-  build.init(db, TABLE, agency, function(err) {
-    if ( err ) {
-      error("        WARNING: " + err.message);
-    }
+/**
+ * Build gtfs_agency table
+ * @type {buildTable}
+ * @private
+ */
+function buildTable(db, agencyOptions, callback) {
+  build.init(db, TABLE, agencyOptions, function() {
     callback();
   });
 }

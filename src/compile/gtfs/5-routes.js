@@ -1,11 +1,13 @@
 'use strict';
 
 const build = require('../utils/build.js');
-const chalk = require('chalk');
-const error = function(text) {console.error(chalk.bold.red(text))};
+const log = require('../../helpers/log.js');
 
-
-// TABLE STRUCTURE
+/**
+ * gtfs_routes table definition
+ * @type {RTTableSchema}
+ * @private
+ */
 const TABLE = {
   sourceDirectory: "{{locations.gtfsDir}}",
   sourceFile: "routes.txt",
@@ -59,12 +61,16 @@ const TABLE = {
 
 
 
+/**
+ * Build gtfs_agency table
+ * @type {buildTable}
+ * @private
+ */
 function buildTable(db, agency, callback) {
-  build.init(db, TABLE, agency, function(err) {
-    if ( err ) {
-      error("        WARNING: " + err.message);
-    }
-    _checkRouteNames(db, callback);
+  build.init(db, TABLE, agency, function() {
+    _checkRouteNames(db, function() {
+      callback();
+    });
   });
 }
 
@@ -76,7 +82,7 @@ function buildTable(db, agency, callback) {
  * @private
  */
 function _checkRouteNames(db, callback) {
-  console.log("        ... Checking route short names");
+  log("        ... Checking route short names");
 
   let sql = "";
   db.each("SELECT route_short_name, route_long_name FROM " + TABLE.name + ";",
@@ -90,10 +96,7 @@ function _checkRouteNames(db, callback) {
       }
     },
     function() {
-      db.exec(sql, function(err) {
-        if ( err ) {
-          error("       WARNING: could not fix routes");
-        }
+      db.exec(sql, function() {
         callback();
       });
     }

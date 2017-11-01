@@ -10,6 +10,7 @@
         "gtfsDir": "./db-build/gtfs/",
         "lastModified": "./db-build/gtfs/lastModified.txt",
         "gtfsZip": "./db-build/gtfs/gtfs.zip",
-        "rtDir": "./db-build/rt/"
+        "rtDir": "./db-build/rt/",
+        "updateScript": "./db-build/src/update.js"
     }
 }

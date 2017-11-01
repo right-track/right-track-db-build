@@ -1,24 +1,26 @@
 'use strict';
 
 /**
- * Right Track Database Builder: start database compilation
- * @module /compile
+ * ### Right Track Database Compiler
+ *
+ * This module starts the database compilation process.  It will run the
+ * build scripts found in the `./gtfs/` and `./rt/` directories.
+ * @module compile
  */
 
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const errors = require('../helpers/errors.js');
+const log = require('../helpers/log.js');
+const options = require('../helpers/options.js');
 const config = require('../../config.json');
 const buildDirectory = require('./utils/buildDirectory.js');
-const chalk = require('chalk');
-const log = console.log;
-const info = function(text) {console.log(chalk.yellow(text))};
-const error = function(text) {console.error(chalk.bold.red(text))};
 
 
-// DB Build Options
-let OPTIONS = undefined;
-
-// Final callback when everything is finished
+/**
+ * Final callback to return to the run script
+ * @type {runCallback}
+ */
 let FINAL_CALLBACK = function() {};
 
 // Agency Index Counter
@@ -30,15 +32,13 @@ let AGENCY = -1;
 
 /**
  * Start the database compilation process
- * @param {Options} options DB Build Options
- * @param {mainCallback} callback Callback function when the database compilation is complete
+ * @param {runCallback} callback Callback function when the database compilation is complete
  */
-function compile(options, callback) {
-  info("RUNNING DATABASE COMPILATION SCRIPTS");
+function compile(callback) {
+  log.info("RUNNING DATABASE COMPILATION SCRIPTS");
   log("------------------------------------------------");
 
   // Set properties
-  OPTIONS = options;
   FINAL_CALLBACK = callback;
 
   // Start with the first agency
@@ -56,8 +56,8 @@ function _startNextAgency() {
   AGENCY++;
 
   // Continue with the next agency if there are more
-  if ( AGENCY < OPTIONS.agencies.length ) {
-    if ( OPTIONS.agencies[AGENCY].update ) {
+  if ( AGENCY < options.agencyCount() ) {
+    if ( options.agency(AGENCY).compile ) {
       _compile();
     }
     else {
@@ -79,49 +79,58 @@ function _startNextAgency() {
  * @private
  */
 function _compile() {
-  let agency = OPTIONS.agencies[AGENCY];
+  let agencyOptions = options.agency(AGENCY);
 
   // Start compiling agency...
-  log("AGENCY: " + chalk.bgYellow.black(" " + agency.agency.id + " "));
+  log.raw([
+    {
+      "text": "AGENCY:"
+    },
+    {
+      "text": " " + agencyOptions.agency.id + " ",
+      "chalk": "bgYellow.black"
+    }
+  ]);
 
   // Open Database
   let db = new sqlite3.Database(
-    path.normalize(agency.agency.moduleDirectory + "/" + config.locations.db),
+    path.normalize(agencyOptions.agency.moduleDirectory + "/" + config.locations.db),
     function(err) {
       if ( err ) {
-        error("ERROR: Could not open database for agency <" + agency.agency.id + ">");
-        OPTIONS.errors.push("Could not open database for agency <" + agency.agency.id + ">");
+        let msg = "Could not open agency database";
+        log.error("ERROR: " + msg);
+        errors.error(msg, err.message, agencyOptions.agency.id);
         _finishAgency(db);
       }
 
       else {
-        _build(db, agency);
+        _build(db, agencyOptions);
       }
     }
   );
 
   // DB Error Handler
   db.on('error', function(err) {
-    error("ERROR: " + err.message + " <" + agency.agency.id + ">");
-    OPTIONS.errors.push(err.message + " <" + agency.agency.id + ">");
+    log.error("ERROR: " + err.message);
+    errors.error(err.message, err.stack, agencyOptions.agency.id);
   });
 
 }
 
 /**
- * Build the Database tables by calling the build scripts in the
- * gtfs and rt directories
- * @param {sqlite3} db The SQLite Database being built
- * @param {object} agency The Agency Build Options
+ * Build the Database tables by calling the build scripts in the gtfs and
+ * rt directories
+ * @param {Object} db The SQLite Database being built
+ * @param {object} agencyOptions The Agency Build Options
  * @private
  */
-function _build(db, agency) {
+function _build(db, agencyOptions) {
 
   let gtfsDirectory = path.normalize(__dirname + '/gtfs/');
   let rtDirectory = path.normalize(__dirname + '/rt/');
 
-  buildDirectory(db, agency, gtfsDirectory, function() {
-    buildDirectory(db, agency, rtDirectory, function() {
+  buildDirectory(db, agencyOptions, gtfsDirectory, function() {
+    buildDirectory(db, agencyOptions, rtDirectory, function() {
       _finishAgency(db, true);
     });
   });
@@ -131,8 +140,8 @@ function _build(db, agency) {
 
 /**
  * Callback function for when the agency is finished compiling
- * @param db SQLite database that was built
- * @param compiled Successful compilation flag
+ * @param {object} db SQLite database that was built
+ * @param {boolean} [compiled=false] Successful compilation flag
  * @private
  */
 function _finishAgency(db, compiled=false) {
@@ -141,7 +150,7 @@ function _finishAgency(db, compiled=false) {
   db.close();
 
   // Flag the agency as compiled
-  OPTIONS.agencies[AGENCY].compile = compiled;
+  options.agency(AGENCY).compileComplete = compiled;
 
   // Continue to the next agency
   _startNextAgency();
@@ -156,7 +165,7 @@ function _finishAgency(db, compiled=false) {
  * @private
  */
 function _finish() {
-  FINAL_CALLBACK(OPTIONS);
+  FINAL_CALLBACK();
 }
 
 

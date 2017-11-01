@@ -3,7 +3,10 @@
 const build = require('../utils/build.js');
 
 
-// TABLE STRUCTURE
+/**
+ * gtfs_directions table definition
+ * @type {RTTableSchema}
+ */
 const TABLE = {
   sourceDirectory: "{{locations.gtfsDir}}",
   sourceFile: "gtfs_directions",
@@ -20,7 +23,10 @@ const TABLE = {
   ]
 };
 
-// INITIAL DATA VALUES FOR TABLE
+/**
+ * Initial values for table
+ * @type {RTTableValues}
+ */
 const VALUES = [
   {
     "direction_id": 0,
@@ -33,9 +39,16 @@ const VALUES = [
 ];
 
 
-function buildTable(db, agency, callback) {
+/**
+ * Build gtfs_calendar_dates table
+ * @type {buildTable}
+ * @private
+ */
+function buildTable(db, agencyOptions, callback) {
   build.create(db, TABLE, function() {
-    build.add(db, TABLE, VALUES, callback);
+    build.add(db, TABLE, VALUES, function() {
+      callback();
+    });
   });
 }
 
