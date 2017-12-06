@@ -11,6 +11,7 @@ const build = require('../utils/build.js');
 const TABLE = {
   sourceDirectory: "{{locations.gtfsDir}}",
   sourceFile: "gtfs_directions",
+  name: "gtfs_directions",
   fields: [
     {
       "name": "direction_id",
