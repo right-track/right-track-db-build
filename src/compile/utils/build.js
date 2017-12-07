@@ -105,8 +105,13 @@ function create(db, table, callback) {
  */
 function load(db, table, agencyOptions, callback) {
 
-  // Make sure source directory and files are defined
-  if ( table.sourceDirectory === undefined || table.sourceFile === undefined ) {
+  // Skip when no source file provided
+  if ( table.sourceFile === undefined && table.sourceDirectory === undefined ) {
+    return callback();
+  }
+
+  // Make sure source directory is defined if source file provided
+  if ( table.sourceFile !== undefined && table.sourceDirectory === undefined ) {
     let msg = "Source directory and/or file are not defined for table " + table.name;
     log.warning("        WARNING: " + msg);
     errors.warning(msg, "Directory: " + table.sourceDirectory + " and File: " + table.sourceFile, agencyOptions.agency.id);
