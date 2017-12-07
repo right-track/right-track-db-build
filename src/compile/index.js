@@ -106,22 +106,24 @@ function _compile() {
     }
   ]);
 
-  // Open Database
-  let db = new sqlite3.Database(
-    path.normalize(agencyOptions.agency.moduleDirectory + "/" + config.locations.db),
-    function(err) {
-      if ( err ) {
-        let msg = "Could not open agency database";
-        log.error("ERROR: " + msg);
-        errors.error(msg, err.message, agencyOptions.agency.id);
-        _finishAgency(db);
-      }
+  // Remove Existing Database
+  let dbPath = path.normalize(agencyOptions.agency.moduleDirectory + "/" + config.locations.db);
+  if ( fs.existsSync(dbPath) ) {
+    fs.unlinkSync(dbPath);
+  }
 
-      else {
-        _build(db, agencyOptions);
-      }
+  // Open Database
+  let db = new sqlite3.Database(dbPath, function(err) {
+    if ( err ) {
+      let msg = "Could not open agency database";
+      log.error("ERROR: " + msg);
+      errors.error(msg, err.message, agencyOptions.agency.id);
+      _finishAgency(db);
     }
-  );
+    else {
+      _build(db, agencyOptions);
+    }
+  });
 
   // DB Error Handler
   db.on('error', function(err) {
