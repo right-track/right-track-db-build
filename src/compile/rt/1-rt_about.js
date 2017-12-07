@@ -88,13 +88,30 @@ function init(db, agencyOptions, callback) {
   let start = compile;
   let end = compile;
   db.get("SELECT MIN(start_date) AS start, MAX(end_date) AS end FROM " + config.tables.gtfs.calendar + ";", function(err, row) {
+    if ( err ) {
+      let msg = "Could not get DB start and/or end dates";
+      log.error("        ERROR: " + msg);
+      errors.error(msg, "rt_about data has not been set", agencyOptions.agency.id);
+      return callback();
+    }
+
+    // Set calendar start/end dates
     let calendar_start = row.start;
     let calendar_end = row.end;
 
     // Get Start and End Dates from gtfs_calendar_dates
     db.get("SELECT MIN(date) AS start, MAX(date) AS end FROM " + config.tables.gtfs.calendar_dates + ";", function(err, row) {
+      if ( err ) {
+        let msg = "Could not get DB start and/or end dates";
+        log.error("        ERROR: " + msg);
+        errors.error(msg, "rt_about data has not been set", agencyOptions.agency.id);
+        return callback();
+      }
+
+      // Set calendar_dates start/end dates
       let dates_start = row.start;
       let dates_end = row.end;
+
 
       // Get Start Date
       if ( calendar_start === null ) {
