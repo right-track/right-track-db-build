@@ -1,7 +1,8 @@
 {
   "options": {
     "force": false,
-    "agencies": []
+    "agencies": [],
+    "locale": "en_US"
   },
   "locations": {
     "buildDir": "./db-build/",
