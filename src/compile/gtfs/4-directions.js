@@ -11,8 +11,6 @@ const build = require('../utils/build.js');
  */
 const TABLE = {
   name: config.tables.gtfs.directions,
-  sourceDirectory: config.locations.gtfsDir,
-  sourceFile: "gtfs_directions",
   fields: [
     {
       "name": "direction_id",
