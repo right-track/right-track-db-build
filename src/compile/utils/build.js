@@ -159,11 +159,11 @@ function load(db, table, agencyOptions, callback) {
   // Read each line of the source file
   rd.on('line', function(line) {
     if ( !readHeaders ) {
-      headers = _split(line);
+      headers = _split(line, table.separator);
       readHeaders = true;
     }
     else {
-      let items = _split(line);
+      let items = _split(line, table.separator);
 
       // Start column and value data strings
       let columns = "(";
@@ -329,11 +329,12 @@ function _isRelativePath(directory) {
  * Split a line from a source file into separate fields.  Remove all
  * double and single quotes from the field
  * @param {string} str The line from the source file
+ * @param {string} [sep=,] The field separator
  * @returns {Array} List of parsed fields
  * @private
  */
-function _split(str) {
-  let items = str.split(',');
+function _split(str, sep=',') {
+  let items = str.split(sep);
   for ( let i = 0; i < items.length; i++ ) {
     let item = items[i];
     if ( item.indexOf("\"") > -1 ) {
