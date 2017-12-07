@@ -13,6 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 const log = require('../../helpers/log.js');
+const errors = require('../../helpers/errors.js');
 
 
 /**
@@ -26,6 +27,13 @@ const log = require('../../helpers/log.js');
  */
 function buildDirectory(db, agencyOptions, directory, callback) {
   log("--> Processing Build Scripts From Directory: " + path.basename(directory));
+
+  // Check to make sure directory exists
+  if ( !fs.existsSync(directory) ) {
+    log.warning("        WARNING: Source directory does not exist (" + directory + ")");
+    errors.warning("Source directory does not exist", "Directory: " + directory, agencyOptions.agency.id);
+    return callback();
+  }
 
   // Get the builders in the directory
   let builders = _getBuildFunctions(directory);
