@@ -8,6 +8,7 @@
  * @module compile
  */
 
+const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const errors = require('../helpers/errors.js');
@@ -80,6 +81,18 @@ function _startNextAgency() {
  * @private
  */
 function _compile() {
+
+  // Set compiled Date
+  let compiled = new Date();
+  options.agency(AGENCY).compiled = compiled;
+
+  // Set version
+  let version = _version(compiled);
+  let version_path = path.normalize(options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.version);
+  fs.writeFileSync(version_path, version);
+  options.agency(AGENCY).version = parseInt(version);
+
+  // Get agency options
   let agencyOptions = options.agency(AGENCY);
 
   // Start compiling agency...
@@ -167,6 +180,23 @@ function _finishAgency(db, compiled=false) {
  */
 function _finish() {
   FINAL_CALLBACK();
+}
+
+
+
+
+/**
+ * Generate the DB Version from the compile date/time
+ * @param compiled Compile Date
+ * @returns {string} DB Version
+ * @private
+ */
+function _version(compiled) {
+  let yyyy = compiled.getFullYear();
+  let mm = compiled.getMonth()+1;
+  let dd  = compiled.getDate();
+  let hh = compiled.getHours();
+  return String(1000000*yyyy + 10000*mm + 100*dd + hh);
 }
 
 

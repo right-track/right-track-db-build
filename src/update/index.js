@@ -10,6 +10,8 @@
  * @module update
  */
 
+const fs = require('fs');
+const path = require('path');
 const config = require('../../config.json');
 const errors = require('../helpers/errors.js');
 const log = require('../helpers/log.js');
@@ -84,7 +86,7 @@ function _startNextAgency() {
 
     // Try to load the agency update script
     try {
-      update = require(agencyOptions.require + "/" + config.locations.updateScript);
+      update = require(agencyOptions.agency.moduleDirectory + "/" + config.locations.updateScript);
     }
     catch(err) {
       exception = err;
@@ -115,6 +117,13 @@ function _startNextAgency() {
 function _agencyUpdateComplete(requested, successful) {
   options.agency(AGENCY).update = requested;
   options.agency(AGENCY).updateComplete = successful;
+  options.agency(AGENCY).published = new Date(
+    fs.readFileSync(
+      path.normalize(
+        options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.published
+      )
+    ).toString()
+  );
 
   let details = {};
   if ( requested && successful ) {

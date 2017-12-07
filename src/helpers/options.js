@@ -43,8 +43,11 @@ function addAgency(require) {
     agency.require = require;
     agency.update = false;
     agency.updateComplete = false;
+    agency.published = undefined;
     agency.compile = false;
     agency.compileComplete = false;
+    agency.compiled = undefined;
+    agency.version = undefined;
 
     OPTIONS.agencies.push(agency);
   }
