@@ -12,5 +12,23 @@
     "gtfsZip": "./db-build/gtfs/gtfs.zip",
     "rtDir": "./db-build/rt/",
     "updateScript": "./db-build/src/update.js"
+  },
+  "tables": {
+    "gtfs": {
+      "agency": "gtfs_agency",
+      "calendar": "gtfs_calendar",
+      "calendar_dates": "gtfs_calendar_dates",
+      "directions": "gtfs_directions",
+      "routes": "gtfs_routes",
+      "stops": "gtfs_stops",
+      "stop_times": "gtfs_stop_times",
+      "trips": "gtfs_trips"
+    },
+    "rt": {
+      "about": "rt_about",
+      "stops_extra": "rt_stops_extra",
+      "al_stop_names": "rt_alt_stop_names",
+      "holidays": "rt_holidays"
+    }
   }
 }

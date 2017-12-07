@@ -1,8 +1,9 @@
 'use strict';
 
+const config = require('../../../config.json');
 const build = require('../utils/build.js');
 const log = require('../../helpers/log.js');
-
+const errors = require('../../helpers/errors.js');
 
 /**
  * rt_about table definition
@@ -10,7 +11,7 @@ const log = require('../../helpers/log.js');
  * @private
  */
 const TABLE = {
-  name: "rt_about",
+  name: config.tables.rt.about,
   fields: [
     {
       "name": "compile_date",
@@ -86,12 +87,12 @@ function init(db, agencyOptions, callback) {
   // Get Start and End Dates from gtfs_calendar
   let start = compile;
   let end = compile;
-  db.get("SELECT MIN(start_date) AS start, MAX(end_date) AS end FROM gtfs_calendar;", function(err, row) {
+  db.get("SELECT MIN(start_date) AS start, MAX(end_date) AS end FROM " + config.tables.gtfs.calendar + ";", function(err, row) {
     let calendar_start = row.start;
     let calendar_end = row.end;
 
     // Get Start and End Dates from gtfs_calendar_dates
-    db.get("SELECT MIN(date) AS start, MAX(date) AS end FROM gtfs_calendar_dates;", function(err, row) {
+    db.get("SELECT MIN(date) AS start, MAX(date) AS end FROM " + config.tables.gtfs.calendar_dates + ";", function(err, row) {
       let dates_start = row.start;
       let dates_end = row.end;
 
@@ -125,7 +126,7 @@ function init(db, agencyOptions, callback) {
 
 
       // INSERT DATA
-      let sql = "INSERT INTO rt_about (compile_date, gtfs_publish_date, start_date, end_date, version, notes) VALUES (" + compile + ", " + publish + ", " + start + ", " + end + ", " + version + ", '" + notes + "');";
+      let sql = "INSERT INTO " + config.tables.rt.about + " (compile_date, gtfs_publish_date, start_date, end_date, version, notes) VALUES (" + compile + ", " + publish + ", " + start + ", " + end + ", " + version + ", '" + notes + "');";
       db.exec(sql, function() {
         return callback();
       });

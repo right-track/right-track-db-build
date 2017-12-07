@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('../../../config.json');
 const build = require('../utils/build.js');
 
 /**
@@ -8,9 +9,9 @@ const build = require('../utils/build.js');
  * @private
  */
 const TABLE = {
-  sourceDirectory: "{{locations.gtfsDir}}",
+  name: config.tables.gtfs.agency,
+  sourceDirectory: config.locations.gtfsDir,
   sourceFile: "agency.txt",
-  name: "gtfs_agency",
   fields: [
     {
       "name": "agency_id",

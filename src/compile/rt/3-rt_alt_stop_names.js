@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('../../../config.json');
 const build = require('../utils/build.js');
 
 /**
@@ -8,9 +9,9 @@ const build = require('../utils/build.js');
  * @private
  */
 const TABLE = {
-  sourceDirectory: "{{locations.rtDir}}",
+  name: config.tables.rt.al_stop_names,
+  sourceDirectory: config.locations.rtDir,
   sourceFile: "rt_alt_stop_names.csv",
-  name: "rt_alt_stop_names",
   fields: [
     {
       "name": "stop_id",

@@ -61,9 +61,9 @@
  * This defines the Right Track Database table's properties, including table
  * fields and their types, foreign keys, and indices.
  * @typedef {Object} RTTableSchema
+ * @property {string} name Name of table in the final database
  * @property {string|undefined} [sourceDirectory] Path to the directory containing the source file
  * @property {string|undefined} [sourceFile] Name of the source file
- * @property {string} name Name of table in the final database
  * @property {Object[]} fields List of table fields
  * @property {string} fields[].name Name of field (will be column name in final table and must match source file header name unless `source_name` is specified)
  * @property {string} fields[].type Data Type of field (TEXT, INTEGER, etc)

@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('../../../config.json');
 const build = require('../utils/build.js');
 const log = require('../../helpers/log.js');
 
@@ -9,9 +10,9 @@ const log = require('../../helpers/log.js');
  * @private
  */
 const TABLE = {
-  sourceDirectory: "{{locations.gtfsDir}}",
+  name: config.tables.gtfs.trips,
+  sourceDirectory: config.locations.gtfsDir,
   sourceFile: "trips.txt",
-  name: "gtfs_trips",
   fields: [
     {
       "name": "route_id",
@@ -118,15 +119,15 @@ function _updateTripRow(db, rows, count, callback) {
     let trip_id = rows[count].trip_id;
 
     // Get name of last stop
-    db.get("SELECT stop_name FROM gtfs_stops WHERE stop_id = (" +
-      "SELECT stop_id FROM gtfs_stop_times WHERE trip_id = '" + trip_id + "' AND stop_sequence = (" +
-      "SELECT MAX(stop_sequence) FROM gtfs_stop_times WHERE trip_id = '" + trip_id + "'" +
+    db.get("SELECT stop_name FROM " + config.tables.gtfs.stops + " WHERE stop_id = (" +
+      "SELECT stop_id FROM " + config.tables.gtfs.stop_times + " WHERE trip_id = '" + trip_id + "' AND stop_sequence = (" +
+      "SELECT MAX(stop_sequence) FROM " + config.tables.gtfs.stop_times + " WHERE trip_id = '" + trip_id + "'" +
       ")" +
       ");",
       function(err, row) {
 
         // Update trip headsign = "To last_stop_name"
-        db.exec("UPDATE " + TABLE.name + " SET trip_headsign = 'To " + row.stop_name + "' WHERE trip_id = '" + trip_id + "';",
+        db.exec("UPDATE " + config.tables.gtfs.trips + " SET trip_headsign = 'To " + row.stop_name + "' WHERE trip_id = '" + trip_id + "';",
           function() {
             _updateTripRow(db, rows, count+1, callback);
           }

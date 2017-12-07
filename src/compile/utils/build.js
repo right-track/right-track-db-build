@@ -13,7 +13,6 @@
 const rl = require('readline');
 const fs = require('fs');
 const path = require('path');
-const config = require('../../../config.json');
 const log = require('../../helpers/log.js');
 const errors = require('../../helpers/errors.js');
 
@@ -119,8 +118,8 @@ function load(db, table, agencyOptions, callback) {
   }
 
   // Determine source file
-  let sourceDirectory = _parseConfigValue(table.sourceDirectory);
-  let sourceFile = _parseConfigValue(table.sourceFile);
+  let sourceDirectory = table.sourceDirectory;
+  let sourceFile = table.sourceFile;
 
   // Add agency module directory to relative paths
   if ( _isRelativePath(sourceDirectory) ) {
@@ -323,50 +322,6 @@ function _isRelativePath(directory) {
   else {
     return false;
   }
-}
-
-
-/**
- * Parse the specified String for values in the configuration file.  The
- * configuration property will be in the format `{{property.name}}`.
- * @param {string} str The String to parse
- * @returns {string} The parsed String
- * @private
- */
-function _parseConfigValue(str) {
-  if ( str.indexOf("{{") > -1 && str.indexOf("}}") > -1 ) {
-    return _parseConfigObject(str, config);
-  }
-  else {
-    return str;
-  }
-}
-
-/**
- * Parse the string for properties specified with the specified configuration object
- * @param {string} str The String to parse
- * @param {object} config The configuration object being parsed
- * @param {string} parent The name of the parent
- * @returns {string} The parsed String
- * @private
- */
-function _parseConfigObject(str, config, parent="") {
-  for ( let property in config ) {
-    if ( config.hasOwnProperty(property) ) {
-      if ( typeof config[property] === 'object' ) {
-        if ( parent !== "" ) {
-          parent = parent + ".";
-        }
-        str = _parseConfigObject(str, config[property], parent + property);
-      }
-      else {
-        let name = parent + "." + property;
-        let value = config[property];
-        str = str.replace("{{" + name + "}}", value);
-      }
-    }
-  }
-  return str;
 }
 
 

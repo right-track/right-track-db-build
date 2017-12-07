@@ -1,16 +1,17 @@
 'use strict';
 
+const config = require('../../../config.json');
 const build = require('../utils/build.js');
 
 /**
- * gtfs_routes table definition
+ * gtfs_stops table definition
  * @type {RTTableSchema}
  * @private
  */
 const TABLE = {
-  sourceDirectory: "{{locations.gtfsDir}}",
+  name: config.tables.gtfs.stops,
+  sourceDirectory: config.locations.gtfsDir,
   sourceFile: "stops.txt",
-  name: "gtfs_stops",
   fields: [
     {
       "name": "stop_id",

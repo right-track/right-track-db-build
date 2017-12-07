@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('../../../config.json');
 const build = require('../utils/build.js');
 
 
@@ -9,9 +10,9 @@ const build = require('../utils/build.js');
  * @private
  */
 const TABLE = {
-  sourceDirectory: "{{locations.gtfsDir}}",
+  name: config.tables.gtfs.directions,
+  sourceDirectory: config.locations.gtfsDir,
   sourceFile: "gtfs_directions",
-  name: "gtfs_directions",
   fields: [
     {
       "name": "direction_id",
@@ -43,7 +44,7 @@ const VALUES = [
 
 
 /**
- * Build gtfs_calendar_dates table
+ * Build gtfs_directions table
  * @type {buildTable}
  * @private
  */

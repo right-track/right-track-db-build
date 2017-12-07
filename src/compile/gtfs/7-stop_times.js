@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('../../../config.json');
 const build = require('../utils/build.js');
 const log = require('../../helpers/log.js');
 
@@ -9,9 +10,9 @@ const log = require('../../helpers/log.js');
  * @private
  */
 const TABLE = {
-  sourceDirectory: "{{locations.gtfsDir}}",
+  name: config.tables.gtfs.stop_times,
+  sourceDirectory: config.locations.gtfsDir,
   sourceFile: "stop_times.txt",
-  name: "gtfs_stop_times",
   fields: [
     {
       "name": "trip_id",
