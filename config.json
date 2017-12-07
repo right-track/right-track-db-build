@@ -1,16 +1,16 @@
 {
-    "options": {
-        "force": false,
-        "agencies": []
-    },
-    "locations": {
-        "buildDir": "./db-build/",
-        "db": "./db-build/database.db",
-        "version": "./db-build/version.txt",
-        "gtfsDir": "./db-build/gtfs/",
-        "lastModified": "./db-build/gtfs/lastModified.txt",
-        "gtfsZip": "./db-build/gtfs/gtfs.zip",
-        "rtDir": "./db-build/rt/",
-        "updateScript": "./db-build/src/update.js"
-    }
+  "options": {
+    "force": false,
+    "agencies": []
+  },
+  "locations": {
+    "buildDir": "./db-build/",
+    "db": "./db-build/database.db",
+    "version": "./db-build/version.txt",
+    "published": "./db-build/gtfs/published.txt",
+    "gtfsDir": "./db-build/gtfs/",
+    "gtfsZip": "./db-build/gtfs/gtfs.zip",
+    "rtDir": "./db-build/rt/",
+    "updateScript": "./db-build/src/update.js"
+  }
 }

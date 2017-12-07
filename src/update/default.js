@@ -114,7 +114,7 @@ function _checkLastUpdate() {
  * @private
  */
 function _compareLastUpdate(server) {
-  let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.lastModified);
+  let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.published);
 
   // Check if our last modified file exists
   if ( fs.existsSync(lastModifiedFile) ) {
@@ -182,7 +182,7 @@ function _downloadZip() {
 function _unzipFiles(serverLastModified) {
   let gtfsDir = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.gtfsDir);
   let gtfsZip = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.gtfsZip);
-  let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + config.locations.lastModified);
+  let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + config.locations.published);
 
   // Extract the files
   let zip = new Zip(gtfsZip);
