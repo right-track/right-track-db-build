@@ -163,9 +163,9 @@ function _calcDepartureSecs(db, callback) {
         _updateDepartureRow(db, rows, 0, function() {
           db.exec("COMMIT", function() {
             callback();
-          })
+          });
         });
-      })
+      });
     }
   );
 
