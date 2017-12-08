@@ -12,7 +12,9 @@
     "gtfsDir": "./db-build/gtfs/",
     "gtfsZip": "./db-build/gtfs/gtfs.zip",
     "rtDir": "./db-build/rt/",
-    "updateScript": "./db-build/src/update.js"
+    "scripts": {
+      "update": "./db-build/src/update.js"
+    }
   },
   "tables": {
     "gtfs": {
