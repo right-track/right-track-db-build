@@ -1,5 +1,6 @@
 'use strict';
 
+const readline = require('readline');
 const config = require('../../../config.json');
 const build = require('../utils/build.js');
 const log = require('../../helpers/log.js');
@@ -108,13 +109,15 @@ function buildTable(db, agency, callback) {
  * @private
  */
 function _calcArrivalSecs(db, callback) {
-  log("        ... Calculating arrival seconds");
+  process.stdout.write("        ... Calculating arrival seconds ");
 
   db.all("SELECT DISTINCT arrival_time FROM " + TABLE.name + ";",
     function(err, rows) {
       db.exec("BEGIN TRANSACTION", function() {
         _updateArrivalRow(db, rows, 0, function() {
           db.exec("COMMIT", function() {
+            readline.cursorTo(process.stdout, 0);
+            process.stdout.write("        ... Calculating arrival seconds\n");
             callback();
           })
         });
@@ -133,6 +136,10 @@ function _calcArrivalSecs(db, callback) {
  * @private
  */
 function _updateArrivalRow(db, rows, count, callback) {
+  let percent = Math.floor((count/rows.length)*100);
+  readline.cursorTo(process.stdout, 0);
+  process.stdout.write("        ... Calculating arrival seconds (" + percent + "%)");
+
   if ( count < rows.length ) {
     let time = rows[count].arrival_time;
     let secs = _convertTimeToSecs(time);
@@ -155,13 +162,15 @@ function _updateArrivalRow(db, rows, count, callback) {
  * @private
  */
 function _calcDepartureSecs(db, callback) {
-  log("        ... Calculating departure seconds");
+  process.stdout.write("        ... Calculating departure seconds ");
 
   db.all("SELECT DISTINCT departure_time FROM " + TABLE.name + ";",
     function(err, rows) {
       db.exec("BEGIN TRANSACTION", function() {
         _updateDepartureRow(db, rows, 0, function() {
           db.exec("COMMIT", function() {
+            readline.cursorTo(process.stdout, 0);
+            process.stdout.write("        ... Calculating departure seconds\n");
             callback();
           });
         });
@@ -180,6 +189,10 @@ function _calcDepartureSecs(db, callback) {
  * @private
  */
 function _updateDepartureRow(db, rows, count, callback) {
+  let percent = Math.floor((count/rows.length)*100);
+  readline.cursorTo(process.stdout, 0);
+  process.stdout.write("        ... Calculating departure seconds (" + percent + "%)");
+
   if ( count < rows.length ) {
     let time = rows[count].departure_time;
     let secs = _convertTimeToSecs(time);
