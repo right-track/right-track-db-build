@@ -72,37 +72,31 @@ function _startNextAgency() {
     }
   ]);
 
-  // Use default update check method...
-  if ( _shouldUseDefaultUpdateMethod(agencyOptions) ) {
-    log("--> Using default update script...");
-    defaultUpdate(agencyOptions, _agencyUpdateComplete);
-  }
+  // Path to agency-specific update script
+  let agencyUpdateScript = path.normalize(agencyOptions.agency.moduleDirectory + '/' + config.locations.scripts.update);
 
-  // Use an agency-specific update method
-  else {
-    let update = undefined;
-    let exception = undefined;
+  // If agency-specific update script exists, use that to update...
+  if ( fs.existsSync(agencyUpdateScript) ) {
     log("--> Using custom update script...");
 
     // Try to load the agency update script
     try {
-      update = require(agencyOptions.agency.moduleDirectory + "/" + config.locations.updateScript);
-    }
-    catch(err) {
-      exception = err;
-    }
-
-    // Run the update script
-    if ( update !== undefined ) {
+      let update = require(agencyUpdateScript);
       update(agencyOptions, _agencyUpdateComplete);
     }
-    else {
+    catch(err) {
       let msg = "Could not run agency update script";
       log.error("ERROR: " + msg);
-      errors.error(msg, exception.message, agencyOptions.agency.id);
+      errors.error(msg, err.message, agencyOptions.agency.id);
       _agencyComplete();
     }
 
+  }
+
+  // Use default update script
+  else {
+    log("--> Using default update script...");
+    defaultUpdate(agencyOptions, _agencyUpdateComplete);
   }
 
 }
@@ -189,31 +183,6 @@ function _agencyComplete() {
  */
 function _finish() {
   FINAL_CALLBACK();
-}
-
-
-
-
-
-/**
- * Check if the agency has build.updateURL defined in it's config
- * @param {object} agency Agency options
- * @returns {boolean}
- * @private
- */
-function _shouldUseDefaultUpdateMethod(agency) {
-  if ( agency !== undefined ) {
-    if ( agency.agency !== undefined ) {
-      if ( agency.agency.config !== undefined ) {
-        if ( agency.agency.config.build !== undefined ) {
-          if ( agency.agency.config.build.updateURL !== undefined ) {
-            return true;
-          }
-        }
-      }
-    }
-  }
-  return false;
 }
 
 

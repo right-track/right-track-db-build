@@ -59,6 +59,16 @@ let UPDATE_SUCCESSFUL = false;
 function defaultUpdate(agencyOptions, callback) {
   log("--> Checking for GTFS data update...");
 
+  // Make sure agency has update URL specified
+  if ( agencyOptions.agency.config.build.updateURL === undefined ) {
+    let msg = "Agency does not have Update URL specified!";
+    let details = "Make sure the agency has the config property build.updateURL specified.";
+    log.error("ERROR: " + msg);
+    log.error(details);
+    errors.error(msg, details, agencyOptions.agency.id);
+    return callback(agencyOptions.update, false);
+  }
+
   // Set agency and callback functions
   AGENCY = agencyOptions.agency;
   UPDATE_CALLBACK = callback;
