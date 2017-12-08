@@ -144,10 +144,13 @@ function _build(db, agencyOptions) {
 
   let gtfsDirectory = path.normalize(__dirname + '/gtfs/');
   let rtDirectory = path.normalize(__dirname + '/rt/');
+  let otherDirectory = path.normalize(__dirname + '/other/');
 
   buildDirectory(db, agencyOptions, gtfsDirectory, function() {
     buildDirectory(db, agencyOptions, rtDirectory, function() {
-      _finishAgency(db, true);
+      buildDirectory(db, agencyOptions, otherDirectory, function() {
+        _finishAgency(db, true);
+      });
     });
   });
 
