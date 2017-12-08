@@ -6,8 +6,8 @@
   },
   "locations": {
     "buildDir": "./db-build/",
-    "db": "./db-build/database.db",
-    "version": "./db-build/version.txt",
+    "db": "./db-build/out/database.db",
+    "version": "./db-build/out/version.txt",
     "published": "./db-build/gtfs/published.txt",
     "gtfsDir": "./db-build/gtfs/",
     "gtfsZip": "./db-build/gtfs/gtfs.zip",
