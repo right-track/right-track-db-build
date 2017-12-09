@@ -54,18 +54,16 @@ const TABLE = {
  */
 function buildTable(db, agencyOptions, callback) {
   build.create(db, TABLE, function() {
-    init(db, agencyOptions, callback);
+    _init(db, agencyOptions, callback);
   });
 }
 
 
 /**
  * Add rt_about data
- * @param db
- * @param agencyOptions
- * @param callback
+ * @private
  */
-function init(db, agencyOptions, callback) {
+function _init(db, agencyOptions, callback) {
   log("        ... Adding rt_about data");
 
   // Get GTFS Publish Date

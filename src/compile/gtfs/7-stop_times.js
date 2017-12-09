@@ -104,8 +104,6 @@ function buildTable(db, agency, callback) {
 
 /**
  * Calculate the arrival_time_seconds field from the arrival_time field
- * @param db
- * @param callback
  * @private
  */
 function _calcArrivalSecs(db, callback) {
@@ -129,10 +127,10 @@ function _calcArrivalSecs(db, callback) {
 
 /**
  * Update specified row with the arrival_time_seconds
- * @param db
- * @param rows
- * @param count
- * @param callback
+ * @param db RightTrackDB
+ * @param rows Rows of arrival times
+ * @param count Arrival time counter
+ * @param callback Arrival time callback
  * @private
  */
 function _updateArrivalRow(db, rows, count, callback) {
@@ -157,8 +155,6 @@ function _updateArrivalRow(db, rows, count, callback) {
 
 /**
  * Calculate the departure_time_seconds field from the departure_time field
- * @param db
- * @param callback
  * @private
  */
 function _calcDepartureSecs(db, callback) {
@@ -182,10 +178,10 @@ function _calcDepartureSecs(db, callback) {
 
 /**
  * Update the specified row with the departure_time_seconds
- * @param db
- * @param rows
- * @param count
- * @param callback
+ * @param db RightTrackDB
+ * @param rows Rows of departure times
+ * @param count Departure time counter
+ * @param callback Departure time callback
  * @private
  */
 function _updateDepartureRow(db, rows, count, callback) {

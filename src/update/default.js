@@ -3,8 +3,8 @@
 /**
  * ### Default Update Check
  *
- * The default update check is used when the Right Track Agency configuration
- * has the property: `build.updateURL`.
+ * The default update check is used when an agency-specific update
+ * script is not found.
  * @module update/default
  */
 
@@ -42,13 +42,14 @@ let UPDATE_SUCCESSFUL = false;
 
 /**
  * This is the built-in default agency update check.  This function is used
- * if the agency configuration contains the property `build.updateURL`.
+ * if there is no agency-specific update script provided by the RightTrackAgency
+ * module for the agency.
  *
  * • First, it performs a `HEAD` request on the update URL to get the server's
  * `last-modified` header.  It will compare this date/time to the one saved
- * in the agency's gtfs directory in the `lastModified.txt` file.
+ * in the agency's gtfs directory in the `published.txt` file.
  *
- * • If the `lastModified.txt` file is not found or has an older date/time
+ * • If the `published.txt` file is not found or has an older date/time
  * than the one provided in the server's `last-modified` header, it will
  * download the zip file and unzip the contents into the agency's gtfs directory.
  *

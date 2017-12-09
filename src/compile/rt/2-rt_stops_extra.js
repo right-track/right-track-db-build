@@ -61,8 +61,6 @@ function buildTable(db, agencyOptions, callback) {
 
 /**
  * Calculate Transfer Weights for each stop in table
- * @param db RightTrackDB
- * @param callback final callback
  * @private
  */
 function _calcTransferWeight(db, callback) {

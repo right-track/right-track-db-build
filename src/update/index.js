@@ -7,6 +7,9 @@
  * in the build options and are returned from the {@link module:helpers/options|options}
  * module.  Depending on the Agency settings, this will either run the default
  * update function or the agency-specific update function.
+ *
+ * If the agency has a post-update script defined, this will be run after the
+ * agency update script is complete, regardless if an update is requested.
  * @module update
  */
 
@@ -88,7 +91,7 @@ function _startNextAgency() {
       let msg = "Could not run agency update script";
       log.error("ERROR: " + msg);
       errors.error(msg, err.message, agencyOptions.agency.id);
-      _agencyComplete();
+      _agencyUpdateComplete(false, false);
     }
 
   }
@@ -109,6 +112,8 @@ function _startNextAgency() {
  * @private
  */
 function _agencyUpdateComplete(requested, successful) {
+
+  // Set agency option properties
   options.agency(AGENCY).update = requested;
   options.agency(AGENCY).updateComplete = successful;
   options.agency(AGENCY).published = new Date(
@@ -157,7 +162,7 @@ function _agencyUpdateComplete(requested, successful) {
 
 
 /**
- * Check to see if there is an agency post-update script to run
+ * Run the agency post-update script, if present
  * @private
  */
 function _agencyPostUpdate() {

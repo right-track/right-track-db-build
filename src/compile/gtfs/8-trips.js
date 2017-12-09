@@ -85,9 +85,7 @@ function buildTable(db, agency, callback) {
 
 
 /**
- * Check the trip headsigns.  Set them to "To <destination>"
- * @param db
- * @param callback
+ * Set trip head signs to "To <destination>"
  * @private
  */
 function _checkTripHeadsigns(db, callback) {
@@ -108,10 +106,10 @@ function _checkTripHeadsigns(db, callback) {
 
 /**
  * Update the trip_headsign field for the specified row
- * @param db
- * @param rows
- * @param count
- * @param callback
+ * @param db RightTrackDB
+ * @param rows Trip Rows
+ * @param count Trip counter
+ * @param callback Trip callback
  * @private
  */
 function _updateTripRow(db, rows, count, callback) {

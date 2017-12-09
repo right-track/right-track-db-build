@@ -19,8 +19,11 @@
  * @property {RightTrackAgency} agencies[].agency The `RightTrackAgency` Class for the agency
  * @property {boolean} agencies[].update=false The GTFS data update flag (true when a GTFS data update is requested)
  * @property {boolean} agencies[].updateComplete=false The GTFS data update success flag (true when GTFS data is successfully updated)
+ * @property {Date} agencies[].published The Date/Time the GTFS data was published
  * @property {boolean} agencies[].compile=false The DB compilation flag (true when the DB compilation is requested)
  * @property {boolean} agencies[].compileComplete=false The DB compilation success flag (true when DB is successfully compiled)
+ * @property {Date} agencies[].compiled the Date/Time the DB was compiled
+ * @property {int} agencies[].version the DB version code (based off of the compile date/time)
  */
 
 /**
@@ -64,6 +67,7 @@
  * @property {string} name Name of table in the final database
  * @property {string|undefined} [sourceDirectory] Path to the directory containing the source file
  * @property {string|undefined} [sourceFile] Name of the source file
+ * @property {string|undefined} [separator] Field separator used in the source file
  * @property {Object[]} fields List of table fields
  * @property {string} fields[].name Name of field (will be column name in final table and must match source file header name unless `source_name` is specified)
  * @property {string} fields[].type Data Type of field (TEXT, INTEGER, etc)

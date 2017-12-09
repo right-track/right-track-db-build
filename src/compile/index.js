@@ -4,7 +4,7 @@
  * ### Right Track Database Compiler
  *
  * This module starts the database compilation process.  It will run the
- * build scripts found in the `./gtfs/` and `./rt/` directories.
+ * build scripts found in the `./gtfs/`, `./rt/`, and `./other/` directories.
  * @module compile
  */
 

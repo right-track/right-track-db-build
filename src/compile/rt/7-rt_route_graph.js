@@ -50,8 +50,6 @@ function buildTable(db, agencyOptions, callback) {
 
 /**
  * Start building the route graph
- * @param db RightTrackDB
- * @param callback Final callback
  * @private
  */
 function _build(db, callback) {
@@ -118,10 +116,18 @@ function _processTrip(db, rows, count, callback) {
   }
 
 
+  /**
+   * Start processing the next trip
+   * @private
+   */
   function _nextTrip() {
     _processTrip(db, rows, count+1, callback);
   }
 
+  /**
+   * Finished processing all trips
+   * @private
+   */
   function _finish() {
     callback();
   }
@@ -188,10 +194,18 @@ function _processStop(db, rows, count, callback) {
   }
 
 
+  /**
+   * Start processing the next stop
+   * @private
+   */
   function _nextStop() {
     _processStop(db, rows, count+1, callback);
   }
 
+  /**
+   * Finished processing all stops
+   * @private
+   */
   function _finish() {
     callback();
   }
