@@ -150,8 +150,30 @@ function _agencyUpdateComplete(requested, successful) {
     details
   ]);
 
-  // Complete the agency update check
-  _agencyComplete();
+  // Check for a post-update script
+  _agencyPostUpdate();
+
+}
+
+
+/**
+ * Check to see if there is an agency post-update script to run
+ * @private
+ */
+function _agencyPostUpdate() {
+  let postUpdateScript = path.normalize(options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.scripts.postUpdate);
+
+  // post update script exists
+  if ( fs.existsSync(postUpdateScript) ) {
+    log("--> Running agency post-update script...");
+    let postUpdate = require(postUpdateScript);
+    postUpdate(options.agency(AGENCY), _agencyComplete);
+  }
+
+  // no post update script
+  else {
+    _agencyComplete();
+  }
 }
 
 
