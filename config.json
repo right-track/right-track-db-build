@@ -14,7 +14,9 @@
     "gtfsZip": "./db-build/gtfs/gtfs.zip",
     "rtDir": "./db-build/rt/",
     "scripts": {
-      "update": "./db-build/src/update.js"
+      "update": "./db-build/src/update.js",
+      "postUpdate": "./db-build/src/postUpdate.js",
+      "postCompile": "./db-build/src/postCompile.js"
     }
   },
   "tables": {
