@@ -149,10 +149,36 @@ function _build(db, agencyOptions) {
   buildDirectory(db, agencyOptions, gtfsDirectory, function() {
     buildDirectory(db, agencyOptions, rtDirectory, function() {
       buildDirectory(db, agencyOptions, otherDirectory, function() {
-        _finishAgency(db, true);
+        _agencyPostCompile(db, agencyOptions);
       });
     });
   });
+
+}
+
+
+/**
+ * Run the agency post-compile script, if present
+ * @param {Object} db The SQLite Database being built
+ * @param {object} agencyOptions The Agency Build Options
+ * @private
+ */
+function _agencyPostCompile(db, agencyOptions) {
+  let postCompileScript = path.normalize(agencyOptions.agency.moduleDirectory + '/' + config.locations.scripts.postCompile);
+
+  // post compile script exists
+  if ( fs.existsSync(postCompileScript) ) {
+    log("--> Running agency post-compile script...");
+    let postCompile = require(postCompileScript);
+    postCompile(agencyOptions, db, function() {
+      _finishAgency(db, true);
+    });
+  }
+
+  // no post compile script
+  else {
+    _finishAgency(db, true);
+  }
 
 }
 
