@@ -16,6 +16,8 @@ const options = require('./helpers/options.js');
 const errors = require('./helpers/errors.js');
 const update = require('./update/');
 const compile = require('./compile/');
+const finish = require('./finish/');
+
 
 /**
  * The JS Date used to keep track of the start time
@@ -102,18 +104,24 @@ function _updateFinished() {
  * @private
  */
 function _compile() {
-  compile(_compileFinished);
+  compile(function() {
+    log("================================================");
+    _finish();
+  });
 }
 
 
+// ==== FINISH FUNCTIONS ==== //
+
 /**
- * Callback function when the compilation of all agencies is complete
- * @type {runCallback}
+ * Start the finish process
  * @private
  */
-function _compileFinished() {
-  log("================================================");
-  _finished();
+function _finish() {
+  finish(function() {
+    log("================================================");
+    _finished();
+  });
 }
 
 

@@ -24,6 +24,7 @@
  * @property {boolean} agencies[].compileComplete=false The DB compilation success flag (true when DB is successfully compiled)
  * @property {Date} agencies[].compiled the Date/Time the DB was compiled
  * @property {int} agencies[].version the DB version code (based off of the compile date/time)
+ * @property {boolean} agencies[].sane DB Sanity Check flag (true if passed sanity checks)
  */
 
 /**

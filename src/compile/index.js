@@ -38,7 +38,6 @@ let AGENCY = -1;
  */
 function compile(callback) {
   log.info("RUNNING DATABASE COMPILATION SCRIPTS");
-  log("------------------------------------------------");
 
   // Set properties
   FINAL_CALLBACK = callback;
@@ -96,6 +95,7 @@ function _compile() {
   let agencyOptions = options.agency(AGENCY);
 
   // Start compiling agency...
+  log("------------------------------------------------");
   log.raw([
     {
       "text": "AGENCY:"
