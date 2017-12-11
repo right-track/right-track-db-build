@@ -1,8 +1,15 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const errors = require('../helpers/errors.js');
 const log = require('../helpers/log.js');
 const config = require('../../config.json');
+
+
+// Min File Sizes (Bytes)
+const MIN_DB_SIZE = 500000;
+const MIN_ZIP_SIZE = 250000;
 
 
 /**
@@ -143,7 +150,7 @@ let SANE = true;
  * @param {boolean} callback.sane Sanity Check pass flag
  */
 function sanityChecks(db, agencyOptions, callback) {
-  console.log("--> Running Sanity Checks");
+  log("--> Running Sanity Checks");
 
   // Set Database
   DB = db;
@@ -154,9 +161,63 @@ function sanityChecks(db, agencyOptions, callback) {
   // Set final callback
   FINAL_CALLBACK = callback;
 
+  // Run the file checks
+  _fileChecks();
+
   // Start running the sanity checks
   _runChecks();
 
+}
+
+
+/**
+ * Run file checks
+ * Make sure db and zip files exist and are at least a minimum size
+ * @private
+ */
+function _fileChecks() {
+  let status = "pass";
+  let style = "bgGreen.black.bold";
+  let msg = undefined;
+
+  let dbPath = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.files.db);
+  let dbZipPath = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.files.dbZip);
+
+  // Make sure files exist
+  if ( !fs.existsSync(dbPath) ) {
+    status = "fail";
+    msg = "DB file not found";
+  }
+  else if ( !fs.existsSync(dbZipPath) ) {
+    status = "fail";
+    msg = "DB Zip file not found";
+  }
+  else if ( fs.statSync(dbPath).size < MIN_DB_SIZE ) {
+    status = "fail";
+    msg = "DB file too small";
+  }
+  else if ( fs.statSync(dbPath).size < MIN_ZIP_SIZE ) {
+    status = "fail";
+    msg = "DB Zip file too small";
+  }
+
+  // Log the failed test
+  if ( status !== "pass" ) {
+    SANE = false;
+    style = "bgRed.white.bold";
+    errors.error("Fail file test: " + msg, undefined, AGENCY.id);
+  }
+
+  // Display test status
+  log.raw([
+    {
+      "text": "    ... Checking files"
+    },
+    {
+      "text": " " + status + " ",
+      "chalk": style
+    }
+  ]);
 }
 
 
