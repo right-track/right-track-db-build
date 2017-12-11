@@ -10,8 +10,8 @@
     "docs": "jsdoc -c jsdoc.json --readme README.md --template $NODE_PATH/docdash"
   },
   "dependencies": {
-    "adm-zip": "^0.4.7",
     "chalk": "^2.2.0",
+    "decompress-zip": "^0.3.0",
     "right-track-agency": "~1.1.0",
     "sqlite3": "^3.1.13"
   },

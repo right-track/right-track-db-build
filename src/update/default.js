@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const URL = require('url');
 const http = require('http');
-const Zip = require('adm-zip');
+const UnZip = require('decompress-zip');
 const config = require('../../config.json');
 const log = require('../helpers/log.js');
 const errors = require('../helpers/errors.js');
@@ -195,21 +195,37 @@ function _unzipFiles(serverLastModified) {
   let gtfsZip = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.files.gtfsZip);
   let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + config.locations.files.published);
 
-  // Extract the files
-  let zip = new Zip(gtfsZip);
-  zip.extractAllTo(gtfsDir, true);
+  // Unzip the GTFS Files
+  let zip = new UnZip(gtfsZip);
+  zip.extract({
+    path: gtfsDir
+  });
 
-  // Remove zip file
-  fs.unlink(gtfsZip, function() {});
-
-  // Update the lastModified file...
-  fs.writeFile(lastModifiedFile, serverLastModified, function() {
-
-    // Return with update flag
-    UPDATE_SUCCESSFUL = true;
+  // Unzip error
+  zip.on('error', function(err) {
+    let msg = "Could not unzip GTFS zip file";
+    log.error("ERROR: " + msg);
+    errors.error(msg, err.message, AGENCY.id);
     return _finish();
+  });
+
+  // Finished Unzipping
+  zip.on('extract', function() {
+
+    // Remove zip file
+    fs.unlink(gtfsZip, function() {});
+
+    // Update the lastModified file...
+    fs.writeFile(lastModifiedFile, serverLastModified, function() {
+
+      // Return with update flag
+      UPDATE_SUCCESSFUL = true;
+      return _finish();
+
+    });
 
   });
+
 }
 
 
