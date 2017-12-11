@@ -10,7 +10,7 @@ const build = require('../utils/build.js');
  */
 const TABLE = {
   name: config.tables.rt.holidays,
-  sourceDirectory: config.locations.rtDir,
+  sourceDirectory: config.locations.directories.rt,
   sourceFile: "rt_holidays.csv",
   fields: [
     {

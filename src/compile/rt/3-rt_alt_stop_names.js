@@ -10,7 +10,7 @@ const build = require('../utils/build.js');
  */
 const TABLE = {
   name: config.tables.rt.al_stop_names,
-  sourceDirectory: config.locations.rtDir,
+  sourceDirectory: config.locations.directories.rt,
   sourceFile: "rt_alt_stop_names.csv",
   fields: [
     {

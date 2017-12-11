@@ -93,7 +93,7 @@ function _setup() {
   ]);
 
   // Set up DB
-  let dbPath = path.normalize(agencyOptions.agency.moduleDirectory + "/" + config.locations.db);
+  let dbPath = path.normalize(agencyOptions.agency.moduleDirectory + "/" + config.locations.files.db);
   let db = new sqlite3.Database(dbPath, function(err) {
     if ( err ) {
       let msg = "Could not open agency database";

@@ -3,7 +3,6 @@
 const readline = require('readline');
 const config = require('../../../config.json');
 const build = require('../utils/build.js');
-const log = require('../../helpers/log.js');
 
 /**
  * gtfs_stop_times table definition
@@ -12,7 +11,7 @@ const log = require('../../helpers/log.js');
  */
 const TABLE = {
   name: config.tables.gtfs.stop_times,
-  sourceDirectory: config.locations.gtfsDir,
+  sourceDirectory: config.locations.directories.gtfs,
   sourceFile: "stop_times.txt",
   fields: [
     {

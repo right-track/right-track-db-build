@@ -10,7 +10,7 @@ const build = require('../utils/build.js');
  */
 const TABLE = {
   name: config.tables.gtfs.stops,
-  sourceDirectory: config.locations.gtfsDir,
+  sourceDirectory: config.locations.directories.gtfs,
   sourceFile: "stops.txt",
   fields: [
     {

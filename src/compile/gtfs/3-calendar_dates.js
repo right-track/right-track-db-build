@@ -10,7 +10,7 @@ const build = require('../utils/build.js');
  */
 const TABLE = {
   name: config.tables.gtfs.calendar_dates,
-  sourceDirectory: config.locations.gtfsDir,
+  sourceDirectory: config.locations.directories.gtfs,
   sourceFile: "calendar_dates.txt",
   fields: [
     {

@@ -119,7 +119,7 @@ function _agencyUpdateComplete(requested, successful) {
   options.agency(AGENCY).published = new Date(
     fs.readFileSync(
       path.normalize(
-        options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.published
+        options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.files.published
       )
     ).toString()
   );

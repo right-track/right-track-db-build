@@ -11,7 +11,7 @@ const log = require('../../helpers/log.js');
  */
 const TABLE = {
   name: config.tables.gtfs.trips,
-  sourceDirectory: config.locations.gtfsDir,
+  sourceDirectory: config.locations.directories.gtfs,
   sourceFile: "trips.txt",
   fields: [
     {

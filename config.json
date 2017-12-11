@@ -5,14 +5,20 @@
     "locale": "en_US"
   },
   "locations": {
-    "buildDir": "./db-build/",
-    "db": "./db-build/out/database.db",
-    "dbZip": "./db-build/out/database.db.zip",
-    "version": "./db-build/out/version.txt",
-    "gtfsDir": "./db-build/gtfs/",
-    "published": "./db-build/gtfs/published.txt",
-    "gtfsZip": "./db-build/gtfs/gtfs.zip",
-    "rtDir": "./db-build/rt/",
+    "directories": {
+      "build": "./db-build/",
+      "gtfs": "./db-build/gtfs/",
+      "out": "./db-build/out/",
+      "rt": "./db-build/rt/",
+      "src": "./db-build/src/"
+    },
+    "files": {
+      "db": "./db-build/out/database.db",
+      "dbZip": "./db-build/out/database.db.zip",
+      "version": "./db-build/out/version.txt",
+      "published": "./db-build/gtfs/published.txt",
+      "gtfsZip": "./db-build/gtfs/gtfs.zip"
+    },
     "scripts": {
       "update": "./db-build/src/update.js",
       "postUpdate": "./db-build/src/postUpdate.js",

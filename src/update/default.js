@@ -125,7 +125,7 @@ function _checkLastUpdate() {
  * @private
  */
 function _compareLastUpdate(server) {
-  let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.published);
+  let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.files.published);
 
   // Check if our last modified file exists
   if ( fs.existsSync(lastModifiedFile) ) {
@@ -163,7 +163,7 @@ function _updateFiles() {
  * @private
  */
 function _downloadZip() {
-  let gtfsZip = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.gtfsZip);
+  let gtfsZip = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.files.gtfsZip);
 
   // Set output file
   let zip = fs.createWriteStream(gtfsZip);
@@ -191,9 +191,9 @@ function _downloadZip() {
  * @private
  */
 function _unzipFiles(serverLastModified) {
-  let gtfsDir = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.gtfsDir);
-  let gtfsZip = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.gtfsZip);
-  let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + config.locations.published);
+  let gtfsDir = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.directories.gtfs);
+  let gtfsZip = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.files.gtfsZip);
+  let lastModifiedFile = path.normalize(AGENCY.moduleDirectory + config.locations.files.published);
 
   // Extract the files
   let zip = new Zip(gtfsZip);

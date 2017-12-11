@@ -11,7 +11,7 @@ const log = require('../../helpers/log.js');
  */
 const TABLE = {
   name: config.tables.rt.stops_extra,
-  sourceDirectory: config.locations.rtDir,
+  sourceDirectory: config.locations.directories.rt,
   sourceFile: "rt_stops_extra.csv",
   fields: [
     {

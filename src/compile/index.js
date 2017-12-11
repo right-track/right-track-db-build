@@ -87,7 +87,7 @@ function _compile() {
 
   // Set version
   let version = _version(compiled);
-  let version_path = path.normalize(options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.version);
+  let version_path = path.normalize(options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.files.version);
   fs.writeFileSync(version_path, version);
   options.agency(AGENCY).version = parseInt(version);
 
@@ -107,7 +107,7 @@ function _compile() {
   ]);
 
   // Remove Existing Database
-  let dbPath = path.normalize(agencyOptions.agency.moduleDirectory + "/" + config.locations.db);
+  let dbPath = path.normalize(agencyOptions.agency.moduleDirectory + "/" + config.locations.files.db);
   if ( fs.existsSync(dbPath) ) {
     fs.unlinkSync(dbPath);
   }
