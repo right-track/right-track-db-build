@@ -9,7 +9,9 @@
  */
 
 
+const fs = require('fs');
 const path = require('path');
+const archiver = require('archiver');
 const sqlite3 = require('sqlite3');
 const config = require('../../config.json');
 const log = require('../helpers/log.js');
@@ -73,6 +75,7 @@ function _startNextAgency() {
 
 /**
  * Set up the database for the wrap-up procedures
+ * Start running the wrap-up procedures once setup
  * @private
  */
 function _setup() {
@@ -99,10 +102,10 @@ function _setup() {
       let msg = "Could not open agency database";
       log.error("ERROR: " + msg);
       errors.error(msg, err.message, agencyOptions.agency.id);
-      _finishAgency(db);
+      return _finishAgency(db);
     }
     else {
-      _wrapUp(db, agencyOptions);
+      return _run(db, agencyOptions);
     }
   });
 
@@ -121,18 +124,68 @@ function _setup() {
  * @param agencyOptions Agency Options
  * @private
  */
-function _wrapUp(db, agencyOptions) {
-  // Run Sanity Checks
-  sanityChecks(db, agencyOptions, function(sane) {
-    console.log("SANITY CHECK: " + sane);
+function _run(db, agencyOptions) {
 
-    // Set sane flag
-    agencyOptions.sane = sane;
+  // Create Zip File
+  _zip(agencyOptions, function() {
 
-    // Finish the agency
-    _finishAgency(db);
+    // Run Sanity Checks
+    sanityChecks(db, agencyOptions, function(sane) {
+
+      // Set sane flag
+      agencyOptions.sane = sane;
+
+      // Install database to agency modules, if sane
+      if ( sane ) {
+        _finishAgency(db);
+      }
+
+      // Finish the agency
+      else {
+        _finishAgency(db);
+      }
+
+    });
 
   });
+
+}
+
+
+/**
+ * Create a zip archive of the database file
+ * @param agencyOptions Agency Options
+ * @param callback Callback function
+ * @private
+ */
+function _zip(agencyOptions, callback) {
+  log("--> Creating zip archive");
+
+  // Database Paths
+  let dbPath = path.normalize(agencyOptions.agency.moduleDirectory + '/' + config.locations.files.db);
+  let zipPath = path.normalize(agencyOptions.agency.moduleDirectory + '/' + config.locations.files.dbZip);
+
+  // Create Zip
+  let zip = fs.createWriteStream(zipPath);
+  let archive = archiver('zip', {zib: {level: 9}});
+
+  // Zip Error Handler
+  zip.on('error', function(err) {
+    let msg = "Could not create zip archive of database";
+    log.error("ERROR: " + msg);
+    errors.error(msg, err.stack, agencyOptions.agency.id);
+    return callback();
+  });
+
+  // Zip Finished
+  zip.on('close', function() {
+    return callback();
+  });
+
+  // Add file
+  archive.pipe(zip);
+  archive.file(dbPath, {name: 'database.db'});
+  archive.finalize();
 
 }
 

@@ -11,12 +11,15 @@
  */
 
 
+const fs = require('fs');
+const path = require('path');
 const log = require('./helpers/log.js');
 const options = require('./helpers/options.js');
 const errors = require('./helpers/errors.js');
 const update = require('./update/');
 const compile = require('./compile/');
 const finish = require('./finish/');
+const config = require('../config.json');
 
 
 /**
