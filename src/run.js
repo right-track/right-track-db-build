@@ -46,7 +46,48 @@ function start() {
     process.exit(1);
   }
 
+  // Start the setup process
+  _setup();
+}
+
+
+
+// ==== SETUP FUNCTIONS ==== //
+
+/**
+ * Setup the update/compilation process
+ * Make sure all agency build directories are present
+ * @private
+ */
+function _setup() {
+
+  // Parse each agency
+  for ( let i = 0; i < options.agencyCount(); i++ ) {
+    let agency = options.agency(i);
+
+    // Make sure db build directories are present
+    let directories = config.locations.directories;
+    for ( let name in directories ) {
+      if ( directories.hasOwnProperty(name) ) {
+        let directory = directories[name];
+        let directoryPath = path.normalize(agency.agency.moduleDirectory + '/' + directory);
+
+        // Try to create the directory, if it doesn't exist
+        if ( !fs.existsSync(directoryPath) ) {
+          fs.mkdirSync(directoryPath);
+          if ( !fs.existsSync(directoryPath) ) {
+            log.error("ERROR: Could not create directory: " + directoryPath);
+            process.exit(1);
+          }
+        }
+      }
+    }
+
+  }
+
+  // Start the Update Process
   _update();
+
 }
 
 
