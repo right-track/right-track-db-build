@@ -6,25 +6,59 @@ Right Track Database Builder
 
 ---
 
-This project is still being actively developed and modified.  For the more
-stable previous version (shell script based), see the [dwaring87/right-track-db](https://github.com/dwaring87/right-track-db) 
-project. 
+This project is used to compile a **Right Track Database**: a SQLite database
+containing GTFS transit data and additional Right Track data tables for a
+single transit agency.  This database is used in the various **Right Track**
+projects, such as the [right-track-server](https://github.com/right-track/right-track-server).
+
+### Installation
+
+This project can be installed via `npm`:
+
+```
+npm install -g right-track-db-build
+```
+
+When installed globally, `npm` will link the executable `right-track-db-build`
+into your `$PATH`.
+
+### Dependencies
+
+In order to compile a database for a specific transit agency, a **Right Track
+Agency** module (such as [right-track-agency-mnr](https://github.com/right-track/right-track-agency-mnr))
+will also need to be installed.  The agency module provides information on
+where/how to obtain the agency's GTFS data as well as additional database
+compilation instructions.
+
+The agencies are provided to the `right-track-db-build` script via the
+`--agency` command line flag.
+
+**NOTE:** There are no Right Track Agency modules listed as dependencies
+in this project's `package.json` file.  The Agency modules will have
+to be installed and referenced manually.
+
 
 ### Usage
+
+Example: Update GTFS data and compile a database for Metro North Railroad:
+
+```
+right-track-db-build --agency right-track-agency-mnr
+```
 
 The command line utility has the following usage:
 
 ```text
-Right Track DB Generator
+Right Track Database Builder
 Module: right-track-db-build
-Version: 0.0.1
+Version: 1.0.0
 ----------------------------
 Usage:
   right-track-db-build [options] --agency <declaration> [agency options] ...
 options:
   --force|-f       Force a GTFS update and database compilation
   --help|-h        Display this usage information
-  --post|-p <file> Define script to run after update & compilation
+  --post|-p <file> Define a post-install script to run after update & compilation
   --version|-v     Display the DB Build script version
 agency declaration:
   Declare an agency to check for GTFS updates/compile database.  The agency
@@ -39,3 +73,19 @@ agency options:
   --notes|-n <notes>
      Specify agency update notes to be included in the new database
 ```
+
+
+### Post-Install Script
+
+You can provide an additional post-install script via the `--post` command
+line flag.
+
+This is a JavaScript module that exports a single function.  This function takes
+the following arguments:
+
+  - `{Object}` Database Build Options
+  - `{Object[]}` List of Exceptions (Warnings & Errors) encountered during the build process
+  - `{function}` Callback function called when the post-install script has finished (takes no arguments)
+
+This script can be used to finalize the installation of the new database (ie, copy
+the database to a server for distribution), send an alert of an update, etc.
