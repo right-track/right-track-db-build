@@ -137,7 +137,7 @@ function _run(db, agencyOptions) {
 
       // Install database to agency modules, if sane
       if ( sane ) {
-        _finishAgency(db);
+        _install(db, agencyOptions);
       }
 
       // Finish the agency
@@ -187,6 +187,111 @@ function _zip(agencyOptions, callback) {
   archive.file(dbPath, {name: 'database.db'});
   archive.finalize();
 
+}
+
+
+/**
+ * Install the Database files into the agency module
+ * @param db RightTrackDB
+ * @param agencyOptions Agency Options
+ * @private
+ */
+function _install(db, agencyOptions) {
+  log("--> Installing Database");
+
+  // Set source file paths
+  let dbPath = path.normalize(agencyOptions.agency.moduleDirectory + '/' + config.locations.files.db);
+  let dbZipPath = path.normalize(agencyOptions.agency.moduleDirectory + '/' + config.locations.files.dbZip);
+  let versionPath = path.normalize(agencyOptions.agency.moduleDirectory + '/' + config.locations.files.version);
+
+  // Set destination file paths
+  let latestDir = path.normalize(path.dirname(agencyOptions.agency.config.db.location));
+  let archiveDir = path.normalize(agencyOptions.agency.config.db.archiveDir);
+  let latestDbPath = path.normalize(latestDir + '/' + path.basename(dbPath));
+  let latestDbZipPath = path.normalize(latestDir + '/' + path.basename(dbZipPath));
+  let latestVersionPath = path.normalize(latestDir + '/' + path.basename(versionPath));
+  let archiveDbPath = path.normalize(archiveDir + '/' + agencyOptions.version + ".zip");
+
+  // Set paths to copy
+  let paths = [];
+  paths.push({source: dbPath, destination: latestDbPath});
+  paths.push({source: dbZipPath, destination: latestDbZipPath});
+  paths.push({source: versionPath, destination: latestVersionPath});
+  paths.push({source: dbZipPath, destination: archiveDbPath});
+
+  // Copy the files
+  _copyFiles(paths, 0, function() {
+
+    // Finish the Agency when copied
+    _finishAgency(db);
+
+  });
+
+}
+
+
+/**
+ * Copy the set of files
+ * @param {Object[]} paths List of files to copy
+ * @param {string} paths.source Source file path
+ * @param {string} paths.destination Destination file path
+ * @param {int} count File counter
+ * @param callback Callback function
+ * @private
+ */
+function _copyFiles(paths, count, callback) {
+  if ( count < paths.length ) {
+    _copy(
+      paths[count].source,
+      paths[count].destination,
+      function(err) {
+        if ( err ) {
+          let msg = "Could not copy " + paths[count].source + " --> " + paths[count].destination;
+          log.error("ERROR: " + msg);
+          errors.error(msg, err.stack, options.agency(AGENCY).agency.id);
+          _finish();
+        }
+        else {
+          _next();
+        }
+      }
+    );
+  }
+  else {
+    _finish();
+  }
+
+  function _next() {
+    return _copyFiles(paths, count+1, callback);
+  }
+  function _finish() {
+    return callback();
+  }
+}
+
+
+/**
+ * Copy the source file to the destination file
+ * @param source Source file path
+ * @param destination Destination file path
+ * @param callback Callback function(err)
+ * @private
+ */
+function _copy(source, destination, callback) {
+  let s = fs.createReadStream(source);
+  s.on('error', function(err) {
+    return callback(err);
+  });
+
+  let d = fs.createWriteStream(destination);
+  d.on('close', function() {
+    return callback();
+  });
+  d.on('error', function(err) {
+    return callback(err);
+  });
+
+  s.pipe(d);
 }
 
 

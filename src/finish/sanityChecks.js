@@ -185,19 +185,19 @@ function _fileChecks() {
 
   // Make sure files exist
   if ( !fs.existsSync(dbPath) ) {
-    status = "fail";
+    status = "FAIL";
     msg = "DB file not found";
   }
   else if ( !fs.existsSync(dbZipPath) ) {
-    status = "fail";
+    status = "FAIL";
     msg = "DB Zip file not found";
   }
   else if ( fs.statSync(dbPath).size < MIN_DB_SIZE ) {
-    status = "fail";
+    status = "FAIL";
     msg = "DB file too small";
   }
   else if ( fs.statSync(dbPath).size < MIN_ZIP_SIZE ) {
-    status = "fail";
+    status = "FAIL";
     msg = "DB Zip file too small";
   }
 
