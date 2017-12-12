@@ -127,17 +127,21 @@ function _parseArgs() {
     else if ( arg === '--post' || arg === '-p' ) {
       i++;
       if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
-        log.error("ERROR: post script is not defined");
+        log.error("ERROR: post-install script is not defined");
         _usage();
         process.exit(1);
       }
       else {
-        if ( fs.existsSync(args[i]) ) {
-          options.set().post = args[i];
+        let post = args[i];
+        if ( !path.isAbsolute(post) ) {
+          post = path.normalize(process.cwd() + '/' + post);
+        }
+        if ( fs.existsSync(post) ) {
+          options.set().post = post;
         }
         else {
-          log.error("ERROR: post script file does not exist (" + args[i] + ")");
-          log.error("Make sure the file path to the post script is correct");
+          log.error("ERROR: post-install script file does not exist (" + post + ")");
+          log.error("Make sure the file path to the post-install script is correct");
           process.exit(1);
         }
       }
@@ -244,6 +248,7 @@ function _parseAgencies() {
 function _loadAgency(i) {
 
   log("==> LOADING MODULE: " + options.agency(i).require);
+  log("    Location: " + require.resolve(options.agency(i).require));
 
   // Load agency & read agency config
   try {
@@ -281,7 +286,7 @@ function _usage() {
   log("options:");
   log("  --force|-f       Force a GTFS update and database compilation");
   log("  --help|-h        Display this usage information");
-  log("  --post|-p <file> Define script to run after update & compilation");
+  log("  --post|-p <file> Define a post-install script to run after update & compilation");
   log("  --version|-v     Display the DB Build script version");
   log("agency declaration:");
   log("  Declare an agency to check for GTFS updates/compile database.  The agency");
