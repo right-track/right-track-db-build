@@ -1,0 +1,374 @@
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>finish/sanityChecks.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-cli.html">cli</a></li><li><a href="module-compile.html">compile</a><ul class='methods'><li data-type='method'><a href="module-compile.html#~compile">compile</a></li></ul></li><li><a href="module-compile_utils_build.html">compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-compile_utils_buildDirectory.html">compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-finish.html">finish</a><ul class='methods'><li data-type='method'><a href="module-finish.html#~finish">finish</a></li></ul></li><li><a href="module-helpers_errors.html">helpers/errors</a><ul class='methods'><li data-type='method'><a href="module-helpers_errors.html#~error">error</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrorCount">getErrorCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrors">getErrors</a></li><li data-type='method'><a href="module-helpers_errors.html#~getExceptions">getExceptions</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarningCount">getWarningCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarnings">getWarnings</a></li><li data-type='method'><a href="module-helpers_errors.html#~reset">reset</a></li><li data-type='method'><a href="module-helpers_errors.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_log.html">helpers/log</a><ul class='methods'><li data-type='method'><a href="module-helpers_log.html#~error">error</a></li><li data-type='method'><a href="module-helpers_log.html#~info">info</a></li><li data-type='method'><a href="module-helpers_log.html#~log">log</a></li><li data-type='method'><a href="module-helpers_log.html#~raw">raw</a></li><li data-type='method'><a href="module-helpers_log.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_options.html">helpers/options</a><ul class='methods'><li data-type='method'><a href="module-helpers_options.html#~addAgency">addAgency</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyConfig">addAgencyConfig</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyNotes">addAgencyNotes</a></li><li data-type='method'><a href="module-helpers_options.html#~agency">agency</a></li><li data-type='method'><a href="module-helpers_options.html#~agencyCount">agencyCount</a></li><li data-type='method'><a href="module-helpers_options.html#~get">get</a></li><li data-type='method'><a href="module-helpers_options.html#~set">set</a></li></ul></li><li><a href="module-run.html">run</a><ul class='methods'><li data-type='method'><a href="module-run.html#~start">start</a></li></ul></li><li><a href="module-update.html">update</a><ul class='methods'><li data-type='method'><a href="module-update.html#~update">update</a></li></ul></li><li><a href="module-update_default.html">update/default</a><ul class='methods'><li data-type='method'><a href="module-update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#CHECKS">CHECKS</a></li><li><a href="global.html#sanityChecks">sanityChecks</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">finish/sanityChecks.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const errors = require('../helpers/errors.js');
+const log = require('../helpers/log.js');
+const config = require('../../config.json');
+
+
+// Min File Sizes (Bytes)
+const MIN_DB_SIZE = 500000;
+const MIN_ZIP_SIZE = 250000;
+
+
+/**
+ * List of sanity checks to perform on the agency database
+ * @type {object[]}
+ */
+const CHECKS = [
+  {
+    "name": "agency count",
+    "select": "SELECT COUNT(agency_id) AS count FROM " + config.tables.gtfs.agency + ";",
+    "test": function(row) {
+      return row.count > 0;
+    }
+  },
+  {
+    "name": "calendar table exists",
+    "select": "SELECT COUNT(service_id) AS count FROM " + config.tables.gtfs.calendar + ";",
+    "test": function(row) {
+      return row.count >= 0;
+    }
+  },
+  {
+    "name": "calendar_dates table exists",
+    "select": "SELECT COUNT(service_id) AS count FROM " + config.tables.gtfs.calendar_dates + ";",
+    "test": function(row) {
+      return row.count >= 0;
+    }
+  },
+  {
+    "name": "direction 0 updated",
+    "select": "SELECT description FROM " + config.tables.gtfs.directions + " WHERE direction_id=0;",
+    "test": function(row) {
+      return row.description.toLowerCase() !== "this way";
+    }
+  },
+  {
+    "name": "direction 1 updated",
+    "select": "SELECT description FROM " + config.tables.gtfs.directions + " WHERE direction_id=1;",
+    "test": function(row) {
+      return row.description.toLowerCase() !== "that way";
+    }
+  },
+  {
+    "name": "route count",
+    "select": "SELECT COUNT(route_id) AS count FROM " + config.tables.gtfs.routes + ";",
+    "test": function(row) {
+      return row.count > 0;
+    }
+  },
+  {
+    "name": "stop_times count",
+    "select": "SELECT COUNT(trip_id) AS count FROM " + config.tables.gtfs.stop_times + ";",
+    "test": function(row) {
+      return row.count > 0;
+    }
+  },
+  {
+    "name": "timetable arrival_time_seconds",
+    "select": "SELECT COUNT(trip_id) AS count FROM " + config.tables.gtfs.stop_times + " WHERE arrival_time_seconds IS NULL OR arrival_time_seconds = '';",
+    "test": function(row) {
+      return row.count === 0;
+    }
+  },
+  {
+    "name": "timetable departure_time_seconds",
+    "select": "SELECT COUNT(trip_id) AS count FROM " + config.tables.gtfs.stop_times + " WHERE departure_time_seconds IS NULL OR departure_time_seconds = '';",
+    "test": function(row) {
+      return row.count === 0;
+    }
+  },
+  {
+    "name": "stop count",
+    "select": "SELECT COUNT(stop_id) AS count FROM " + config.tables.gtfs.stops + ";",
+    "test": function(row) {
+      return row.count > 0;
+    }
+  },
+  {
+    "name": "trip count",
+    "select": "SELECT COUNT(trip_id) AS count FROM " + config.tables.gtfs.trips + ";",
+    "test": function(row) {
+      return row.count > 0;
+    }
+  },
+  {
+    "name": "version",
+    "select": "SELECT version FROM " + config.tables.rt.about + ";",
+    "test": function(row) {
+      return row.version > 2017000000;
+    }
+  },
+  {
+    "name": "start date",
+    "select": "SELECT start_date FROM " + config.tables.rt.about + ";",
+    "test": function(row) {
+      let today = _yyyymmdd(new Date());
+      let start = row.start_date;
+      return start > 20170000 &amp;&amp; start &lt;= today;
+    }
+  }
+];
+
+
+
+
+/**
+ * SQLite Database for Agency
+ * @private
+ */
+let DB = undefined;
+
+/**
+ * Right Track Agency
+ * @private
+ */
+let AGENCY = undefined;
+
+/**
+ * Final callback function to return to wrap-up process
+ * @param {boolean} sane DB Sanity Flag
+ * @private
+ */
+let FINAL_CALLBACK = function(sane) {};
+
+/**
+ * Final Sanity Check Flag
+ * @private
+ */
+let SANE = true;
+
+
+
+/**
+ * Run sanity checks on the specified agency's database
+ * @param {object} db SQLite Database
+ * @param {object} agencyOptions Agency Options
+ * @param {function} callback Sanity check callback function
+ * @param {boolean} callback.sane Sanity Check pass flag
+ */
+function sanityChecks(db, agencyOptions, callback) {
+  log("--> Running Sanity Checks");
+
+  // Set Database
+  DB = db;
+
+  // Set Agency
+  AGENCY = agencyOptions.agency;
+
+  // Set final callback
+  FINAL_CALLBACK = callback;
+
+  // Run the file checks
+  _fileChecks();
+
+  // Start running the sanity checks
+  _runChecks();
+
+}
+
+
+/**
+ * Run file checks
+ * Make sure db and zip files exist and are at least a minimum size
+ * @private
+ */
+function _fileChecks() {
+  let status = "pass";
+  let style = "bgGreen.black.bold";
+  let msg = undefined;
+
+  let dbPath = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.files.db);
+  let dbZipPath = path.normalize(AGENCY.moduleDirectory + '/' + config.locations.files.dbZip);
+
+  // Make sure files exist
+  if ( !fs.existsSync(dbPath) ) {
+    status = "FAIL";
+    msg = "DB file not found";
+  }
+  else if ( !fs.existsSync(dbZipPath) ) {
+    status = "FAIL";
+    msg = "DB Zip file not found";
+  }
+  else if ( fs.statSync(dbPath).size &lt; MIN_DB_SIZE ) {
+    status = "FAIL";
+    msg = "DB file too small";
+  }
+  else if ( fs.statSync(dbPath).size &lt; MIN_ZIP_SIZE ) {
+    status = "FAIL";
+    msg = "DB Zip file too small";
+  }
+
+  // Log the failed test
+  if ( status !== "pass" ) {
+    SANE = false;
+    style = "bgRed.white.bold";
+    errors.error("Fail file test: " + msg, undefined, AGENCY.id);
+  }
+
+  // Display test status
+  log.raw([
+    {
+      "text": "    ... Checking files"
+    },
+    {
+      "text": " " + status + " ",
+      "chalk": style
+    }
+  ]);
+}
+
+
+/**
+ * Run the sanity check specified by the count
+ * @param count check counter
+ * @private
+ */
+function _runChecks(count=0) {
+  if ( count &lt; CHECKS.length ) {
+    _check(CHECKS[count], _nextCheck);
+  }
+  else {
+    _finish();
+  }
+
+  function _nextCheck() {
+    _runChecks(count+1);
+  }
+}
+
+/**
+ * Perform the specified sanity check
+ * @param check Sanity Check
+ * @param callback Check callback function
+ * @private
+ */
+function _check(check, callback) {
+  DB.get(check.select, function(err, row) {
+    let status = "pass";
+    let style = "bgGreen.black.bold";
+    let msg = undefined;
+
+    // Database Error
+    if ( err ) {
+      status = "ERROR";
+      msg = err.message.toString();
+    }
+
+    // Perform the test
+    else {
+      let pass = check.test(row);
+      if ( !pass ) {
+        status = "FAIL";
+        msg = "Test result: " + JSON.stringify(row);
+      }
+    }
+
+    // Log the failed test
+    if ( status !== "pass" ) {
+      SANE = false;
+      style = "bgRed.white.bold";
+      errors.error("Fail DB test: " + check.name, msg, AGENCY.id);
+    }
+
+    // Display test status
+    log.raw([
+      {
+        "text": "    ... Checking " + check.name
+      },
+      {
+        "text": " " + status + " ",
+        "chalk": style
+      }
+    ]);
+
+    return callback();
+  });
+}
+
+
+/**
+ * Finish the sanity check process
+ * @private
+ */
+function _finish() {
+  FINAL_CALLBACK(SANE);
+}
+
+
+/**
+ * Generate a Date Int from the specified date
+ * @param date JS Date
+ * @returns {string} Date Int
+ * @private
+ */
+function _yyyymmdd(date) {
+  let yyyy = date.getFullYear();
+  let mm = date.getMonth()+1;
+  let dd  = date.getDate();
+  return String(10000*yyyy + 100*mm + dd);
+}
+
+
+module.exports = sanityChecks;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Dec 12 2017 17:43:14 GMT-0500 (EST) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
