@@ -314,7 +314,37 @@ function _finishAgency(db) {
  * @private
  */
 function _finish() {
-  FINAL_CALLBACK();
+
+  // Check for post-install script
+  if ( options.get().post ) {
+    log("================================================");
+    log.info("RUNNING POST-INSTALL SCRIPT");
+    log("Location: " + options.get().post);
+    log("------------------------------------------------");
+
+    // Run the post-install script
+    try {
+      let postInstall = require(options.get().post);
+      postInstall(options.get(), function() {
+        return FINAL_CALLBACK();
+      });
+    }
+
+    // Catch errors
+    catch(err) {
+      let msg = "Could not run post-install script";
+      log.error("ERROR: " + msg);
+      errors.error(msg, err.stack, undefined);
+      return FINAL_CALLBACK();
+    }
+
+  }
+
+  // No post-install script specified...
+  else {
+    return FINAL_CALLBACK();
+  }
+
 }
 
 
