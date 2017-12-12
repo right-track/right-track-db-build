@@ -325,7 +325,7 @@ function _finish() {
     // Run the post-install script
     try {
       let postInstall = require(options.get().post);
-      postInstall(options.get(), function() {
+      postInstall(options.get(), errors.getExceptions(), function() {
         return FINAL_CALLBACK();
       });
     }
