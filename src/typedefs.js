@@ -11,6 +11,7 @@
  * module.
  * @typedef {Object} Options
  * @property {boolean} force=false Force update and compile flag
+ * @property {boolean} test=false Don't install the database, when true
  * @property {string} [post] The path to the post-update script
  * @property {Object[]} agencies List of agencies to check for updates & compile
  * @property {string} agencies[].require The agency module require name or path

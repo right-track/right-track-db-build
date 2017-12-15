@@ -57,8 +57,9 @@ Usage:
   right-track-db-build [options] --agency <declaration> [agency options] ...
 options:
   --force|-f       Force a GTFS update and database compilation
-  --help|-h        Display this usage information
+  --test|-t        Test the DB compilation (does not install)
   --post|-p <file> Define a post-install script to run after update & compilation
+  --help|-h        Display this usage information
   --version|-v     Display the DB Build script version
 agency declaration:
   Declare an agency to check for GTFS updates/compile database.  The agency
@@ -89,3 +90,5 @@ the following arguments:
 
 This script can be used to finalize the installation of the new database (ie, copy
 the database to a server for distribution), send an alert of an update, etc.
+
+**NOTE:** The Post-Install script will not run of the `--test` flag is provided.

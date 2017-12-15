@@ -83,7 +83,7 @@ function _setup() {
   // Get agency options
   let agencyOptions = options.agency(AGENCY);
 
-  // Start compiling agency...
+  // Display agency
   log("------------------------------------------------");
   log.raw([
     {
@@ -135,8 +135,8 @@ function _run(db, agencyOptions) {
       // Set sane flag
       agencyOptions.sane = sane;
 
-      // Install database to agency modules, if sane
-      if ( sane ) {
+      // Install database to agency modules, if sane and not testing
+      if ( sane && !options.get().test ) {
         _install(db, agencyOptions);
       }
 

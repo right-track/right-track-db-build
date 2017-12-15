@@ -77,6 +77,11 @@ function _parseArgs() {
       options.set().force = true;
     }
 
+    // --test / -t
+    else if ( arg === '--test' || arg === '-t' ) {
+      options.set().test = !options.get().test;
+    }
+
     // --agency / -a
     else if ( arg === '--agency' || arg === '-a' ) {
       i++;
@@ -285,8 +290,9 @@ function _usage() {
   log("  " + path.basename(process.argv[1]) + " [options] --agency <declaration> [agency options] ...");
   log("options:");
   log("  --force|-f       Force a GTFS update and database compilation");
-  log("  --help|-h        Display this usage information");
+  log("  --test|-t        Test the DB compilation (does not install)");
   log("  --post|-p <file> Define a post-install script to run after update & compilation");
+  log("  --help|-h        Display this usage information");
   log("  --version|-v     Display the DB Build script version");
   log("agency declaration:");
   log("  Declare an agency to check for GTFS updates/compile database.  The agency");

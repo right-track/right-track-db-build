@@ -1,6 +1,7 @@
 {
   "options": {
     "force": false,
+    "test": false,
     "agencies": [],
     "locale": "en_US"
   },
