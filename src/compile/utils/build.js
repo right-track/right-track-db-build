@@ -158,65 +158,67 @@ function load(db, table, agencyOptions, callback) {
 
   // Read each line of the source file
   rd.on('line', function(line) {
-    if ( !readHeaders ) {
-      headers = _split(line, table.separator);
-      readHeaders = true;
-    }
-    else {
-      let items = _split(line, table.separator);
+    if ( line.toString().length > 0 ) {
+      if ( !readHeaders ) {
+        headers = _split(line, table.separator);
+        readHeaders = true;
+      }
+      else {
+        let items = _split(line, table.separator);
 
-      // Start column and value data strings
-      let columns = "(";
-      let values = "(";
+        // Start column and value data strings
+        let columns = "(";
+        let values = "(";
 
-      // Loop through each value
-      for ( let i = 0; i < items.length; i++ ) {
-        let header = headers[i];
-        let value = items[i];
-        let field = _findField(header, table.fields);
+        // Loop through each value
+        for ( let i = 0; i < items.length; i++ ) {
+          let header = headers[i];
+          let value = items[i];
+          let field = _findField(header, table.fields);
 
-        // Add field name and value based on field information
-        if ( field !== undefined ) {
+          // Add field name and value based on field information
+          if ( field !== undefined ) {
 
-          // Add field name
-          columns += field.name;
+            // Add field name
+            columns += field.name;
 
-          // Add field value
-          if ( field.type.toUpperCase() === 'TEXT' ) {
-            values += "'" + value + "'";
-          }
-          else {
-            if ( value === '' ) {
-              values += 'NULL';
+            // Add field value
+            if ( field.type.toUpperCase() === 'TEXT' ) {
+              values += "'" + value + "'";
             }
             else {
-              values += value;
+              if ( value === '' ) {
+                values += 'NULL';
+              }
+              else {
+                values += value;
+              }
             }
+          }
+
+          // Add default field name and value
+          else {
+            columns += header;
+            values += "'" + value + "'";
+          }
+
+          // Add commas
+          if ( i < items.length - 1 ) {
+            columns += ", ";
+            values += ", ";
           }
         }
 
-        // Add default field name and value
-        else {
-          columns += header;
-          values += "'" + value + "'";
-        }
+        // End columns and values strings
+        columns += ")";
+        values += ")";
 
-        // Add commas
-        if ( i < items.length-1) {
-          columns += ", ";
-          values += ", ";
-        }
+        // Build INSERT statement
+        let sql = "INSERT INTO " + table.name + " " + columns + " VALUES " + values + ";";
+
+        // Execute the INSERT
+        db.exec(sql);
       }
-
-      // End columns and values strings
-      columns += ")";
-      values += ")";
-
-      // Build INSERT statement
-      let sql = "INSERT INTO " + table.name + " " + columns + " VALUES " + values + ";";
-
-      // Execute the INSERT
-      db.exec(sql);
     }
   });
 
