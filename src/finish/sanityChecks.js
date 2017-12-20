@@ -1,5 +1,14 @@
 'use strict';
 
+/**
+ * #### Database Sanity Checks
+ *
+ * This function performs a set list of sanity checks on the compiled
+ * agency database.  If any of these checks fail, the function will add the
+ * error to the DB compilation exceptions and return false in the callback.
+ * @module finish/sanityChecks
+ */
+
 const fs = require('fs');
 const path = require('path');
 const errors = require('../helpers/errors.js');
@@ -13,8 +22,13 @@ const MIN_ZIP_SIZE = 250000;
 
 
 /**
- * List of sanity checks to perform on the agency database
- * @type {object[]}
+ * List of sanity checks to perform on the agency database.  Each object in this
+ * array contains three properties that define the sanity check.
+ * @type {object[]} List of Sanity Checks
+ * @property {string} name Check Name
+ * @property {string} select SQL Select statement to perform
+ * @property {function} test Function that accepts a single DB row and returns a boolean (pass/fail)
+ * @property {boolean} test.row SQLite DB Row object returned from the SELECT query
  */
 const CHECKS = [
   {
