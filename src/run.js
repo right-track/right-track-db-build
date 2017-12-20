@@ -193,7 +193,7 @@ function _finished() {
   // Print Warnings, if any
   let warnings = errors.getWarnings();
   if ( warnings.length > 0 ) {
-    exit = 2;
+    exit = 0;
     log.warning(warnings.length + " WARNING(S) LOGGED", false);
     for ( let i = 0; i < warnings.length; i++ ) {
       log.warning("--> " + warnings[i].message + " <" + warnings[i].agencyId + ">", false);
