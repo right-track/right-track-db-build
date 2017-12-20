@@ -81,18 +81,18 @@ function _startNextAgency() {
  */
 function _compile() {
 
-  // Set compiled Date
-  let compiled = new Date();
-  options.agency(AGENCY).compiled = compiled;
-
-  // Set version
-  let version = _version(compiled);
-  let version_path = path.normalize(options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.files.version);
-  fs.writeFileSync(version_path, version);
-  options.agency(AGENCY).version = parseInt(version);
-
   // Get agency options
   let agencyOptions = options.agency(AGENCY);
+
+  // Set compiled Date
+  let compiled = new Date();
+  agencyOptions.compiled = compiled;
+
+  // Set version and write to file
+  let version = _version(compiled);
+  let versionPath = path.normalize(agencyOptions.agency.moduleDirectory + '/' + config.locations.files.version);
+  fs.writeFileSync(versionPath, version);
+  agencyOptions.version = parseInt(version);
 
   // Start compiling agency...
   log("------------------------------------------------");
@@ -191,11 +191,11 @@ function _agencyPostCompile(db, agencyOptions) {
  */
 function _finishAgency(db, compiled=false) {
 
-  // Close database connection
-  db.close();
-
   // Flag the agency as compiled
   options.agency(AGENCY).compileComplete = compiled;
+
+  // Close database connection
+  db.close();
 
   // Continue to the next agency
   _startNextAgency();

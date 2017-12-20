@@ -41,15 +41,12 @@
  * @property {int} version the DB version code (based off of the compile date/time)
  * @property {boolean} sane=false DB Sanity Check flag (true if passed sanity checks)
  * @property {Object} files Agency Database File Locations, set when the agency database has been compiled
- * @property {string} files.tempDir Temporary database directory
- * @property {string} files.tempDb Temporary database file location
- * @property {string} files.tempDbZip Temporary database zip file location
- * @property {string} files.tempVersion Temporary version file location
  * @property {string} files.latestDir Latest database directory
- * @property {string} files.archiveDir Database archive directory
  * @property {string} files.latestDb Latest database file location
  * @property {string} files.latestDbZip Latest database zip file location
  * @property {string} files.latestVersion Latest version file location
+ * @property {string} files.archiveDir Database archive directory
+ * @property {string} files.archiveDb Archived database file location
  */
 
 /**

@@ -49,6 +49,7 @@ function addAgency(require) {
     agency.compiled = undefined;
     agency.version = undefined;
     agency.sane = false;
+    agency.files = {};
 
     OPTIONS.agencies.push(agency);
   }
