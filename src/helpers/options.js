@@ -49,6 +49,7 @@ function addAgency(require) {
     agency.compiled = undefined;
     agency.version = undefined;
     agency.sane = false;
+    agency.files = {};
 
     OPTIONS.agencies.push(agency);
   }
@@ -97,7 +98,7 @@ function agencyCount() {
 /**
  * Get the agency's build options
  * @param {int} index Agency index
- * @returns {object} Agency Build Options
+ * @returns {AgencyOptions} Agency Build Options
  */
 function agency(index) {
   return OPTIONS.agencies[index];

@@ -120,8 +120,8 @@ function _setup() {
 
 /**
  * Run the wrap-up procedures
- * @param db RightTrackDB
- * @param agencyOptions Agency Options
+ * @param {Object} db SQLite Database
+ * @param {AgencyOptions} agencyOptions Agency Options
  * @private
  */
 function _run(db, agencyOptions) {
@@ -154,8 +154,8 @@ function _run(db, agencyOptions) {
 
 /**
  * Create a zip archive of the database file
- * @param agencyOptions Agency Options
- * @param callback Callback function
+ * @param {AgencyOptions} agencyOptions Agency Options
+ * @param {function} callback Callback function()
  * @private
  */
 function _zip(agencyOptions, callback) {
@@ -192,8 +192,8 @@ function _zip(agencyOptions, callback) {
 
 /**
  * Install the Database files into the agency module
- * @param db RightTrackDB
- * @param agencyOptions Agency Options
+ * @param {Object} db SQLite Database
+ * @param {AgencyOptions} agencyOptions Agency Options
  * @private
  */
 function _install(db, agencyOptions) {
@@ -211,6 +211,14 @@ function _install(db, agencyOptions) {
   let latestDbZipPath = path.normalize(latestDir + '/' + path.basename(dbZipPath));
   let latestVersionPath = path.normalize(latestDir + '/' + path.basename(versionPath));
   let archiveDbPath = path.normalize(archiveDir + '/' + agencyOptions.version + ".zip");
+
+  // Save destination file and directory paths to agency options
+  agencyOptions.files.latestDir = latestDir;
+  agencyOptions.files.latestDb = latestDbPath;
+  agencyOptions.files.latestDbZip = latestDbZipPath;
+  agencyOptions.files.latestVersion = latestVersionPath;
+  agencyOptions.files.archiveDir = archiveDir;
+  agencyOptions.files.archiveDb = archiveDbPath;
 
   // Set paths to copy
   let paths = [];
@@ -236,7 +244,7 @@ function _install(db, agencyOptions) {
  * @param {string} paths.source Source file path
  * @param {string} paths.destination Destination file path
  * @param {int} count File counter
- * @param callback Callback function
+ * @param {function} callback Callback function()
  * @private
  */
 function _copyFiles(paths, count, callback) {
@@ -272,9 +280,9 @@ function _copyFiles(paths, count, callback) {
 
 /**
  * Copy the source file to the destination file
- * @param source Source file path
- * @param destination Destination file path
- * @param callback Callback function(err)
+ * @param {string} source Source file path
+ * @param {string} destination Destination file path
+ * @param {function} callback Callback function(err)
  * @private
  */
 function _copy(source, destination, callback) {
@@ -297,7 +305,7 @@ function _copy(source, destination, callback) {
 
 /**
  * Finish the Agency wrap-up
- * @param db RightTrackDB
+ * @param {Object} db SQLite Database
  * @private
  */
 function _finishAgency(db) {

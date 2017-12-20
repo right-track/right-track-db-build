@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>compile/utils/buildDirectory - Documentation</title>
+    <title>finish/sanityChecks - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">compile/utils/buildDirectory</h1>
+    <h1 class="page-title">finish/sanityChecks</h1>
     
 
     
@@ -50,9 +50,9 @@
     <div class="container-overview">
     
         
-            <div class="description"><h4>Database Build Directory</h4><p>Process the build table scripts found in a specified directory.</p>
-<p>This will run all .js files in the specified directory that export
-a <code>buildTable</code> function.</p></div>
+            <div class="description"><h4>Database Sanity Checks</h4><p>This function performs a set list of sanity checks on the compiled
+agency database.  If any of these checks fail, the function will add the
+error to the DB compilation exceptions and return false in the callback.</p></div>
         
 
         
@@ -66,7 +66,7 @@ a <code>buildTable</code> function.</p></div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compile_utils_buildDirectory.js.html">compile/utils/buildDirectory.js</a>, <a href="compile_utils_buildDirectory.js.html#line3">line 3</a>
+        <a href="finish_sanityChecks.js.html">finish/sanityChecks.js</a>, <a href="finish_sanityChecks.js.html#line3">line 3</a>
     </li></ul></dd>
     
 
@@ -144,6 +144,230 @@ a <code>buildTable</code> function.</p></div>
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="~CHECKS"><span class="type-signature">(inner, constant) </span>CHECKS<span class="type-signature"> :Array.&lt;object></span></h4>
+
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="finish_sanityChecks.js.html">finish/sanityChecks.js</a>, <a href="finish_sanityChecks.js.html#line33">line 33</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Check Name</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>select</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>SQL Select statement to perform</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>test</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Function that accepts a single DB row and returns a boolean (pass/fail)</p>
+                <h6>Properties</h6>
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>row</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>SQLite DB Row object returned from the SELECT query</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<div class="description">
+    <p>List of sanity checks to perform on the agency database.  Each object in this
+array contains three properties that define the sanity check.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;object></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+        
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -153,7 +377,7 @@ a <code>buildTable</code> function.</p></div>
 
     
 
-    <h4 class="name" id="~buildDirectory"><span class="type-signature">(inner) </span>buildDirectory<span class="signature">(db, agencyOptions, directory, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~sanityChecks"><span class="type-signature">(inner) </span>sanityChecks<span class="signature">(db, agencyOptions, callback)</span><span class="type-signature"></span></h4>
 
     
 
@@ -165,7 +389,7 @@ a <code>buildTable</code> function.</p></div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="compile_utils_buildDirectory.js.html">compile/utils/buildDirectory.js</a>, <a href="compile_utils_buildDirectory.js.html#line28">line 28</a>
+        <a href="finish_sanityChecks.js.html">finish/sanityChecks.js</a>, <a href="finish_sanityChecks.js.html#line166">line 166</a>
     </li></ul></dd>
     
 
@@ -205,9 +429,7 @@ a <code>buildTable</code> function.</p></div>
 
 
 <div class="description">
-    <p>Run all of the build table scripts in the specified directory.  This will find
-all .js files that export a <code>buildTable</code> function and run the scripts in
-alphabetical order of the scripts' filenames.</p>
+    <p>Run sanity checks on the specified agency's database</p>
 </div>
 
 
@@ -251,7 +473,7 @@ alphabetical order of the scripts' filenames.</p>
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">object</span>
 
 
             
@@ -261,7 +483,7 @@ alphabetical order of the scripts' filenames.</p>
 
             
 
-            <td class="description last"><p>The SQLite database being built</p></td>
+            <td class="description last"><p>SQLite Database</p></td>
         </tr>
 
     
@@ -274,7 +496,7 @@ alphabetical order of the scripts' filenames.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#AgencyOptions">AgencyOptions</a></span>
+<span class="param-type">object</span>
 
 
             
@@ -284,30 +506,7 @@ alphabetical order of the scripts' filenames.</p>
 
             
 
-            <td class="description last"><p>The Agency Build Options</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>directory</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The path to the directory containing the build scripts</p></td>
+            <td class="description last"><p>Agency Options</p></td>
         </tr>
 
     
@@ -330,7 +529,56 @@ alphabetical order of the scripts' filenames.</p>
 
             
 
-            <td class="description last"><p>Callback function() called when all build scripts have finished</p></td>
+            <td class="description last"><p>Sanity check callback function</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sane</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Sanity Check pass flag</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
