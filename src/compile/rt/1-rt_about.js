@@ -78,7 +78,7 @@ function _init(db, agencyOptions, callback) {
   // Set notes
   let notes = agencyOptions.notes;
   if ( agencyOptions.notes === undefined ) {
-    let c = agencyOptions.compiled.toLocaleString();
+    let c = agencyOptions.compiled.toLocaleString(config.options.locale.toString().replace('_', '-'));
     notes = "This schedule database was automatically compiled on " + c + " due to a schedule data update from " + agencyOptions.agency.name + ".";
   }
 
