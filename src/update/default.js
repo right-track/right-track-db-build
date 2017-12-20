@@ -53,7 +53,7 @@ let UPDATE_SUCCESSFUL = false;
  * than the one provided in the server's `last-modified` header, it will
  * download the zip file and unzip the contents into the agency's gtfs directory.
  *
- * @param {Object} agencyOptions Agency Build Options
+ * @param {AgencyOptions} agencyOptions Agency Build Options
  * @param {updateCallback} callback callback function when update is complete
  * @type {updateFunction}
  */

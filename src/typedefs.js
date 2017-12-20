@@ -9,23 +9,47 @@
  * determine which Agencies to check for updates and compile databases for.  The
  * options are set, modified and returned via the {@link module:helpers/options|options}
  * module.
+ *
  * @typedef {Object} Options
- * @property {boolean} force=false Force update and compile flag
+ *
+ * @property {boolean} force=false Force a GTFS data update and database compilation, when true
  * @property {boolean} test=false Don't install the database, when true
  * @property {string} [post] The path to the post-update script
- * @property {Object[]} agencies List of agencies to check for updates & compile
- * @property {string} agencies[].require The agency module require name or path
- * @property {string} [agencies[].config] The agency module additional configuration file path
- * @property {string} [agencies[].notes] The agency update notes to be included in the database
- * @property {RightTrackAgency} agencies[].agency The `RightTrackAgency` Class for the agency
- * @property {boolean} agencies[].update=false The GTFS data update flag (true when a GTFS data update is requested)
- * @property {boolean} agencies[].updateComplete=false The GTFS data update success flag (true when GTFS data is successfully updated)
- * @property {Date} agencies[].published The Date/Time the GTFS data was published
- * @property {boolean} agencies[].compile=false The DB compilation flag (true when the DB compilation is requested)
- * @property {boolean} agencies[].compileComplete=false The DB compilation success flag (true when DB is successfully compiled)
- * @property {Date} agencies[].compiled the Date/Time the DB was compiled
- * @property {int} agencies[].version the DB version code (based off of the compile date/time)
- * @property {boolean} agencies[].sane DB Sanity Check flag (true if passed sanity checks)
+ * @property {AgencyOptions[]} agencies List of Agency Build Options for the Right Track
+ * Agencies that are to be processed by the db-build script.
+ */
+
+/**
+ * Agency Build Options
+ *
+ * These options are set during the update and compilation process for the specific
+ * agency.  These options provide the Right Track Agency configuration, update and 
+ * compilation process success and generated database version and file information.
+ *
+ * @typedef {Object} AgencyOptions
+ *
+ * @property {string} require The agency module require name or path
+ * @property {string} [config] The agency module additional configuration file path
+ * @property {string} [notes] The agency update notes to be included in the database
+ * @property {RightTrackAgency} agency The `RightTrackAgency` Class for the agency
+ * @property {boolean} update=false The GTFS data update flag (true when a GTFS data update is requested)
+ * @property {boolean} updateComplete=false The GTFS data update success flag (true when GTFS data is successfully updated)
+ * @property {Date} published The Date/Time the GTFS data was published
+ * @property {boolean} compile=false The DB compilation flag (true when the DB compilation is requested)
+ * @property {boolean} compileComplete=false The DB compilation success flag (true when DB is successfully compiled)
+ * @property {Date} compiled the Date/Time the DB was compiled
+ * @property {int} version the DB version code (based off of the compile date/time)
+ * @property {boolean} sane=false DB Sanity Check flag (true if passed sanity checks)
+ * @property {Object} files Agency Database File Locations, set when the agency database has been compiled
+ * @property {string} files.tempDir Temporary database directory
+ * @property {string} files.tempDb Temporary database file location
+ * @property {string} files.tempDbZip Temporary database zip file location
+ * @property {string} files.tempVersion Temporary version file location
+ * @property {string} files.latestDir Latest database directory
+ * @property {string} files.archiveDir Database archive directory
+ * @property {string} files.latestDb Latest database file location
+ * @property {string} files.latestDbZip Latest database zip file location
+ * @property {string} files.latestVersion Latest version file location
  */
 
 /**
@@ -96,7 +120,7 @@
  * This function is used to build a table in the Right Track Database.
  * @typedef {function} buildTable
  * @param {object} db The SQLite database being built
- * @param {object} agencyOptions The Agency Build Options
+ * @param {AgencyOptions} agencyOptions The Agency Build Options
  * @param {buildTableCallback} callback The build table callback function
  */
 

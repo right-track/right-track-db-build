@@ -137,7 +137,7 @@ function _compile() {
  * Build the Database tables by calling the build scripts in the gtfs and
  * rt directories
  * @param {Object} db The SQLite Database being built
- * @param {object} agencyOptions The Agency Build Options
+ * @param {AgencyOptions} agencyOptions The Agency Build Options
  * @private
  */
 function _build(db, agencyOptions) {
@@ -160,7 +160,7 @@ function _build(db, agencyOptions) {
 /**
  * Run the agency post-compile script, if present
  * @param {Object} db The SQLite Database being built
- * @param {object} agencyOptions The Agency Build Options
+ * @param {AgencyOptions} agencyOptions The Agency Build Options
  * @private
  */
 function _agencyPostCompile(db, agencyOptions) {

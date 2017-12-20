@@ -23,7 +23,7 @@ const errors = require('../../helpers/errors.js');
  * relationships) and import the data from the table's source file.
  * @param {object} db SQLite Database being built
  * @param {RTTableSchema} table The Right Track Table Schema
- * @param {object} agencyOptions The Agency Build Options
+ * @param {AgencyOptions} agencyOptions The Agency Build Options
  * @param {buildTableCallback} callback Callback function called when init is finished
  */
 function init(db, table, agencyOptions, callback) {
@@ -99,7 +99,7 @@ function create(db, table, callback) {
  * Load the source file into the database
  * @param {object} db SQLite database being built
  * @param {RTTableSchema} table The Right Track Table Schema
- * @param {Object} agencyOptions Agency Build Options
+ * @param {AgencyOptions} agencyOptions Agency Build Options
  * @param {buildTableCallback} callback Callback function called when load is finished
  */
 function load(db, table, agencyOptions, callback) {

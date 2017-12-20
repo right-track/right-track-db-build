@@ -97,7 +97,7 @@ function agencyCount() {
 /**
  * Get the agency's build options
  * @param {int} index Agency index
- * @returns {object} Agency Build Options
+ * @returns {AgencyOptions} Agency Build Options
  */
 function agency(index) {
   return OPTIONS.agencies[index];

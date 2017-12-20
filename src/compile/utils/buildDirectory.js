@@ -21,7 +21,7 @@ const errors = require('../../helpers/errors.js');
  * all .js files that export a `buildTable` function and run the scripts in
  * alphabetical order of the scripts' filenames.
  * @param {Object} db The SQLite database being built
- * @param {Object} agencyOptions The Agency Build Options
+ * @param {AgencyOptions} agencyOptions The Agency Build Options
  * @param {string} directory The path to the directory containing the build scripts
  * @param {function} callback Callback function() called when all build scripts have finished
  */
@@ -50,7 +50,7 @@ function buildDirectory(db, agencyOptions, directory, callback) {
  * @param {int} index Index of build script to run
  * @param {object[]} builders List of Builders
  * @param {object} db The SQLite Database being built
- * @param {object} agencyOptions Agency Build Options
+ * @param {AgencyOptions} agencyOptions Agency Build Options
  * @param {function} callback Callback function() called when all build scripts have finished
  * @private
  */
