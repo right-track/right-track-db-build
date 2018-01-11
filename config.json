@@ -43,7 +43,8 @@
       "al_stop_names": "rt_alt_stop_names",
       "holidays": "rt_holidays",
       "links": "rt_links",
-      "properties": "rt_properties"
+      "properties": "rt_properties",
+      "route_graph": "rt_route_graph",
     }
   }
 }
