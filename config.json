@@ -45,6 +45,7 @@
       "links": "rt_links",
       "properties": "rt_properties",
       "route_graph": "rt_route_graph",
+      "line_graph": "rt_line_graph"
     }
   }
 }
