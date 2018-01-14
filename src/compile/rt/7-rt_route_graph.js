@@ -10,7 +10,7 @@ const build = require('../utils/build.js');
  * @private
  */
 const TABLE = {
-  name: "rt_route_graph",
+  name: config.tables.rt.route_graph,
   fields: [
     {
       "name": "line_id",
