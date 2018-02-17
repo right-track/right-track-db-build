@@ -140,6 +140,22 @@ agency's GTFS files before the database compilation begins.
 
 
 
+### Peak Calculator Script
+
+If this script is present, it will determine if a Trip should be considered
+a peak trip.  If it is a peak trip then the DB-build function will
+update the value of `peak` in the `gtfs_trips` table to `1`.
+
+**Location:** {{AGENCY_MODULE}}/db-build/src/peak.js
+
+**Parameters:**
+  - `{Object} db` - The SQLite Database instance of the database currently being built
+  - `{string} tripId` - The GTFS Trip ID of the Trip to determine the peak status of
+  - `{function} callback` - The callback function to return to the build script
+      - `{boolean} peak` - The peak status of the Trip (`true` when peak)
+
+
+
 ### Post-Compile Script
 
 If this script is present, it will run after the database compilation process
