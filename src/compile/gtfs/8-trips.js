@@ -65,6 +65,11 @@ const TABLE = {
     {
       "name": "trip_short_name",
       "type": "TEXT"
+    },
+    {
+      "name": "peak",
+      "type": "INTEGER",
+      "attributes": "DEFAULT 0"
     }
   ]
 };
@@ -78,7 +83,9 @@ const TABLE = {
 function buildTable(db, agency, callback) {
   build.init(db, TABLE, agency, function() {
     _checkTripHeadsigns(db, function() {
-      callback();
+      _setTripPeak(db, agency.agency, function() {
+        callback();
+      });
     });
   });
 }
