@@ -13,7 +13,7 @@ projects, such as the [right-track-server](https://github.com/right-track/right-
 and is required for any data queries performed by the [right-track-core](https://github.com/right-track/right-track-core)
 library.
 
-### Installation
+## Installation
 
 This project can be installed via `npm`:
 
@@ -24,7 +24,7 @@ npm install -g right-track-db-build
 When installed globally, `npm` will link the executable `right-track-db-build`
 into your `$PATH`.
 
-### Dependencies
+## Dependencies
 
 In order to compile a database for a specific transit agency, a **Right Track
 Agency** module (such as [right-track-agency-mnr](https://github.com/right-track/right-track-agency-mnr))
@@ -42,7 +42,7 @@ to be installed separately and referenced manually using the `--agency`
 CLI flag.
 
 
-### Usage
+## Usage
 
 Example: Update GTFS data and compile a database for Metro North Railroad:
 
@@ -80,7 +80,86 @@ agency options:
 ```
 
 
-### Post-Install Script
+# Additional Scripts
+
+
+## Agency Scripts
+
+Each Agency can provide scripts that override the default update script,
+run after the update procedure, and run after the compilation process.
+
+
+
+### Update Script
+
+If this script is present, it will override the default update check script.
+
+The default update script makes a HEAD request to the URL in the agency's
+config property (`build.updateURL`).  If the Last-Modified Header is newer
+than the saved date/time (or the saved date/time does not exist) then
+the GTFS zip file from the URL will be downloaded and unzipped into the
+`./db-build/gtfs/` directory of the agency module.
+
+This script can be used to provide a different update and install
+procedure.  The script should check if a newer GTFS source file
+is available.  If an update is available, it should download and
+install the GTFS files into the agency module's `./db-build/gtfs/`
+directory.
+
+**Location:** {{AGENCY_MODULE}}/db-build/src/update.js
+
+**Parameters:**
+  - `{Object} options` - The DB-Build Agency Options
+  - `{function|Object} log` - The DB-Build Log functions (see `./src/helpers/log.js`)
+  - `{Object} errors` - The DB-Build Error functions (see `./src/helpers/errors.js`)
+  - `{function} callback` - The callback function to return to the build script
+      - `{boolean} requested` - Set to `true` when a GTFS update has been requested
+      - `{boolean} successful` - Set to `true` when a GTFS update has been successfully installed
+      - `{string} [published]` - (optional) The date/time stamp of the GTFS published date/time.
+        If not provided, this will be read from the `./db-build/gtfs/published.txt` file.
+      - `{string} [notes]` - (optional) The database build notes.
+        If not provided, this will be automatically generated from the compile and publish dates.
+
+
+
+### Post-Update Script
+
+If this script is present, it will run after the update procedure
+and before the database compilation process.
+
+This script can be used to make any agency-specific changes to the
+agency's GTFS files before the database compilation begins.
+
+**Location:** {{AGENCY_MODULE}}/db-build/src/postUpdate.js
+
+**Parameters:**
+  - `{Object} options` - The DB-Build Agency Options
+  - `{function|Object} log` - The DB-Build Log functions (see `./src/helpers/log.js`)
+  - `{Object} errors` - The DB-Build Error functions (see `./src/helpers/errors.js`)
+  - `{function} callback` - The callback function to return to the build script (no parameters)
+
+
+
+### Post-Compile Script
+
+If this script is present, it will run after the database compilation process
+and before the database installation.
+
+This script can be used to make any agency-specific changes to the compiled
+Right Track database before it is installed.
+
+**Location:** {{AGENCY_MODULE}}/db-build/src/postCompile.js
+
+**Parameters:**
+  - `{Object} options` - The DB-Build Agency Options
+  - `{Object} db` - SQLite3 reference to the compiled database
+  - `{function|Object} log` - The DB-Build Log functions (see `./src/helpers/log.js`)
+  - `{Object} errors` - The DB-Build Error functions (see `./src/helpers/errors.js`)
+  - `{function} callback` - The callback function to return to the build script (no parameters)
+
+
+
+## Post-Install Script
 
 You can provide an additional post-install script via the `--post` command
 line flag.
