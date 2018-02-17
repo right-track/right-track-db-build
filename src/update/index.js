@@ -182,7 +182,7 @@ function _agencyPostUpdate() {
   if ( fs.existsSync(postUpdateScript) ) {
     log("--> Running agency post-update script...");
     let postUpdate = require(postUpdateScript);
-    postUpdate(options.agency(AGENCY), _agencyComplete);
+    postUpdate(options.agency(AGENCY), log, errors, _agencyComplete);
   }
 
   // no post update script
