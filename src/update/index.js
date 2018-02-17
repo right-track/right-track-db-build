@@ -85,7 +85,7 @@ function _startNextAgency() {
     // Try to load the agency update script
     try {
       let update = require(agencyUpdateScript);
-      update(agencyOptions, _agencyUpdateComplete);
+      update(agencyOptions, log, errors, _agencyUpdateComplete);
     }
     catch(err) {
       let msg = "Could not run agency update script";
@@ -108,21 +108,31 @@ function _startNextAgency() {
  * Function to call when an agency is finished with the update check
  * @param {boolean} requested Update requested flag
  * @param {boolean} successful Update successful flag
+ * @param {string} [published] GTFS Published Date/Time (if not provided, use
+ * value in the default the published file)
+ * @param {string} [notes] Agency update notes (does not override notes
+ * provided as a command line option)
  * @type {updateCallback}
  * @private
  */
-function _agencyUpdateComplete(requested, successful) {
+function _agencyUpdateComplete(requested, successful, published, notes) {
 
   // Set agency option properties
   options.agency(AGENCY).update = requested;
   options.agency(AGENCY).updateComplete = successful;
-  options.agency(AGENCY).published = new Date(
+  options.agency(AGENCY).published = published !== undefined ? published :
+    new Date(
     fs.readFileSync(
       path.normalize(
         options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.files.published
       )
     ).toString()
   );
+
+  // Set notes, if not provided
+  if ( !options.agency(AGENCY).notes && notes ) {
+    options.agency(AGENCY).notes = notes;
+  }
 
   let details = {};
   if ( requested && successful ) {
