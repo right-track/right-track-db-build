@@ -23,6 +23,7 @@
     "scripts": {
       "update": "./db-build/src/update.js",
       "postUpdate": "./db-build/src/postUpdate.js",
+      "peak": "./db-build/src/peak.js",
       "postCompile": "./db-build/src/postCompile.js"
     }
   },

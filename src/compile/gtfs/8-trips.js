@@ -1,5 +1,8 @@
 'use strict';
 
+const readline = require('readline');
+const fs = require('fs');
+const path = require('path');
 const config = require('../../../config.json');
 const build = require('../utils/build.js');
 const log = require('../../helpers/log.js');
@@ -144,6 +147,110 @@ function _updateTripRow(db, rows, count, callback) {
   }
   else {
     callback();
+  }
+}
+
+
+/**
+ * Set Trip default peak status
+ * @param db RightTrackDB (SQLite3 implementation)
+ * @param agency The RightTrackAgency implementation being used to build the Database
+ * @param callback Callback function
+ * @private
+ */
+function _setTripPeak(db, agency, callback) {
+  process.stdout.write("        ... Setting Trip Peak Status ");
+
+  // Peak Function location
+  let location = path.normalize(agency.moduleDirectory + '/' + config.locations.scripts.peak);
+
+  // Peak Function Exists...
+  if ( fs.existsSync(location) ) {
+
+    // Get All of the Trips
+    db.all("SELECT trip_id FROM " + config.tables.gtfs.trips + ";", function(err, rows) {
+      db.exec("BEGIN TRANSACTION", function() {
+
+        // Update Each Trip
+        _updateTripPeak(db, agency, rows, 0, function() {
+          db.exec("COMMIT", function() {
+            _finish();
+          });
+        });
+
+      });
+    });
+
+  }
+
+  // Peak Function Not Implemented...
+  else {
+    readline.cursorTo(process.stdout, 0);
+    process.stdout.write("        ... Setting Trip Peak Status (SKIPPING)");
+    _finish();
+  }
+
+
+  /**
+   * Finish Setting Trip Peak Status
+   * @private
+   */
+  function _finish() {
+    readline.cursorTo(process.stdout, 0);
+    process.stdout.write("        ... Setting Trip Peak Status\n");
+    callback();
+  }
+
+}
+
+
+/**
+ * Update the Trip Peak Status for the specified Trip using the
+ * specified peak calculator function
+ * @param db RightTrackDB (SQLite3 implementation)
+ * @param agency The RightTrackAgency implementation being used to build the Database
+ * @param rows Rows of Trips
+ * @param count Current Trip
+ * @param callback Callback function
+ * @private
+ */
+function _updateTripPeak(db, agency, rows, count, callback) {
+  let percent = Math.floor((count/rows.length)*100);
+  readline.cursorTo(process.stdout, 0);
+  process.stdout.write("        ... Setting Trip Peak Status (" + percent + "%)");
+
+  // Continue...
+  if ( count < rows.length ) {
+
+    // Get the Peak Calc Function
+    let location = path.normalize(agency.moduleDirectory + '/' + config.locations.scripts.peak);
+    let peakCalc = require(location);
+
+    // Determine Trip Peak Status
+    peakCalc(db, rows[count].trip_id, function(peak) {
+      if ( peak ) {
+        db.exec("UPDATE " + config.tables.gtfs.trips + " SET peak = 1 WHERE trip_id = '" + rows[count].trip_id + "';", function() {
+          _next();
+        });
+      }
+      else {
+        _next();
+      }
+    });
+
+  }
+
+  // Return...
+  else {
+    return callback();
+  }
+
+  /**
+   * Update the Next Trip
+   * @private
+   */
+  function _next() {
+    _updateTripPeak(db, agency, rows, count+1, callback);
   }
 }
 
