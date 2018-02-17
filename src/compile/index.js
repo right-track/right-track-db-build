@@ -170,7 +170,7 @@ function _agencyPostCompile(db, agencyOptions) {
   if ( fs.existsSync(postCompileScript) ) {
     log("--> Running agency post-compile script...");
     let postCompile = require(postCompileScript);
-    postCompile(agencyOptions, db, function() {
+    postCompile(agencyOptions, db, log, errors, function() {
       _finishAgency(db, true);
     });
   }
