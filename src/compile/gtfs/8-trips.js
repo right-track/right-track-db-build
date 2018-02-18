@@ -153,6 +153,11 @@ function _updateTripRow(db, rows, count, callback) {
 
 /**
  * Set Trip default peak status
+ *
+ * Peak Values:
+ * 0 = never peak
+ * 1 = always peak (excluding holidays)
+ * 2 = peak on weekdays (excluding holidays)
  * @param db RightTrackDB (SQLite3 implementation)
  * @param agency The RightTrackAgency implementation being used to build the Database
  * @param callback Callback function
@@ -228,8 +233,8 @@ function _updateTripPeak(db, agency, rows, count, callback) {
 
     // Determine Trip Peak Status
     peakCalc(db, rows[count].trip_id, function(peak) {
-      if ( peak ) {
-        db.exec("UPDATE " + config.tables.gtfs.trips + " SET peak = 1 WHERE trip_id = '" + rows[count].trip_id + "';", function() {
+      if ( peak > 0 ) {
+        db.exec("UPDATE " + config.tables.gtfs.trips + " SET peak = " + peak + " WHERE trip_id = '" + rows[count].trip_id + "';", function () {
           _next();
         });
       }
