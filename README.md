@@ -140,6 +140,35 @@ agency's GTFS files before the database compilation begins.
 
 
 
+### Peak Calculator Script
+
+If this script is present, it will determine if a Trip should be considered
+a peak trip (ie, operates during agency-specified rush hours and has higher
+than usual fares).  By default the DB-Build script will mark all Trips as
+not peak (value of `0`).  This script should return a peak status value
+for the specified Trip with one of these possible values:
+
+- `0` - the Trip is never considered a Peak trip
+- `1` - the Trip is always considered a Peak trip when it runs (excluding
+Holidays that do not have Peak trips)
+- `2` - the Trip may be considered a Peak trip, if the date of the Trip
+is a weekday (excluding Holidays that do not have Peak trips)
+
+When the `right-track-core` library creates a `Trip` instance, it will consult
+the `rt_holidays` table, if present.  If a `Trip` is being created for a date
+that is considered a Holiday and the holiday has a `peak` value of `false`, then
+all Trips running on that date will be considered Off-Peak.
+
+**Location:** {{AGENCY_MODULE}}/db-build/src/peak.js
+
+**Parameters:**
+  - `{Object} db` - The SQLite Database instance of the database currently being built
+  - `{string} tripId` - The GTFS Trip ID of the Trip to determine the peak status of
+  - `{function} callback` - The callback function to return to the build script
+      - `{int} peak` - The peak status of the Trip
+
+
+
 ### Post-Compile Script
 
 If this script is present, it will run after the database compilation process
