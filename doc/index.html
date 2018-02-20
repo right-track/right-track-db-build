@@ -1,8 +1,7 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Home - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
@@ -12,6 +11,7 @@
     <![endif]-->
     <link type="text/css" rel="stylesheet" href="styles/prettify.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
@@ -55,10 +55,10 @@ single transit agency.  This database is used in the various <strong>Right Track
 projects, such as the <a href="https://github.com/right-track/right-track-server">right-track-server</a>
 and is required for any data queries performed by the <a href="https://github.com/right-track/right-track-core">right-track-core</a>
 library.</p>
-<h3>Installation</h3><p>This project can be installed via <code>npm</code>:</p>
+<h2>Installation</h2><p>This project can be installed via <code>npm</code>:</p>
 <pre class="prettyprint source"><code>npm install -g right-track-db-build</code></pre><p>When installed globally, <code>npm</code> will link the executable <code>right-track-db-build</code>
 into your <code>$PATH</code>.</p>
-<h3>Dependencies</h3><p>In order to compile a database for a specific transit agency, a <strong>Right Track
+<h2>Dependencies</h2><p>In order to compile a database for a specific transit agency, a <strong>Right Track
 Agency</strong> module (such as <a href="https://github.com/right-track/right-track-agency-mnr">right-track-agency-mnr</a>)
 will also need to be installed.  The agency module provides information on
 where/how to obtain the agency's GTFS data as well as additional database
@@ -70,7 +70,7 @@ databases) will be kept in the Right Track Agency's module.</p>
 in this project's <code>package.json</code> file.  The Agency modules will have
 to be installed separately and referenced manually using the <code>--agency</code>
 CLI flag.</p>
-<h3>Usage</h3><p>Example: Update GTFS data and compile a database for Metro North Railroad:</p>
+<h2>Usage</h2><p>Example: Update GTFS data and compile a database for Metro North Railroad:</p>
 <pre class="prettyprint source"><code>right-track-db-build --agency right-track-agency-mnr</code></pre><p>The command line utility has the following usage:</p>
 <pre class="prettyprint source lang-text"><code>Right Track Database Builder
 Module: right-track-db-build
@@ -95,7 +95,87 @@ agency options:
   --config|-c &lt;file>
      Specify the path to an optional agency configuration file
   --notes|-n &lt;notes>
-     Specify agency update notes to be included in the new database</code></pre><h3>Post-Install Script</h3><p>You can provide an additional post-install script via the <code>--post</code> command
+     Specify agency update notes to be included in the new database</code></pre><h1>Additional Scripts</h1><h2>Agency Scripts</h2><p>Each Agency can provide scripts that override the default update script,
+run after the update procedure, and run after the compilation process.</p>
+<h3>Update Script</h3><p>If this script is present, it will override the default update check script.</p>
+<p>The default update script makes a HEAD request to the URL in the agency's
+config property (<code>build.updateURL</code>).  If the Last-Modified Header is newer
+than the saved date/time (or the saved date/time does not exist) then
+the GTFS zip file from the URL will be downloaded and unzipped into the
+<code>./db-build/gtfs/</code> directory of the agency module.</p>
+<p>This script can be used to provide a different update and install
+procedure.  The script should check if a newer GTFS source file
+is available.  If an update is available, it should download and
+install the GTFS files into the agency module's <code>./db-build/gtfs/</code>
+directory.</p>
+<p><strong>Location:</strong> {{AGENCY_MODULE}}/db-build/src/update.js</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>{Object} options</code> - The DB-Build Agency Options</li>
+<li><code>{function|Object} log</code> - The DB-Build Log functions (see <code>./src/helpers/log.js</code>)</li>
+<li><code>{Object} errors</code> - The DB-Build Error functions (see <code>./src/helpers/errors.js</code>)</li>
+<li><code>{function} callback</code> - The callback function to return to the build script<ul>
+<li><code>{boolean} requested</code> - Set to <code>true</code> when a GTFS update has been requested</li>
+<li><code>{boolean} successful</code> - Set to <code>true</code> when a GTFS update has been successfully installed</li>
+<li><code>{string} [published]</code> - (optional) The date/time stamp of the GTFS published date/time.
+If not provided, this will be read from the <code>./db-build/gtfs/published.txt</code> file.</li>
+<li><code>{string} [notes]</code> - (optional) The database build notes.
+If not provided, this will be automatically generated from the compile and publish dates.</li>
+</ul>
+</li>
+</ul>
+<h3>Post-Update Script</h3><p>If this script is present, it will run after the update procedure
+and before the database compilation process.</p>
+<p>This script can be used to make any agency-specific changes to the
+agency's GTFS files before the database compilation begins.</p>
+<p><strong>Location:</strong> {{AGENCY_MODULE}}/db-build/src/postUpdate.js</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>{Object} options</code> - The DB-Build Agency Options</li>
+<li><code>{function|Object} log</code> - The DB-Build Log functions (see <code>./src/helpers/log.js</code>)</li>
+<li><code>{Object} errors</code> - The DB-Build Error functions (see <code>./src/helpers/errors.js</code>)</li>
+<li><code>{function} callback</code> - The callback function to return to the build script (no parameters)</li>
+</ul>
+<h3>Peak Calculator Script</h3><p>If this script is present, it will determine if a Trip should be considered
+a peak trip (ie, operates during agency-specified rush hours and has higher
+than usual fares).  By default the DB-Build script will mark all Trips as
+not peak (value of <code>0</code>).  This script should return a peak status value
+for the specified Trip with one of these possible values:</p>
+<ul>
+<li><code>0</code> - the Trip is never considered a Peak trip</li>
+<li><code>1</code> - the Trip is always considered a Peak trip when it runs (excluding
+Holidays that do not have Peak trips)</li>
+<li><code>2</code> - the Trip may be considered a Peak trip, if the date of the Trip
+is a weekday (excluding Holidays that do not have Peak trips)</li>
+</ul>
+<p>When the <code>right-track-core</code> library creates a <code>Trip</code> instance, it will consult
+the <code>rt_holidays</code> table, if present.  If a <code>Trip</code> is being created for a date
+that is considered a Holiday and the holiday has a <code>peak</code> value of <code>false</code>, then
+all Trips running on that date will be considered Off-Peak.</p>
+<p><strong>Location:</strong> {{AGENCY_MODULE}}/db-build/src/peak.js</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>{Object} db</code> - The SQLite Database instance of the database currently being built</li>
+<li><code>{string} tripId</code> - The GTFS Trip ID of the Trip to determine the peak status of</li>
+<li><code>{function} callback</code> - The callback function to return to the build script<ul>
+<li><code>{int} peak</code> - The peak status of the Trip</li>
+</ul>
+</li>
+</ul>
+<h3>Post-Compile Script</h3><p>If this script is present, it will run after the database compilation process
+and before the database installation.</p>
+<p>This script can be used to make any agency-specific changes to the compiled
+Right Track database before it is installed.</p>
+<p><strong>Location:</strong> {{AGENCY_MODULE}}/db-build/src/postCompile.js</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>{Object} options</code> - The DB-Build Agency Options</li>
+<li><code>{Object} db</code> - SQLite3 reference to the compiled database</li>
+<li><code>{function|Object} log</code> - The DB-Build Log functions (see <code>./src/helpers/log.js</code>)</li>
+<li><code>{Object} errors</code> - The DB-Build Error functions (see <code>./src/helpers/errors.js</code>)</li>
+<li><code>{function} callback</code> - The callback function to return to the build script (no parameters)</li>
+</ul>
+<h2>Post-Install Script</h2><p>You can provide an additional post-install script via the <code>--post</code> command
 line flag.</p>
 <p>This is a JavaScript module that exports a single function.  This function takes
 the following arguments:</p>
@@ -119,7 +199,7 @@ the database to a server for distribution), send an alert of an update, etc.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Dec 20 2017 14:59:55 GMT-0500 (EST) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Feb 20 2018 11:28:56 GMT-0500 (EST) using the <a href="https://github.com/dwaring87/docdash">@dwaring87/docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
