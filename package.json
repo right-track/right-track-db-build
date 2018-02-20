@@ -7,7 +7,7 @@
   "main": "src/run.js",
   "bin": "src/cli.js",
   "scripts": {
-    "docs": "jsdoc -c jsdoc.json --readme README.md --template $NODE_PATH/docdash"
+    "docs": "jsdoc -c jsdoc.json --readme README.md --template $NODE_PATH/@dwaring87/docdash"
   },
   "dependencies": {
     "archiver": "^2.1.1",
@@ -15,6 +15,10 @@
     "decompress-zip": "^0.3.0",
     "right-track-agency": "^1.1.0",
     "sqlite3": "^3.1.13"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.5.5",
+    "@dwaring87/docdash": "^0.4.1"
   },
   "homepage": "https://righttrack.io",
   "repository": {
