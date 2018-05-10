@@ -12,7 +12,6 @@ const TABLE = {
   name: config.tables.rt.links,
   sourceDirectory: config.locations.directories.rt,
   sourceFile: "rt_links.csv",
-  separator: '|',
   fields: [
     {
       "name": "link_category_title",
