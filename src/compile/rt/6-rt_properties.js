@@ -20,8 +20,7 @@ const TABLE = {
     },
     {
       "name": "value",
-      "type": "TEXT",
-      "attributes": "NOT NULL"
+      "type": "TEXT"
     }
   ]
 };
