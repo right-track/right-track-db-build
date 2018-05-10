@@ -336,18 +336,22 @@ function _isRelativePath(directory) {
  * @private
  */
 function _split(str, sep=',') {
-  let items = str.split(sep);
+
+  // Split by separator not in quotes
+  let expression = "(\".*?\"|[^\"" + sep + "\\s]+)(?=\\s*" + sep + "|\\s*$)";
+  let re = new RegExp(expression, "g");
+  let items = str.match(re);
+
+  // Remove leading and trailing quotes, single quotes
+  items = items || [];
   for ( let i = 0; i < items.length; i++ ) {
-    let item = items[i];
-    if ( item.indexOf("\"") > -1 ) {
-      item = item.replace(/"/g, "");
-    }
-    if ( item.indexOf("'") > -1 ) {
-      item = item.replace(/'/g, "");
-    }
-    items[i] = item;
+    items[i] = items[i].replace(/^"|"$/g, "");
+    items[i] = items[i].replace(/'/g, "");
   }
+
+  // Return list of items
   return items;
+
 }
 
 
