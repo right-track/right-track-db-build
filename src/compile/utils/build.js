@@ -13,6 +13,7 @@
 const rl = require('readline');
 const fs = require('fs');
 const path = require('path');
+const split = require('csv-split-easy');
 const log = require('../../helpers/log.js');
 const errors = require('../../helpers/errors.js');
 
@@ -337,15 +338,9 @@ function _isRelativePath(directory) {
  */
 function _split(str, sep=',') {
 
-  // Split by separator not in quotes
-  let expression = "(\".*?\"|[^\"" + sep + "\\s]+)(?=\\s*" + sep + "|\\s*$)";
-  let re = new RegExp(expression, "g");
-  let items = str.match(re);
-
-  // Remove leading and trailing quotes, single quotes
-  items = items || [];
+  // Split the String
+  let items = split(str)[0];
   for ( let i = 0; i < items.length; i++ ) {
-    items[i] = items[i].replace(/^"|"$/g, "");
     items[i] = items[i].replace(/'/g, "");
   }
 
