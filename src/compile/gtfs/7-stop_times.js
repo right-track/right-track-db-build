@@ -72,6 +72,14 @@ const TABLE = {
       "type": "INTEGER"
     },
     {
+      "name": "track",
+      "type": "TEXT"
+    },
+    {
+      "name": "note_id",
+      "type": "TEXT"
+    },
+    {
       "name": "arrival_time_seconds",
       "type": "INTEGER",
       "index": true
