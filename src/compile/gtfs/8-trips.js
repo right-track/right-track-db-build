@@ -70,6 +70,11 @@ const TABLE = {
       "type": "TEXT"
     },
     {
+      "name": "peak_offpeak",
+      "type": "INTEGER",
+      "attributes": "DEFAULT 0"
+    },
+    {
       "name": "peak",
       "type": "INTEGER",
       "attributes": "DEFAULT 0"
