@@ -3,6 +3,7 @@
 const readline = require('readline');
 const config = require('../../../config.json');
 const build = require('../utils/build.js');
+const log = require('../../helpers/log.js');
 
 /**
  * gtfs_stop_times table definition
@@ -100,10 +101,27 @@ const TABLE = {
  */
 function buildTable(db, agency, callback) {
   build.init(db, TABLE, agency, function() {
-    _calcArrivalSecs(db, function() {
-      _calcDepartureSecs(db, function() {
-        callback();
+    _setDefaults(db, function() {
+      _calcArrivalSecs(db, function() {
+        _calcDepartureSecs(db, function() {
+          callback();
+        });
       });
+    });
+  });
+}
+
+
+/**
+ * Set Default Pickup and Drop Off Types, if not set
+ * @private
+ */
+function _setDefaults(db, callback) {
+  log("        ... Setting default pickup/drop off types");
+
+  db.exec("UPDATE " + TABLE.name + " SET drop_off_type = 0 WHERE drop_off_type IS NULL;", function() {
+    db.exec("UPDATE " + TABLE.name + " SET pickup_type = 0 WHERE pickup_type IS NULL;", function() {
+      callback();
     });
   });
 }
