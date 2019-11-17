@@ -85,11 +85,11 @@ function create(db, table, callback) {
   create += ");";
 
   // Run SQL Statements
-  db.serialize(function() {
-    db.exec(drop);
-    db.exec(create);
-    db.exec(indices, function() {
-      callback();
+  db.exec(drop, function() {
+    db.exec(create, function() {
+      db.exec(indices, function() {
+        callback();
+      });
     });
   });
 
