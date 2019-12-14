@@ -206,26 +206,21 @@ function _install(db, agencyOptions) {
 
   // Set destination file paths
   let latestDir = path.normalize(path.dirname(agencyOptions.agency.config.db.location));
-  let archiveDir = path.normalize(agencyOptions.agency.config.db.archiveDir);
   let latestDbPath = path.normalize(latestDir + '/' + path.basename(dbPath));
   let latestDbZipPath = path.normalize(latestDir + '/' + path.basename(dbZipPath));
   let latestVersionPath = path.normalize(latestDir + '/' + path.basename(versionPath));
-  let archiveDbPath = path.normalize(archiveDir + '/' + agencyOptions.version + ".zip");
 
   // Save destination file and directory paths to agency options
   agencyOptions.files.latestDir = latestDir;
   agencyOptions.files.latestDb = latestDbPath;
   agencyOptions.files.latestDbZip = latestDbZipPath;
   agencyOptions.files.latestVersion = latestVersionPath;
-  agencyOptions.files.archiveDir = archiveDir;
-  agencyOptions.files.archiveDb = archiveDbPath;
 
   // Set paths to copy
   let paths = [];
   paths.push({source: dbPath, destination: latestDbPath});
   paths.push({source: dbZipPath, destination: latestDbZipPath});
   paths.push({source: versionPath, destination: latestVersionPath});
-  paths.push({source: dbZipPath, destination: archiveDbPath});
 
   // Copy the files
   _copyFiles(paths, 0, function() {
