@@ -38,11 +38,24 @@ log("Version: " + props.version);
 log("Started: " + started);
 
 // Parse the passed agencies
-_parseAgencies();
+try {
+  _parseAgencies();  
+}
+catch (error) {
+  log.error("ERROR: Could not parse agencies");
+  log.error(error);
+  process.exit(1);
+}
 
 // Start the Update Check & DB Compilation process
-run();
-
+try {
+  run();
+}
+catch (error) {
+  log.error("ERROR: Could not run update check and DB compilation");
+  log.error(error);
+  process.exit(1);
+}
 
 
 
