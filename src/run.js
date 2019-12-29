@@ -40,7 +40,9 @@ let started = undefined;
  */
 function start() {
   started = new Date();
-  errors.reset();
+
+  log("Starting run...");
+  throw new Error("Error from run.js");
 
   // Make sure there is at least one agency configured
   if ( options.agencyCount() === 0 ) {
