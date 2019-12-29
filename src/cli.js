@@ -23,36 +23,49 @@ const path = require('path');
 const props = require('../package.json');
 const options = require('./helpers/options.js');
 const log = require('./helpers/log.js');
+const errors = require('./helpers/errors.js');
 const run = require('./run.js');
 
 
 
 
 // Parse the CLI arguments
-_parseArgs();
+try {
+  _parseArgs();
+}
+catch (error) {
+  errors.error("Could not parse CLI arguments", error);
+}
 
-// Print start information
-let started = new Date();
-log.info("======== RIGHT TRACK DATABASE GENERATOR ========");
-log("Version: " + props.version);
-log("Started: " + started);
 
 // Parse the passed agencies
 try {
-  _parseAgencies();  
+  if ( errors.getErrorCount() === 0 ) {
+    _parseAgencies();
+  }
 }
 catch (error) {
-  log.error("ERROR: Could not parse agencies");
-  log.error(error);
-  process.exit(1);
+  errors.error("Could not parse agencies", error);
 }
+
 
 // Start the Update Check & DB Compilation process
 try {
-  run();
+  if ( errors.getErrorCount() === 0 ) {
+    run();
+  }
 }
 catch (error) {
-  log.error("ERROR: Could not run update check and DB compilation");
+  errors.error("Could not run update check and DB compilation", error);
+}
+
+
+// Send email report
+try {
+  _report();
+}
+catch (error) {
+  log.error("ERROR: Could not send email report");
   log.error(error);
   process.exit(1);
 }
@@ -99,9 +112,7 @@ function _parseArgs() {
     else if ( arg === '--agency' || arg === '-a' ) {
       i++;
       if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
-        log.error("ERROR: agency declaration not defined");
-        _usage();
-        process.exit(1);
+        return errors.error("Agency declaration is not defined");
       }
       else {
         options.addAgency(args[i]);
@@ -112,18 +123,17 @@ function _parseArgs() {
     else if ( arg === '--config' || arg === '-c' ) {
       i++;
       if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
-        log.error("ERROR: config file for agency is not defined");
-        _usage();
-        process.exit(1);
+        return errors.error("Config file for agency is not defined");
+      }
+      else if ( options.agencyCount() < 1 ) {
+        return errors.error("The --config|-c argument must be preceded by an --agency <...> declaration")
       }
       else {
         if ( fs.existsSync(args[i]) ) {
           options.addAgencyConfig(args[i]);
         }
         else {
-          log.error("ERROR: config file does not exist (" + args[i] + ")");
-          log.error("Make sure the file path to the config file is correct");
-          process.exit(1);
+          return errors.error("Config file does not exist", "File not found [" + args[i] + "]");
         }
       }
     }
@@ -132,9 +142,10 @@ function _parseArgs() {
     else if ( arg === '--notes' || arg === '-n' ) {
       i++;
       if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
-        log.error("ERROR: notes for agency are not defined");
-        _usage();
-        process.exit(1);
+        return errors.error("Notes for agency are not defined");
+      }
+      else if ( options.agencyCount() < 1 ) {
+        return errors.error("The --notes|-n argument must be preceded by an --agency <...> declaration");
       }
       else {
         options.addAgencyNotes(args[i]);
@@ -145,9 +156,7 @@ function _parseArgs() {
     else if ( arg === '--post' || arg === '-p' ) {
       i++;
       if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
-        log.error("ERROR: post-install script is not defined");
-        _usage();
-        process.exit(1);
+        return errors.error("The post-install script is not defined");
       }
       else {
         let post = args[i];
@@ -158,10 +167,19 @@ function _parseArgs() {
           options.set().post = post;
         }
         else {
-          log.error("ERROR: post-install script file does not exist (" + post + ")");
-          log.error("Make sure the file path to the post-install script is correct");
-          process.exit(1);
+          return errors.error("The post-install script does not exist", "File not found [" + post + "]");
         }
+      }
+    }
+
+    // --email / -e
+    else if ( arg === '--email' || arg === '-e' ) {
+      i++;
+      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+        return errors.error("Email address is not defined");
+      }
+      else {
+        options.set().email = args[i];
       }
     }
 
@@ -189,6 +207,10 @@ function _parseArgs() {
  */
 function _parseAgencies() {
 
+  // Print start information
+  log.info("======== RIGHT TRACK DATABASE GENERATOR ========");
+  log("Version: " + props.version);
+  log("Started: " + new Date());
   log("================================================");
   log.info("PARSING AGENCIES");
 
@@ -211,9 +233,10 @@ function _parseAgencies() {
     if ( _isRelativePath(options.agency(i).require) ) {
       require = _makeAbsolutePath(options.agency(i).require);
       if ( !fs.existsSync(require) ) {
-        log.error("ERROR: Agency module path not found (" + require + ")");
-        log.error("Make sure the module path is correct and properly referenced.");
-        process.exit(1);
+        return errors.error(
+          "Could not load agency module", 
+          "Agency module path not found [" + require + "]"
+        );
       }
     }
 
@@ -225,9 +248,10 @@ function _parseAgencies() {
 
     // Unknown agency
     if ( require === undefined ) {
-      log.error("ERROR: Undefined agency <" + options.agency(i).require +">.");
-      log.error("Make sure the agency module is installed and properly referenced.");
-      process.exit(1);
+      return errors.error(
+        "Could not load agency module", 
+        "Make sure the agency module is installed and properly referenced [" + options.agency(i).require + "]"
+      );
     }
 
     // Found agency: load the agency
@@ -241,9 +265,10 @@ function _parseAgencies() {
   for ( let i = 0; i < options.agencyCount(); i++ ) {
     let agency = options.agency(i);
     if ( locations.includes(agency.agency.moduleDirectory) ) {
-      log.error("ERROR: Duplicate agency declaration");
-      log.error("Module location: " + agency.agency.moduleDirectory);
-      process.exit(1);
+      return errors.error(
+        "Duplicate agency declaration",
+        "The agency module has been declared more than once [" + agency.agency.moduleDirectory + "]"
+      );
     }
     else {
       locations.push(agency.agency.moduleDirectory);
@@ -290,6 +315,12 @@ function _loadAgency(i) {
 }
 
 
+function _report() {
+  console.log("==== REPORT ====");
+  console.log(errors.getExceptions());
+}
+
+
 /**
  * Print the usage information
  * @private
@@ -302,11 +333,12 @@ function _usage() {
   log("Usage:");
   log("  " + path.basename(process.argv[1]) + " [options] --agency <declaration> [agency options] ...");
   log("options:");
-  log("  --force|-f       Force a GTFS update and database compilation");
-  log("  --test|-t        Test the DB compilation (does not install)");
-  log("  --post|-p <file> Define a post-install script to run after update & compilation");
-  log("  --help|-h        Display this usage information");
-  log("  --version|-v     Display the DB Build script version");
+  log("  --force|-f         Force a GTFS update and database compilation");
+  log("  --test|-t          Test the DB compilation (does not install)");
+  log("  --post|-p <file>   Define a post-install script to run after update & compilation");
+  log("  --email|-e <email> Email address to send db build results to");
+  log("  --help|-h          Display this usage information");
+  log("  --version|-v       Display the DB Build script version");
   log("agency declaration:");
   log("  Declare an agency to check for GTFS updates/compile database.  The agency");
   log("  can be declared by module name, agency id or file path.  For example:");

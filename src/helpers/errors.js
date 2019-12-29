@@ -85,6 +85,14 @@ function getExceptions() {
   return EXCEPTIONS;
 }
 
+/**
+ * Get the number of Right Track Exceptions
+ * @returns {Number}
+ */
+function getExceptionCount() {
+  return EXCEPTIONS.length;
+}
+
 
 /**
  * Get the list of all Right Track Errors
@@ -144,6 +152,7 @@ module.exports = {
   error: error,
   warning: warning,
   getExceptions: getExceptions,
+  getExceptionCount: getExceptionCount,
   getErrors: getErrors,
   getErrorCount: getErrorCount,
   getWarnings: getWarnings,
