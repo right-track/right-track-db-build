@@ -19,6 +19,8 @@
 
 const chalk = require('chalk');
 
+let LOG_OUTPUT = "";
+
 
 
 /**
@@ -30,6 +32,7 @@ const chalk = require('chalk');
  * @property {function} raw See {@link raw}
  */
 let log = function(text) {
+  _history(text);
   console.log(text);
 };
 
@@ -43,6 +46,7 @@ let log = function(text) {
  * @function
  */
 log.info = function(text) {
+  _history(text);
   console.log(chalk.yellow(text))
 };
 
@@ -54,6 +58,7 @@ log.info = function(text) {
  * @function
  */
 log.warning = function(text, toStdErr=true) {
+  _history(text);
   let raw = chalk.bold.red(text);
   if ( toStdErr ) {
     console.error(raw);
@@ -71,6 +76,7 @@ log.warning = function(text, toStdErr=true) {
  * @function
  */
 log.error = function(text, toStdErr=true) {
+  _history(text);
   let raw = chalk.bold.bgRed.white(" " + text + " ");
   if ( toStdErr ) {
     console.error(raw);
@@ -96,6 +102,7 @@ log.raw = function(parts) {
   let raw = "";
   for ( let i = 0; i < parts.length; i++ ) {
     let part = parts[i];
+    _history(part.text);
     if ( part.chalk ) {
       let chalkParts = part.chalk.split('.');
       let obj = chalk;
@@ -113,6 +120,29 @@ log.raw = function(parts) {
   }
   console.log(raw);
 };
+
+
+/**
+ * Get the log history (plain text)
+ * @name history
+ * @function
+ */
+log.history = function() {
+  return LOG_OUTPUT;
+}
+
+
+/**
+ * Append the specified text to the log history
+ * @param text Text to append to history
+ * @private
+ */
+let _history = function(text) {
+  if ( text ) {
+    LOG_OUTPUT += "\n";
+    LOG_OUTPUT += text;
+  }
+}
 
 
 module.exports = log;

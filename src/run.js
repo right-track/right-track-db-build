@@ -22,13 +22,7 @@ const finish = require('./finish/');
 const config = require('../config.json');
 
 
-/**
- * The JS Date used to keep track of the start time
- * @type {Date}
- * @private
- */
-let started = undefined;
-
+let CALLBACK = undefined;
 
 
 
@@ -37,12 +31,11 @@ let started = undefined;
 /**
  * Start the entire update and compilation process with the options
  * set in the {@link module:helpers/options|options} module
+ * @param {function} callback Callback function
  */
-function start() {
-  started = new Date();
-
-  log("Starting run...");
-  throw new Error("Error from run.js");
+function start(callback) {
+  CALLBACK = callback;
+  options.set().started = new Date();
 
   // Make sure there is at least one agency configured
   if ( options.agencyCount() === 0 ) {
@@ -81,8 +74,8 @@ function _setup() {
         if ( !fs.existsSync(directoryPath) ) {
           fs.mkdirSync(directoryPath);
           if ( !fs.existsSync(directoryPath) ) {
-            log.error("ERROR: Could not create directory: " + directoryPath);
-            process.exit(1);
+            errors.error("Could not setup agency for db build", "Could not create directory: " + directoryPath);
+            return _finished();
           }
         }
       }
@@ -181,45 +174,10 @@ function _finish() {
  * @private
  */
 function _finished() {
-  let exit = 0;
-  let finished = new Date();
-  let delta = new Date(Math.abs(finished.getTime() - started.getTime()));
-
-  // Print Update Stats
-  log.info("UPDATE CHECK AND DATABASE COMPILATION FINISHED");
-  log("------------------------------------------------");
-  log("Finished: " + new Date());
-  log("Run time: " + delta.getUTCMinutes() + " mins " + delta.getUTCSeconds() + " secs");
-  log("================================================");
-
-  // Print Warnings, if any
-  let warnings = errors.getWarnings();
-  if ( warnings.length > 0 ) {
-    exit = 0;
-    log.warning(warnings.length + " WARNING(S) LOGGED", false);
-    for ( let i = 0; i < warnings.length; i++ ) {
-      log.warning("--> " + warnings[i].message + " <" + warnings[i].agencyId + ">", false);
-      if ( warnings[i].details ) {
-        log("    " + warnings[i].details);
-      }
-    }
+  options.set().finished = new Date();
+  if ( CALLBACK ) {
+    return CALLBACK();
   }
-
-  // Print Errors, if any
-  let errs = errors.getErrors();
-  if ( errs.length > 0 ) {
-    exit = 1;
-    log.error(errs.length + " ERROR(S) LOGGED", false);
-    for ( let i = 0; i < errs.length; i++ ) {
-      log.error("--> " + errs[i].message + " <" + errs[i].agencyId + ">", false);
-      if ( errs[i].details ) {
-        log("    " + errs[i].details);
-      }
-    }
-  }
-
-  // Exit the Process
-  process.exit(exit);
 }
 
 
