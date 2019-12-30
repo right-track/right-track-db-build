@@ -25,6 +25,7 @@ const options = require('./helpers/options.js');
 const log = require('./helpers/log.js');
 const errors = require('./helpers/errors.js');
 const run = require('./run.js');
+const report = require('./report.js');
 
 
 
@@ -52,22 +53,27 @@ catch (error) {
 // Start the Update Check & DB Compilation process
 try {
   if ( errors.getErrorCount() === 0 ) {
-    run();
+    run(function() {
+
+      // Send email report
+      try {
+        report();
+      }
+      catch (error) {
+        log.error("ERROR: Could not send email report");
+        log.error(error);
+        process.exit(1);
+      }
+
+    });
+  }
+  else {
+    report();
   }
 }
 catch (error) {
   errors.error("Could not run update check and DB compilation", error);
-}
-
-
-// Send email report
-try {
-  _report();
-}
-catch (error) {
-  log.error("ERROR: Could not send email report");
-  log.error(error);
-  process.exit(1);
+  report();
 }
 
 
@@ -78,6 +84,11 @@ catch (error) {
  * @private
  */
 function _parseArgs() {
+
+  // Print start info
+  log.info("======== RIGHT TRACK DATABASE GENERATOR ========");
+  log("Version: " + props.version);
+  log("Started: " + new Date());
 
   // Get cli arguments
   let args = process.argv.slice(2);
@@ -208,9 +219,6 @@ function _parseArgs() {
 function _parseAgencies() {
 
   // Print start information
-  log.info("======== RIGHT TRACK DATABASE GENERATOR ========");
-  log("Version: " + props.version);
-  log("Started: " + new Date());
   log("================================================");
   log.info("PARSING AGENCIES");
 
@@ -307,17 +315,12 @@ function _loadAgency(i) {
     options.agency(i).agency = agency;
   }
   catch(exception) {
-    log.error("ERROR: could not load agency module <" + options.agency(i).require + ">");
-    log.error("Make sure the module is a Right Track Agency module");
-    process.exit(1);
+    return errors.error(
+      "Could not load agency module", 
+      "The specified agency module could not be loaded as a Right Track Agency [" + options.agency(i).require + "]."
+    );
   }
 
-}
-
-
-function _report() {
-  console.log("==== REPORT ====");
-  console.log(errors.getExceptions());
 }
 
 
@@ -336,7 +339,7 @@ function _usage() {
   log("  --force|-f         Force a GTFS update and database compilation");
   log("  --test|-t          Test the DB compilation (does not install)");
   log("  --post|-p <file>   Define a post-install script to run after update & compilation");
-  log("  --email|-e <email> Email address to send db build results to");
+  log("  --email|-e <email> Email address to send DB build results to");
   log("  --help|-h          Display this usage information");
   log("  --version|-v       Display the DB Build script version");
   log("agency declaration:");
