@@ -194,6 +194,71 @@ function _parseArgs() {
       }
     }
 
+    // --smtp-host
+    else if ( arg === '--smtp-host' ) {
+      i++;
+      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+        return errors.error("SMTP host is not defined");
+      }
+      else {
+        options.set().smtp.host = args[i];
+      }
+    }
+
+    // --smtp-port
+    else if ( arg === '--smtp-port' ) {
+      i++;
+      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+        return errors.error("SMTP port is not defined");
+      }
+      else {
+        options.set().smtp.port = args[i];
+      }
+    }
+
+    // --smtp-secure
+    else if ( arg === '--smtp-secure' ) {
+      options.set().smtp.secure = !options.set().smtp.secure;
+    }
+
+    // --smtp-require-tls
+    else if ( arg === '--smtp-require-tls' ) {
+      options.set().smtp.requireTLS = !options.set().smtp.requireTLS;
+    }
+
+    // --smtp-user
+    else if ( arg === '--smtp-user' ) {
+      i++;
+      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+        return errors.error("SMTP user is not defined");
+      }
+      else {
+        options.set().smtp.auth.user = args[i];
+      }
+    }
+
+    // --smtp-pass
+    else if ( arg === '--smtp-pass' ) {
+      i++;
+      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+        return errors.error("SMTP password is not defined");
+      }
+      else {
+        options.set().smtp.auth.pass = args[i];
+      }
+    }
+
+    // --smtp-from
+    else if ( arg === '--smtp-from' ) {
+      i++;
+      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+        return errors.error("SMTP From is not defined");
+      }
+      else {
+        options.set().smtp.from = args[i];
+      }
+    }
+
   }
 
   // Make sure at least one agency is provided
@@ -224,7 +289,7 @@ function _parseAgencies() {
 
   // Parse each of the agencies
   for ( let i = 0; i < options.agencyCount(); i++ ) {
-    let require = undefined;
+    let req = undefined;
 
     log("------------------------------------------------");
     log.raw([
@@ -239,23 +304,23 @@ function _parseAgencies() {
 
     // Relative path
     if ( _isRelativePath(options.agency(i).require) ) {
-      require = _makeAbsolutePath(options.agency(i).require);
-      if ( !fs.existsSync(require) ) {
+      req = _makeAbsolutePath(options.agency(i).require);
+      if ( !fs.existsSync(req) ) {
         return errors.error(
           "Could not load agency module", 
-          "Agency module path not found [" + require + "]"
+          "Agency module path not found [" + req + "]"
         );
       }
     }
 
     // Try finding the module by name
     else {
-      require = _lookupModule(options.agency(i).require);
+      req = _lookupModule(options.agency(i).require);
     }
 
 
     // Unknown agency
-    if ( require === undefined ) {
+    if ( req === undefined ) {
       return errors.error(
         "Could not load agency module", 
         "Make sure the agency module is installed and properly referenced [" + options.agency(i).require + "]"
@@ -263,7 +328,7 @@ function _parseAgencies() {
     }
 
     // Found agency: load the agency
-    options.agency(i).require = require;
+    options.agency(i).require = req;
     _loadAgency(i);
 
   }
@@ -354,6 +419,15 @@ function _usage() {
   log("     Specify the path to an optional agency configuration file");
   log("  --notes|-n <notes>");
   log("     Specify agency update notes to be included in the new database");
+  log("SMTP options:");
+  log("  These options can be used to set the SMTP server for sending DB build results");
+  log("  --smtp-host <host>");
+  log("  --smtp-port <port>");
+  log("  --smtp-auth-uesr <username>");
+  log("  --smtp-auth-pass <password>");
+  log("  --smtp-from <name <email>>");
+  log("  --smtp-secure");
+  log("  --smtp-require-tls");
 }
 
 
