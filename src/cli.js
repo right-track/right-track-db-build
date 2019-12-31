@@ -30,54 +30,60 @@ const report = require('./report.js');
 
 
 
-// Parse the CLI arguments
-try {
-  _parseArgs();
-}
-catch (error) {
-  errors.error("Could not parse CLI arguments", error);
-}
+// Start the CLI
+init();
 
 
-// Parse the passed agencies
-try {
-  if ( errors.getErrorCount() === 0 ) {
-    _parseAgencies();
+
+
+// ==== MAIN ENTRY POINT ==== //
+
+/**
+ * Start processing the CLI arguments and run the
+ * DB build scripts
+ */
+function init() {
+
+  // Parse the CLI arguments
+  try {
+    _parseArgs();
   }
-}
-catch (error) {
-  errors.error("Could not parse agencies", error);
-}
-
-
-// Start the Update Check & DB Compilation process
-try {
-  if ( errors.getErrorCount() === 0 ) {
-    run(function() {
-
-      // Send email report
-      try {
-        report();
-      }
-      catch (error) {
-        log.error("ERROR: Could not send email report");
-        log.error(error);
-        process.exit(1);
-      }
-
-    });
+  catch (error) {
+    errors.error("Could not parse CLI arguments", error);
   }
-  else {
-    report();
+
+
+  // Parse the passed agencies
+  try {
+    if ( errors.getErrorCount() === 0 ) {
+      _parseAgencies();
+    }
   }
+  catch (error) {
+    errors.error("Could not parse agencies", error);
+  }
+
+
+  // Start the Update Check & DB Compilation process
+  try {
+    if ( errors.getErrorCount() === 0 ) {
+      run(function() {
+        _report();
+      });
+    }
+    else {
+      _report();
+    }
+  }
+  catch (error) {
+    errors.error("Could not run update check and DB compilation", error);
+    _report();
+  }
+
 }
-catch (error) {
-  errors.error("Could not run update check and DB compilation", error);
-  report();
-}
 
 
-
+// ==== HELPER FUNCTIONS ==== //
 
 /**
  * Parse the CLI arguments
@@ -386,6 +392,22 @@ function _loadAgency(i) {
     );
   }
 
+}
+
+
+/**
+ * Generate and send the summary report
+ * @private
+ */
+function _report() {
+  try {
+    report();
+  }
+  catch (error) {
+    log.error("ERROR: Could not send email report");
+    log.error(error);
+    process.exit(1);
+  }
 }
 
 
