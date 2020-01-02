@@ -116,6 +116,24 @@ function init() {
  */
 function _parseConfig() {
 
+  // Check for a config file path
+  let config = _checkConfig();
+
+  // Read the config file
+  if ( config ) {
+    _readConfig(config);
+  }
+
+}
+
+
+/**
+ * Check if a config file path has been provided
+ * @return {string} path to possible config file
+ * @private
+ */
+function _checkConfig() {
+
   // Get last 2 arguments
   let last_arg = undefined;
   let second_last_arg = undefined;
@@ -132,8 +150,88 @@ function _parseConfig() {
 
   // Last arg should be parsed as config location...
   if ( check_last === 0 && check_second_last !== 2 && last_arg.charAt(0) !== "-" ) {
-    console.log("TODO: Read config file...");
     ARGS.pop();
+    return last_arg;
+  }
+
+  // No config file found
+  return undefined;
+
+}
+
+
+/**
+ * Read the config file from the specified path
+ * @param  {string} location Path to config file
+ * @private
+ */
+function _readConfig(location) {
+
+  // Check if file exists
+  if ( !fs.existsSync(location) ) {
+    return errors.error("Config file not found", "Make sure the path to the config file is correct [" + location + "]");
+  }
+
+  // Read the config file
+  let config = require(fs.realpathSync(location));
+
+  // Parse the config file
+  if ( config.hasOwnProperty('test') ) {
+    options.set().test = config.test;
+  }
+  if ( config.hasOwnProperty('force') ) {
+    options.set().force = config.force;
+  }
+  if ( config.hasOwnProperty('post') ) {
+    options.set().post = fs.realpathSync(config.post);
+  }
+  if ( config.hasOwnProperty('email') ) {
+    options.set().email = config.email;
+  }
+  if ( config.hasOwnProperty('agencies') ) {
+    if ( Array.isArray(config.agencies) ) {
+      for ( let i = 0; i < config.agencies.length; i++ ) {
+        let a = config.agencies[i];
+        if ( typeof a === 'string' ) {
+          options.addAgency(a);
+        }
+        else if ( a !== null && typeof a === 'object' ) {
+          if ( a.hasOwnProperty('agency') ) {
+            options.addAgency(a.agency);
+            if ( a.hasOwnProperty('config') ) {
+              options.addAgencyConfig(a.config);
+            }
+            if ( a.hasOwnProperty('notes') ) {
+              options.addAgencyNotes(a.notes);
+            }
+          }
+        }
+      }
+    }
+  }
+  if ( config.hasOwnProperty('smtp') ) {
+    let smtp = config.smtp;
+    if ( smtp.hasOwnProperty('host') ) {
+      options.set().smtp.host = smtp.host;
+    }
+    if ( smtp.hasOwnProperty('port') ) {
+      options.set().smtp.port = smtp.port;
+    }
+    if ( smtp.hasOwnProperty('secure') ) {
+      options.set().smtp.secure = smtp.secure;
+    }
+    if ( smtp.hasOwnProperty('requireTLS') ) {
+      options.set().smtp.requireTLS = smtp.requireTLS;
+    }
+    if ( smtp.hasOwnProperty('auth') ) {
+      let auth = smtp.auth;
+      if ( auth.hasOwnProperty('user') ) {
+        options.set().smtp.auth.user = auth.user;
+      }
+      if ( auth.hasOwnProperty('pass') ) {
+        options.set().smtp.auth.pass = auth.pass;
+      }
+    }
   }
 
 }
@@ -228,15 +326,10 @@ function _parseArgs() {
       }
       else {
         let post = ARGS[i];
-        if ( !path.isAbsolute(post) ) {
-          post = path.normalize(process.cwd() + '/' + post);
-        }
-        if ( fs.existsSync(post) ) {
-          options.set().post = post;
-        }
-        else {
+        if ( !fs.existsSync(post) ) {
           return errors.error("The post-install script does not exist", "File not found [" + post + "]");
         }
+        options.set().post = fs.realpathSync(post);
       }
     }
 
@@ -320,8 +413,7 @@ function _parseArgs() {
 
   // Make sure at least one agency is provided
   if ( options.agencyCount() < 1 ) {
-    _usage();
-    process.exit(0);
+    return errors.error("No agencies defined", "At least one agency must be defined");
   }
 
   // Flag agencies for update when force is set

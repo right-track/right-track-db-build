@@ -3,6 +3,8 @@
     "force": false,
     "test": false,
     "agencies": [],
+    "post": null,
+    "email": null,
     "smtp": {
       "host": "localhost",
       "port": 25,
