@@ -29,6 +29,17 @@ const report = require('./report.js');
 
 
 
+// COMMAND LINE ARGUMENTS
+let ARGS = process.argv.slice(2);
+
+// OPTIONS USED AS FLAGS (do not take arguments)
+const OPTS_FLAGS = ["force", "f", "test", "t", "smtp-secure", "smtp-require-tls", "help", "h", "version", "v"];
+
+// OPTIONS THAT TAKE ARGUMENTS
+const OPTS_ARGS = ["post", "p", "email", "e", "smtp-host", "smtp-port", "smtp-user", "smtp-pass", "smtp-from", 
+    "agency", "a", "config", "c", "notes", "n"];
+
+
 
 // Start the CLI
 init();
@@ -44,9 +55,20 @@ init();
  */
 function init() {
 
+  // Check and Parse config file, if provided
+  try {
+    _parseConfig();
+  }
+  catch (error) {
+    errors.error("Could not parse config file", error);
+  }
+
+
   // Parse the CLI arguments
   try {
-    _parseArgs();
+    if ( errors.getErrorCount() === 0 ) {
+      _parseArgs();
+    }
   }
   catch (error) {
     errors.error("Could not parse CLI arguments", error);
@@ -85,23 +107,52 @@ function init() {
 
 // ==== HELPER FUNCTIONS ==== //
 
+
+/**
+ * Check if a config file path has been provided
+ * If it has, parse the config file and merge it 
+ * with the default configuration
+ * @private
+ */
+function _parseConfig() {
+
+  // Get last 2 arguments
+  let last_arg = undefined;
+  let second_last_arg = undefined;
+  if ( ARGS.length > 0 ) {
+    last_arg = ARGS[ARGS.length-1];
+  }
+  if ( ARGS.length > 1 ) {
+    second_last_arg = ARGS[ARGS.length-2];
+  }
+
+  // Check Args
+  let check_last = _checkOption(last_arg);
+  let check_second_last = _checkOption(second_last_arg);
+
+  // Last arg should be parsed as config location...
+  if ( check_last === 0 && check_second_last !== 2 && last_arg.charAt(0) !== "-" ) {
+    console.log("TODO: Read config file...");
+    ARGS.pop();
+  }
+
+}
+
+
 /**
  * Parse the CLI arguments
  * @private
  */
 function _parseArgs() {
 
-  // Print start info
-  log.info("======== RIGHT TRACK DATABASE GENERATOR ========");
-  log("Version: " + props.version);
-  log("Started: " + new Date());
-
-  // Get cli arguments
-  let args = process.argv.slice(2);
-
   // Parse arguments
-  for ( let i = 0; i < args.length; i++ ) {
-    let arg = args[i];
+  for ( let i = 0; i < ARGS.length; i++ ) {
+    let arg = ARGS[i];
+
+    // Unsupported argument
+    if ( _checkOption(arg) === 0 ) {
+      return errors.error("Unrecognized option", "The option is not supported [" + arg + "]");
+    }
 
     // --help / -h
     if ( arg === '--help' || arg === '-h' ) {
@@ -128,29 +179,29 @@ function _parseArgs() {
     // --agency / -a
     else if ( arg === '--agency' || arg === '-a' ) {
       i++;
-      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( ARGS[i] === undefined || ARGS[i].charAt(0) === '-' ) {
         return errors.error("Agency declaration is not defined");
       }
       else {
-        options.addAgency(args[i]);
+        options.addAgency(ARGS[i]);
       }
     }
 
     // --config / -c
     else if ( arg === '--config' || arg === '-c' ) {
       i++;
-      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( ARGS[i] === undefined || ARGS[i].charAt(0) === '-' ) {
         return errors.error("Config file for agency is not defined");
       }
       else if ( options.agencyCount() < 1 ) {
         return errors.error("The --config|-c argument must be preceded by an --agency <...> declaration")
       }
       else {
-        if ( fs.existsSync(args[i]) ) {
-          options.addAgencyConfig(args[i]);
+        if ( fs.existsSync(ARGS[i]) ) {
+          options.addAgencyConfig(ARGS[i]);
         }
         else {
-          return errors.error("Config file does not exist", "File not found [" + args[i] + "]");
+          return errors.error("Config file does not exist", "File not found [" + ARGS[i] + "]");
         }
       }
     }
@@ -158,25 +209,25 @@ function _parseArgs() {
     // --notes / -n
     else if ( arg === '--notes' || arg === '-n' ) {
       i++;
-      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( ARGS[i] === undefined || ARGS[i].charAt(0) === '-' ) {
         return errors.error("Notes for agency are not defined");
       }
       else if ( options.agencyCount() < 1 ) {
         return errors.error("The --notes|-n argument must be preceded by an --agency <...> declaration");
       }
       else {
-        options.addAgencyNotes(args[i]);
+        options.addAgencyNotes(ARGS[i]);
       }
     }
 
     // --post / -p
     else if ( arg === '--post' || arg === '-p' ) {
       i++;
-      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( ARGS[i] === undefined || ARGS[i].charAt(0) === '-' ) {
         return errors.error("The post-install script is not defined");
       }
       else {
-        let post = args[i];
+        let post = ARGS[i];
         if ( !path.isAbsolute(post) ) {
           post = path.normalize(process.cwd() + '/' + post);
         }
@@ -192,33 +243,33 @@ function _parseArgs() {
     // --email / -e
     else if ( arg === '--email' || arg === '-e' ) {
       i++;
-      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( ARGS[i] === undefined || ARGS[i].charAt(0) === '-' ) {
         return errors.error("Email address is not defined");
       }
       else {
-        options.set().email = args[i];
+        options.set().email = ARGS[i];
       }
     }
 
     // --smtp-host
     else if ( arg === '--smtp-host' ) {
       i++;
-      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( ARGS[i] === undefined || ARGS[i].charAt(0) === '-' ) {
         return errors.error("SMTP host is not defined");
       }
       else {
-        options.set().smtp.host = args[i];
+        options.set().smtp.host = ARGS[i];
       }
     }
 
     // --smtp-port
     else if ( arg === '--smtp-port' ) {
       i++;
-      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( ARGS[i] === undefined || ARGS[i].charAt(0) === '-' ) {
         return errors.error("SMTP port is not defined");
       }
       else {
-        options.set().smtp.port = args[i];
+        options.set().smtp.port = ARGS[i];
       }
     }
 
@@ -235,33 +286,33 @@ function _parseArgs() {
     // --smtp-user
     else if ( arg === '--smtp-user' ) {
       i++;
-      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( ARGS[i] === undefined || ARGS[i].charAt(0) === '-' ) {
         return errors.error("SMTP user is not defined");
       }
       else {
-        options.set().smtp.auth.user = args[i];
+        options.set().smtp.auth.user = ARGS[i];
       }
     }
 
     // --smtp-pass
     else if ( arg === '--smtp-pass' ) {
       i++;
-      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( ARGS[i] === undefined || ARGS[i].charAt(0) === '-' ) {
         return errors.error("SMTP password is not defined");
       }
       else {
-        options.set().smtp.auth.pass = args[i];
+        options.set().smtp.auth.pass = ARGS[i];
       }
     }
 
     // --smtp-from
     else if ( arg === '--smtp-from' ) {
       i++;
-      if ( args[i] === undefined || args[i].charAt(0) === '-' ) {
+      if ( ARGS[i] === undefined || ARGS[i].charAt(0) === '-' ) {
         return errors.error("SMTP From is not defined");
       }
       else {
-        options.set().smtp.from = args[i];
+        options.set().smtp.from = ARGS[i];
       }
     }
 
@@ -279,6 +330,11 @@ function _parseArgs() {
       options.agency(i).update = true;
     }
   }
+
+  // Print start info
+  log.info("======== RIGHT TRACK DATABASE GENERATOR ========");
+  log("Version: " + props.version);
+  log("Started: " + new Date());
 
 }
 
@@ -421,35 +477,42 @@ function _usage() {
   log("Version: " + props.version);
   log("----------------------------");
   log("Usage:");
-  log("  " + path.basename(process.argv[1]) + " [options] --agency <declaration> [agency options] ...");
+  log("  " + path.basename(process.argv[1]) + " [options] --agency <declaration> [agency options] ... [config file]");
+  log("");
+  log("config file:");
+  log("  The path to a configuration file can be used to provide the configuration options for the db build script.");
+  log("  The values in the configuration file will override the default values.  Values provided as CLI arguments");
+  log("  will override the default values and those in the specified configuration file (if provided).");
+  log("  See the README for more detailed information about available configuration variables.");
+  log("");
   log("options:");
-  log("  --force|-f         Force a GTFS update and database compilation");
-  log("  --test|-t          Test the DB compilation (does not install)");
-  log("  --post|-p <file>   Define a post-install script to run after update & compilation");
-  log("  --email|-e <email> Email address to send DB build results to");
-  log("  --help|-h          Display this usage information");
-  log("  --version|-v       Display the DB Build script version");
+  log("  --force|-f             Force a GTFS update and database compilation");
+  log("  --test|-t              Test the DB compilation (does not install)");
+  log("  --post|-p <file>       Define a post-install script to run after update & compilation");
+  log("  --email|-e <email>     Email address to send DB build results to");
+  log("  --smtp-host <host>     SMTP server host");
+  log("  --smtp-port <port>     SMTP server port");
+  log("  --smtp-user <username> SMTP server username");
+  log("  --smtp-pass <password> SMTP server password");
+  log("  --smtp-from <name <email>>  SMTP server From address");
+  log("  --smtp-secure          SMTP server use TLS");
+  log("  --smtp-require-tls     SMTP server require TLS");
+  log("  --help|-h              Display this usage information");
+  log("  --version|-v           Display the DB Build script version");
+  log("");
   log("agency declaration:");
   log("  Declare an agency to check for GTFS updates/compile database.  The agency");
   log("  can be declared by module name, agency id or file path.  For example:");
   log("  --agency right-track-agency-mnr");
   log("  --agency mnr");
   log("  --agency ./path/to/right-track-agency-mnr");
+  log("");
   log("agency options:");
   log("  These options have to be proceeded by an agency declaration (--agency <...>)");
   log("  --config|-c <file>");
   log("     Specify the path to an optional agency configuration file");
   log("  --notes|-n <notes>");
   log("     Specify agency update notes to be included in the new database");
-  log("SMTP options:");
-  log("  These options can be used to set the SMTP server for sending DB build results");
-  log("  --smtp-host <host>");
-  log("  --smtp-port <port>");
-  log("  --smtp-auth-uesr <username>");
-  log("  --smtp-auth-pass <password>");
-  log("  --smtp-from <name <email>>");
-  log("  --smtp-secure");
-  log("  --smtp-require-tls");
 }
 
 
@@ -458,6 +521,31 @@ function _usage() {
 
 
 // ==== HELPER FUNCTIONS ==== //
+
+
+/**
+ * Check if the provided option is supported
+ * @param {string} check The option to check
+ * @return {int} 0 = not supported, 1 = flag, 2 = argument
+ * @private
+ */
+function _checkOption(check) {
+  for ( let i = 0; i < OPTS_FLAGS.length; i++ ) {
+    let opt = OPTS_FLAGS[i];
+    opt = opt.length === 1 ? "-" + opt : "--" + opt;
+    if ( opt === check ) {
+      return 1;
+    }
+  }
+  for ( let i = 0; i < OPTS_ARGS.length; i++ ) {
+    let opt = OPTS_ARGS[i];
+    opt = opt.length === 1 ? "-" + opt : "--" + opt;
+    if ( opt === check ) {
+      return 2;
+    }
+  }
+  return 0;
+}
 
 
 /**

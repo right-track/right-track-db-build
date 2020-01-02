@@ -3,7 +3,6 @@
     "force": false,
     "test": false,
     "agencies": [],
-    "locale": "en_US",
     "smtp": {
       "host": "localhost",
       "port": 25,
@@ -13,7 +12,8 @@
         "user": "",
         "pass": ""
       }
-    }
+    },
+    "locale": "en_US"
   },
   "locations": {
     "directories": {
