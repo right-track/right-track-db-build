@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>report.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-cli.html">cli</a><ul class='methods'><li data-type='method'><a href="module-cli.html#~init">init</a></li></ul></li><li><a href="module-compile.html">compile</a><ul class='methods'><li data-type='method'><a href="module-compile.html#~compile">compile</a></li></ul></li><li><a href="module-compile_utils_build.html">compile/utils/build</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_build.html#~add">add</a></li><li data-type='method'><a href="module-compile_utils_build.html#~create">create</a></li><li data-type='method'><a href="module-compile_utils_build.html#~init">init</a></li><li data-type='method'><a href="module-compile_utils_build.html#~load">load</a></li></ul></li><li><a href="module-compile_utils_buildDirectory.html">compile/utils/buildDirectory</a><ul class='methods'><li data-type='method'><a href="module-compile_utils_buildDirectory.html#~buildDirectory">buildDirectory</a></li></ul></li><li><a href="module-finish.html">finish</a><ul class='methods'><li data-type='method'><a href="module-finish.html#~finish">finish</a></li></ul></li><li><a href="module-finish_sanityChecks.html">finish/sanityChecks</a><ul class='methods'><li data-type='method'><a href="module-finish_sanityChecks.html#~sanityChecks">sanityChecks</a></li></ul></li><li><a href="module-helpers_errors.html">helpers/errors</a><ul class='methods'><li data-type='method'><a href="module-helpers_errors.html#~error">error</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrorCount">getErrorCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getErrors">getErrors</a></li><li data-type='method'><a href="module-helpers_errors.html#~getExceptionCount">getExceptionCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getExceptions">getExceptions</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarningCount">getWarningCount</a></li><li data-type='method'><a href="module-helpers_errors.html#~getWarnings">getWarnings</a></li><li data-type='method'><a href="module-helpers_errors.html#~reset">reset</a></li><li data-type='method'><a href="module-helpers_errors.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_log.html">helpers/log</a><ul class='methods'><li data-type='method'><a href="module-helpers_log.html#~error">error</a></li><li data-type='method'><a href="module-helpers_log.html#~history">history</a></li><li data-type='method'><a href="module-helpers_log.html#~info">info</a></li><li data-type='method'><a href="module-helpers_log.html#~log">log</a></li><li data-type='method'><a href="module-helpers_log.html#~raw">raw</a></li><li data-type='method'><a href="module-helpers_log.html#~warning">warning</a></li></ul></li><li><a href="module-helpers_options.html">helpers/options</a><ul class='methods'><li data-type='method'><a href="module-helpers_options.html#~addAgency">addAgency</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyConfig">addAgencyConfig</a></li><li data-type='method'><a href="module-helpers_options.html#~addAgencyNotes">addAgencyNotes</a></li><li data-type='method'><a href="module-helpers_options.html#~agency">agency</a></li><li data-type='method'><a href="module-helpers_options.html#~agencyCount">agencyCount</a></li><li data-type='method'><a href="module-helpers_options.html#~get">get</a></li><li data-type='method'><a href="module-helpers_options.html#~set">set</a></li></ul></li><li><a href="module-report.html">report</a><ul class='methods'><li data-type='method'><a href="module-report.html#~report">report</a></li></ul></li><li><a href="module-run.html">run</a><ul class='methods'><li data-type='method'><a href="module-run.html#~start">start</a></li></ul></li><li><a href="module-update.html">update</a><ul class='methods'><li data-type='method'><a href="module-update.html#~update">update</a></li></ul></li><li><a href="module-update_default.html">update/default</a><ul class='methods'><li data-type='method'><a href="module-update_default.html#~defaultUpdate">defaultUpdate</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">report.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>#!/usr/bin/env node
+'use strict';
+
+/**
+ * ### Right Track Database Builder Report
+ *
+ * This module will create a report on the agencies that have 
+ * been updated and any warnings and/or errors that ocurred 
+ * during the build process.  If an email address is provided 
+ * in the options, the report will be sent in an email.
+ * @module report
+ */
+
+
+const props = require('../package.json');
+const log = require('./helpers/log.js');
+const options = require('./helpers/options.js');
+const errors = require('./helpers/errors.js');
+
+const os = require('os');
+const nodemailer = require('nodemailer');
+const h2t = require('html-to-text');
+
+
+/**
+ * Print status of DB update and compilation process and 
+ * generate an email report, if requested
+ */
+function report() {
+  let opts = options.get();
+
+  // DB Update and Compilation FINISHED
+  if ( opts.started &amp;&amp; opts.finished ) {
+
+    // Calculate delta
+    options.set().delta = new Date(Math.abs(opts.finished.getTime() - opts.started.getTime()));
+
+    // Print Update Stats
+    log.info("UPDATE CHECK AND DATABASE COMPILATION FINISHED");
+    log("------------------------------------------------");
+    log("Finished: " + opts.finished);
+    log("Run time: " + opts.delta.getUTCMinutes() + " mins " + opts.delta.getUTCSeconds() + " secs");
+    log("================================================");
+
+  }
+
+  // DB Update and Compilation DID NOT FINISH
+  else {
+    log("------------------------------------------------");
+    log.error("ERROR: UPDATE CHECK AND DATABASE COMPILATION DID NOT FINISH");
+    log("================================================");
+  }
+
+  
+  // Print exceptions, if any
+  if ( errors.getExceptionCount() > 0 ) {
+    _exceptions();
+  }
+
+  // Generate email, if requested
+  if ( opts.email ) {
+    _email();
+  }
+
+}
+
+
+/**
+ * Print any warnings and errors to the log
+ * @private
+ */
+function _exceptions() {
+  let warnings = errors.getWarnings();
+  let errs = errors.getErrors();
+
+  // Print Warnings, if any
+  if ( warnings.length > 0 ) {
+    log.warning(warnings.length + " WARNING(S) LOGGED", false);
+    for ( let i = 0; i &lt; warnings.length; i++ ) {
+      let msg = "--> " + warnings[i].message;
+      if ( warnings[i].agencyId ) {
+        msg += " &lt;" + warnings[i].agencyId + ">";
+      } 
+      log.warning(msg, false);
+      if ( warnings[i].details ) {
+        log("    " + warnings[i].details);
+      }
+    }
+  }
+
+  // Print Errors, if any
+  if ( errs.length > 0 ) {
+    log.error(errs.length + " ERROR(S) LOGGED", false);
+    for ( let i = 0; i &lt; errs.length; i++ ) {
+      let msg = "--> " + errs[i].message;
+      if ( errs[i].agencyId ) {
+        msg += " &lt;" + errs[i].agencyId + ">";
+      }
+      log.error(msg, false);
+      if ( errs[i].details ) {
+        log("    " + errs[i].details);
+      }
+    }
+  }
+}
+
+
+
+
+/**
+* Generate and send the report email, if an agency was updated and/or compiled 
+* or if they were any exceptions during the database build process
+* @private
+*/
+function _email() {
+  let send_email = false;
+  let opts = options.get();
+
+  // Build Email Body
+  let html = "&lt;h1>" + props.description + ": Status Report&lt;/h1>";
+  html += "&lt;strong>Version:&lt;/strong> " + props.version + "&lt;br />";
+  if ( opts.started ) html += "&lt;strong>Started:&lt;/strong> " + opts.started + "&lt;br />";
+  if ( opts.finished ) html += "&lt;strong>Finished:&lt;/strong> " + opts.finished + "&lt;br />"; 
+  if ( opts.delta ) html += "&lt;strong>Run Time:&lt;/strong> " + opts.delta.getUTCMinutes() + " mins " + opts.delta.getUTCSeconds() + " secs&lt;br />";
+  html += "&lt;br />&lt;hr />";
+
+  // Add Exceptions
+  if ( errors.getExceptionCount() > 0 ) {
+    send_email = true;
+    html += "&lt;h2>Exceptions&lt;/h2>";
+    if ( errors.getErrorCount() > 0 ) {
+      html += "&lt;strong>Errors:&lt;/strong> " + errors.getErrorCount() + "&lt;br />";
+    }
+    if ( errors.getWarningCount() > 0 ) {
+      html += "&lt;strong>Warnings:&lt;/strong> " + errors.getWarningCount() + "&lt;br />";
+    }
+    html += "&lt;em>See the Log below for exception details&lt;/em>&lt;br />";
+    html += "&lt;br />&lt;hr />";
+  }
+
+  // Add Agency Information
+  let tags = "";
+  html += "&lt;h2>Agencies&lt;/h2>";
+  for ( let i = 0; i &lt; opts.agencies.length; i++ ) {
+    let a = opts.agencies[i];
+    try {
+      if ( a.update || a.compile ) {
+        send_email = true;
+      }
+      if ( a.update &amp;&amp; a.compile ) {
+        tags += "[" + a.agency.getConfig().id.toUpperCase() + "] ";
+      }
+
+      // Agency info...
+      html += "&lt;h3>" + a.agency.getConfig().name + " [" + a.agency.getConfig().id + "]&lt;/h3>";
+      if ( a.published ) html += "&lt;strong>GTFS Published:&lt;/strong> " + a.published + "&lt;br />";
+      html += "&lt;strong>Update Requested?&lt;/strong> " + a.update + "&lt;br />";
+      
+      // Update info...
+      if ( a.update ) {
+        html += "&lt;strong>Update Complete?&lt;/strong> " + a.updateComplete + "&lt;br />";
+        html += "&lt;strong>Compilation Requested?&lt;/strong> " + a.compile + "&lt;br />";
+        
+        // Compile info...
+        if ( a.compile ) {
+          html += "&lt;strong>Compilation Complete?&lt;/strong> " + a.compileComplete + "&lt;br />";
+          html += "&lt;strong>Compiled:&lt;/strong> " + a.compiled + "&lt;br />";
+          html += "&lt;strong>Version:&lt;/strong> " + a.version + "&lt;br />";
+          html += "&lt;strong>Notes:&lt;/strong> " + a.notes + "&lt;br />";
+          html += "&lt;strong>Sane?&lt;/strong> " + a.sane + "&lt;br />";
+        }
+      }
+    }
+    catch (error) {
+      html += "&lt;h3>" + a.require + "&lt;/h3>";
+      html += "&lt;strong>&lt;em>Could not process agency&lt;/em>&lt;/strong>&lt;br />";
+    }
+  }
+  html += "&lt;br />&lt;hr />";
+
+  // Add Log
+  html += "&lt;h2>Log&lt;/h2>";
+  html += "&lt;pre>&lt;code>";
+  html += log.history();
+  html += "&lt;/code>&lt;/pre>";
+
+  // Construct Email
+  let email = {
+    from: opts.smtp.from || props.description + " &lt;" + os.userInfo().username + "@" + os.hostname() + ">", 
+    to: opts.email,
+    subject: "[RTDB] " + tags + props.description,
+    text: h2t.fromString(html),
+    html: html
+  }
+
+  // Send Email
+  if ( send_email ) {
+    log.info("SENDING STATUS REPORT EMAIL...");
+
+    let transporter = nodemailer.createTransport(opts.smtp);
+    transporter.sendMail(email, function(err, info) {
+      if (err) {
+        log.error("ERROR: Could not send status report email");
+        log.info(err.toString());
+      }
+      else {
+        log("...Status report email sent");
+      }
+      log("================================================");
+    });
+  }
+}
+
+
+module.exports = report;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Thu Jan 02 2020 21:10:23 GMT-0500 (Eastern Standard Time) using the <a href="https://github.com/dwaring87/docdash">@dwaring87/docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

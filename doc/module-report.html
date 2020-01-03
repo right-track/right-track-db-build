@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>helpers/log.js - Documentation</title>
+    <title>report - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,166 +28,222 @@
 
 <div id="main">
     
-    <h1 class="page-title">helpers/log.js</h1>
+    <h1 class="page-title">report</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>'use strict';
+        
+            
+        
+    
+</header>
 
-/**
- * ### Console output helper
- *
- * Display output text to the console in a number of predefined styles.
- *
- * This module exports the log function which includes the other documented
- * functions as properties of itself.
- *
- * Usage:
- * ```
- * const log = require('./log.js');
- * log("Log a general message");
- * log.info("Log an informational message");
- * ```
- * @module helpers/log
- */
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><h3>Right Track Database Builder Report</h3>
+<p>This module will create a report on the agencies that have
+been updated and any warnings and/or errors that ocurred
+during the build process.  If an email address is provided
+in the options, the report will be sent in an email.</p></div>
+        
 
-const chalk = require('chalk');
-
-let LOG_OUTPUT = "";
-
-
-
-/**
- * Log a general message to the console / stdout
- * @param {string} text Message
- * @property {function} info See {@link info}
- * @property {function} warning See {@link warning}
- * @property {function} error See {@link error}
- * @property {function} raw See {@link raw}
- */
-let log = function(text) {
-  _history(text);
-  console.log(text);
-};
+        
+            
 
 
 
 
-/**
- * Log an information message to the console / stdout
- * @param {string} text Message
- * @name info
- * @function
- */
-log.info = function(text) {
-  _history(text);
-  console.log(chalk.yellow(text))
-};
+<dl class="details">
 
-/**
- * Log a warning message to the console / stderr (by default)
- * @param {string} text Message
- * @param {boolean} [toStdErr=true] Set to false to print to stdout
- * @name warning
- * @function
- */
-log.warning = function(text, toStdErr=true) {
-  _history(text);
-  let raw = chalk.bold.red(text);
-  if ( toStdErr ) {
-    console.error(raw);
-  }
-  else {
-    console.log(raw);
-  }
-};
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="report.js.html">report.js</a>, <a href="report.js.html#line4">line 4</a>
+    </li></ul></dd>
+    
 
-/**
- * Log an error message to the console / stderr (by default)
- * @param {string} text Message
- * @param {boolean} [toStdErr=true] Set to false to print to stdout
- * @name error
- * @function
- */
-log.error = function(text, toStdErr=true) {
-  _history(text);
-  let raw = chalk.bold.bgRed.white(" " + text + " ");
-  if ( toStdErr ) {
-    console.error(raw);
-  }
-  else {
-    console.log(raw);
-  }
-};
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
 
 
-/**
- * Explicitly define the console output style.  The components of
- * the output are specified as a list of objects with the properties:
- * - "text": The text to display
- * - "chalk": The chalk style components (ex: bgYellow.black)
- * @param {Object[]} parts List of output style components
- * @param {string} parts[].text The text to output
- * @param {string} [parts[].chalk] The chalk style components (ex: bgYellow.black)
- * @name raw
- * @function
- */
-log.raw = function(parts) {
-  let raw = "";
-  for ( let i = 0; i &lt; parts.length; i++ ) {
-    let part = parts[i];
-    _history(part.text);
-    if ( part.chalk ) {
-      let chalkParts = part.chalk.split('.');
-      let obj = chalk;
-      for ( let j = 0; j &lt; chalkParts.length; j++ ) {
-        obj = obj[chalkParts[j]];
-      }
-      raw += obj(part.text);
-    }
-    else {
-      raw += part.text;
-    }
-    if ( i &lt; parts.length-1 ) {
-      raw += " ";
-    }
-  }
-  console.log(raw);
-};
 
 
-/**
- * Get the log history (plain text)
- * @name history
- * @function
- */
-log.history = function() {
-  return LOG_OUTPUT;
-}
 
 
-/**
- * Append the specified text to the log history
- * @param text Text to append to history
- * @private
- */
-let _history = function(text) {
-  if ( text ) {
-    LOG_OUTPUT += "\n";
-    LOG_OUTPUT += text;
-  }
-}
 
 
-module.exports = log;</code></pre>
-        </article>
-    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~report"><span class="type-signature">(inner) </span>report<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="report.js.html">report.js</a>, <a href="report.js.html#line29">line 29</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Print status of DB update and compilation process and
+generate an email report, if requested</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
