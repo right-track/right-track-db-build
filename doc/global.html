@@ -126,7 +126,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line22">line 22</a>
+        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line30">line 30</a>
     </li></ul></dd>
     
 
@@ -845,7 +845,7 @@ compilation process success and generated database version and file information.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line114">line 114</a>
+        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line122">line 122</a>
     </li></ul></dd>
     
 
@@ -1025,7 +1025,7 @@ compilation process success and generated database version and file information.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line124">line 124</a>
+        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line132">line 132</a>
     </li></ul></dd>
     
 
@@ -1309,6 +1309,273 @@ Agencies that are to be processed by the db-build script.</p></td>
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>email</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The email address to send summary reports to, if provided</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>smtp</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>SMTP server settings for sending summary reports, if <code>email</code> is set</p>
+                <h6>Properties</h6>
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>host</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>localhost</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>STMP server host</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>port</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>25</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>SMTP server port</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>secure</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>false</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>SMTP server use TLS</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>requireTLS</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>false</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>SMTP server require TLS</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>auth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>SMTP auth settings (<code>auth.user</code> = username, <code>auth.pass</code> = password)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>from</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>SMTP server From address</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -1355,7 +1622,7 @@ module.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line131">line 131</a>
+        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line139">line 139</a>
     </li></ul></dd>
     
 
@@ -1579,7 +1846,7 @@ module.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line84">line 84</a>
+        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line92">line 92</a>
     </li></ul></dd>
     
 
@@ -2098,7 +2365,7 @@ fields and their types, foreign keys, and indices.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line105">line 105</a>
+        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line113">line 113</a>
     </li></ul></dd>
     
 
@@ -2251,7 +2518,7 @@ fields and their types, foreign keys, and indices.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line52">line 52</a>
+        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line60">line 60</a>
     </li></ul></dd>
     
 
@@ -2337,7 +2604,7 @@ process started by the <a href="module-run.html">run</a> module.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line73">line 73</a>
+        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line81">line 81</a>
     </li></ul></dd>
     
 
@@ -2496,7 +2763,7 @@ was successful and the new GTFS files have been downloaded.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line60">line 60</a>
+        <a href="typedefs.js.html">typedefs.js</a>, <a href="typedefs.js.html#line68">line 68</a>
     </li></ul></dd>
     
 
@@ -2656,7 +2923,7 @@ checks (an update was requested, and if the update was successful)</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Thu Jan 02 2020 21:10:23 GMT-0500 (Eastern Standard Time) using the <a href="https://github.com/dwaring87/docdash">@dwaring87/docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.2</a> on Fri Jan 03 2020 08:52:26 GMT-0500 (Eastern Standard Time) using the <a href="https://github.com/dwaring87/docdash">@dwaring87/docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
