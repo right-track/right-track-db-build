@@ -96,7 +96,7 @@ function _exceptions() {
       if ( errs[i].agencyId ) {
         msg += " <" + errs[i].agencyId + ">";
       }
-      log.error(msg, false);
+      log(msg);
       if ( errs[i].details ) {
         log("    " + errs[i].details);
       }

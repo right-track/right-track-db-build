@@ -149,7 +149,7 @@ function _checkConfig() {
   let check_second_last = _checkOption(second_last_arg);
 
   // Last arg should be parsed as config location...
-  if ( check_last === 0 && check_second_last !== 2 && last_arg.charAt(0) !== "-" ) {
+  if ( last_arg && check_last === 0 && check_second_last !== 2 && last_arg.charAt(0) !== "-" ) {
     ARGS.pop();
     return last_arg;
   }
