@@ -30,11 +30,12 @@ In order to compile a database for a specific transit agency, a **Right Track
 Agency** module (such as [right-track-agency-mnr](https://github.com/right-track/right-track-agency-mnr))
 will also need to be installed.  The agency module provides information on
 where/how to obtain the agency's GTFS data as well as additional database
-compilation instructions.  The compiled database (and an archive of compiled
-databases) will be kept in the Right Track Agency's module.
+compilation instructions.  The compiled database will be kept in the 
+Right Track Agency's module.
 
 The agencies are provided to the `right-track-db-build` script via the
-`--agency` command line flag.
+`--agency` command line flag or in a configuration file.  At least one 
+agency must be specified in order for the build script to run.
 
 **NOTE:** There are no Right Track Agency modules listed as dependencies
 in this project's `package.json` file.  The Agency modules will have
@@ -55,22 +56,39 @@ The command line utility has the following usage:
 ```text
 Right Track Database Builder
 Module: right-track-db-build
-Version: 1.0.0
+Version: 1.5.0
 ----------------------------
 Usage:
-  right-track-db-build [options] --agency <declaration> [agency options] ...
+  right-track-db-build [options] --agency <declaration> [agency options] ... [config file]
+
+config file:
+  The path to a configuration file can be used to provide the configuration options for the db build script.
+  The values in the configuration file will override the default values.  Values provided as CLI arguments
+  will override the default values and those in the specified configuration file (if provided).
+  See the README for more detailed information about available configuration variables.
+
 options:
-  --force|-f       Force a GTFS update and database compilation
-  --test|-t        Test the DB compilation (does not install)
-  --post|-p <file> Define a post-install script to run after update & compilation
-  --help|-h        Display this usage information
-  --version|-v     Display the DB Build script version
+  --force|-f             Force a GTFS update and database compilation
+  --test|-t              Test the DB compilation (does not install)
+  --post|-p <file>       Define a post-install script to run after update & compilation
+  --email|-e <email>     Email address to send DB build results to
+  --smtp-host <host>     SMTP server host
+  --smtp-port <port>     SMTP server port
+  --smtp-user <username> SMTP server username
+  --smtp-pass <password> SMTP server password
+  --smtp-from <name <email>>  SMTP server From address
+  --smtp-secure          SMTP server use TLS
+  --smtp-require-tls     SMTP server require TLS
+  --help|-h              Display this usage information
+  --version|-v           Display the DB Build script version
+
 agency declaration:
   Declare an agency to check for GTFS updates/compile database.  The agency
   can be declared by module name, agency id or file path.  For example:
   --agency right-track-agency-mnr
   --agency mnr
   --agency ./path/to/right-track-agency-mnr
+
 agency options:
   These options have to be proceeded by an agency declaration (--agency <...>)
   --config|-c <file>
@@ -78,6 +96,60 @@ agency options:
   --notes|-n <notes>
      Specify agency update notes to be included in the new database
 ```
+
+# Configuration
+
+The Right Track Database builder has a number of configuration variables that can be 
+specified as options at the command line or in a configuration file.  The following 
+table lists all of the configuration options and their default values.
+
+| Configuration Variable | Description | Default Value | CLI Option | Configuration File Key |
+| -------- | ----------- | ---------- | -------- | ---------------------- |
+| **Force** | With this option set, the build script will compile a database for all agencies, even if a GTFS update is not required. | `false` | `--force`, `-f` | `.force` | 
+| **Test** | With this option set, the build script will compile a database for any agencies that require a GTFS update, but the compiled database will not be installed in the **Right Track Agency** module.  The post-install script, if provided, will not run. | `false` | `--test`, `-t` | `.test` |
+| **Post-Install Script** | Provide the path to a JS file that contains a post-install script.  This script will be run after the database(s) have been compiled and installed into the **Right Track Agency** module(s).  This script can be used to finalize the installation of a new database for your specific needs.  See the **Post-Install Script** section below on how to create a post-install script. |  | `--post <file>`, `-p <file>` | `.post` |
+| **AGENCY VARIABLES** |
+| **Agency Declarations** | This option can be used to specify one or more **Right Track Agency** modules to be used with the build script.  At least one agency must be declared in order to run the script.  The agency can be declared by **module name** (right-track-agency-mnr), **agency id** (mnr), or **path to agency module** (/path/to/right-track-agency-mnr). | `[]` | `--agency <declaration>`, `-a <declaration>` | `.agencies[]`  **Example with just declarations:** `"agencies": ["right-track-agency-mnr", "/path/to/right-track-agency-lirr"]`.  **Example with agency config file and/or notes:** `"agencies": [{"agency": "right-track-agency-mnr", "config": "/path/to/mnr.json", "notes": "This is a test"}, {"agency": "right-track-agency-lirr", "config": "/path/to/lirr.json", "notes": "This is a test"}]` | 
+| **Agency Config** | Specify the path to the agency config file to be used with the previously declared agency.  When provided as a CLI option, this option *must* be preceded by an agency declaration. | | `--config <file>`, `-c <file>` | `.agencies[].config` |
+| **Agency Notes** | Use this option to override the default agency update notes added to the compiled database. | **Example:** `This schedule database was automatically compiled on 2020-1-2 01:15:01 due to a schedule data update from Metro North Railroad.` | `--notes <notes>`, `-n <notes>` | `.agencies[].notes` | 
+| **EMAIL VARIABLES** |
+| **Email** | When provided, this email address will be used to send summary reports to after a database has been compiled or errors occurred during the update and/or compilation process.  The following SMTP variables can be set to use an external SMTP mail server. |  | `--email <address>`, `-e <address>` | `.email` |
+| **SMTP Host** | SMTP server host (is the hostname or IP address to connect to) | `localhost` | `--smtp-host <host>` | `.smtp.host` |
+| **SMTP Port** | SMTP server port (is the port to connect to) | `25` | `--smtp-port <port>` | `.smtp.port` |
+| **SMTP Secure** | SMTP server use TLS (if true the connection will use TLS when connecting to server. If false (the default) then TLS is used if server supports the STARTTLS extension. In most cases set this value to true if you are connecting to port 465. For port 587 or 25 keep it false) | `false` | `--smtp-secure` | `.smtp.secure` |
+| **SMTP Require TLS** | SMTP server require TLS (if this is true and secure is false then Nodemailer tries to use STARTTLS even if the server does not advertise support for it. If the connection can not be encrypted then message is not sent) | `false` | `--smtp-require-tls` | `.smtp.requireTLS` |
+| **SMTP Username** | SMTP server username |  | `--smtp-user <username>` | `.smtp.auth.user` |
+| **SMTP Password** | SMTP server password |  | `--smtp-pass <password>` | `.smtp.auth.pass` |
+| **SMTP From** | The 'From' address used in the summary report email | `Right Track Database Builder <user@hostname>` | `--smtp-from <name <email>>` | `.smtp.from` |
+
+## Example Configuration File
+
+```json
+{
+  "agencies": [
+    "right-track-agency-mnr"
+    {
+      "agency": "/home/david/Documents/Development/right-track/src/agency-lirr",
+      "config": "/home/david/Documents/Development/right-track/etc/lirr.json",
+      "notes": "This is a test"
+    }
+  ],
+  "email": "reports@righttrack.io",
+  "smtp": {
+    "host": "email.server.com",
+    "port": 587,
+    "secure": false,
+    "requireTLS": true,
+    "auth": {
+      "user": "username",
+      "pass": "password"
+    },
+    "from": "Right Track Database Builder <reports@righttrack.io>"
+  }
+}
+```
+
+Any CLI options will override the defaults and any found in the config file, provided.
 
 
 # Additional Scripts
