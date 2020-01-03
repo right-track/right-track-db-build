@@ -17,6 +17,14 @@
  * @property {string} [post] The path to the post-update script
  * @property {AgencyOptions[]} agencies List of Agency Build Options for the Right Track
  * Agencies that are to be processed by the db-build script.
+ * @property {string} [email] The email address to send summary reports to, if provided
+ * @property {Object} [smtp] SMTP server settings for sending summary reports, if `email` is set
+ * @property {string} smtp.host=localhost STMP server host
+ * @property {int} smtp.port=25 SMTP server port
+ * @property {boolean} smtp.secure=false SMTP server use TLS
+ * @property {boolean} smtp.requireTLS=false SMTP server require TLS
+ * @property {Object} smtp.auth SMTP auth settings (`auth.user` = username, `auth.pass` = password)
+ * @property {string} smtp.from SMTP server From address
  */
 
 /**
