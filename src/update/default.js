@@ -130,14 +130,16 @@ function _compareLastUpdate(server) {
   // Check if our last modified file exists
   if ( fs.existsSync(lastModifiedFile) ) {
 
-    let ts = fs.readFileSync(lastModifiedFile).toString().trim();
-    let local = new Date(ts);
+    let lm = fs.readFileSync(lastModifiedFile).toString().trim().split('\n');
+    let local = new Date(lm[0]);
+    let compiled = lm[1] && lm[1].split('=').length === 2 && lm[1].split('=')[0] === 'compiled' ? lm[1].split('=')[1] : undefined;
 
     log("    server: " + server);
     log("    local: " + local);
+    log("    compiled: DB Version " + compiled);
 
     // No update required...
-    if ( server <= local ) {
+    if ( compiled && server <= local ) {
       return _finish();
     }
 

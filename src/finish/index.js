@@ -225,8 +225,20 @@ function _install(db, agencyOptions) {
   // Copy the files
   _copyFiles(paths, 0, function() {
 
-    // Finish the Agency when copied
-    _finishAgency(db);
+    // Mark the agency published file as compiled
+    let lastModifiedFile = path.normalize(agencyOptions.agency.moduleDirectory + '/' + config.locations.files.published);
+    let contents_old = fs.readFileSync(lastModifiedFile).toString().split("\n");
+    let contents_new = [];
+    contents_new[0] = contents_old[0];
+    contents_new[1] = "compiled=" + agencyOptions.version;
+
+    // Update the lastModified file...
+    fs.writeFile(lastModifiedFile, contents_new.join('\n'), function() {
+
+      // Finish the agency
+      _finishAgency(db);
+
+    });
 
   });
 
