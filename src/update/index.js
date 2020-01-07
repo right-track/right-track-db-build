@@ -122,16 +122,20 @@ function _agencyUpdateComplete(requested, successful, published, notes) {
   options.agency(AGENCY).updateComplete = successful;
   options.agency(AGENCY).published = published !== undefined ? published :
     new Date(
-    fs.readFileSync(
-      path.normalize(
-        options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.files.published
-      )
-    ).toString()
-  );
+      fs.readFileSync(
+        path.normalize(
+          options.agency(AGENCY).agency.moduleDirectory + '/' + config.locations.files.published
+        )
+      ).toString()
+    );
 
   // Set notes, if not provided
   if ( !options.agency(AGENCY).notes && notes ) {
     options.agency(AGENCY).notes = notes;
+  }
+  else if ( !options.agency(AGENCY).notes ) {
+    let d = new Date().toLocaleString();
+    options.agency(AGENCY).notes = "This schedule database was automatically compiled on " + d + " due to a schedule data update from " + options.agency(AGENCY).agency.name + ".";
   }
 
   let details = {};

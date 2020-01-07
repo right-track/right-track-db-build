@@ -233,7 +233,7 @@ function _readConfig(location) {
       }
     }
     if ( smtp.hasOwnProperty('from') ) {
-      options.set().smtp.fom = smtp.from;
+      options.set().smtp.from = smtp.from;
     }
   }
 

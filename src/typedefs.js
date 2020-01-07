@@ -53,8 +53,6 @@
  * @property {string} files.latestDb Latest database file location
  * @property {string} files.latestDbZip Latest database zip file location
  * @property {string} files.latestVersion Latest version file location
- * @property {string} files.archiveDir Database archive directory
- * @property {string} files.archiveDb Archived database file location
  */
 
 /**
