@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const URL = require('url');
 const http = require('http');
+const https = require('https');
 const UnZip = require('decompress-zip');
 const config = require('../../config.json');
 const log = require('../helpers/log.js');
@@ -170,8 +171,12 @@ function _downloadZip() {
   // Set output file
   let zip = fs.createWriteStream(gtfsZip);
 
+  // Determine protocol
+  let url = AGENCY.config.build.updateURL;
+  let client = url.startsWith('https') ? https : http;
+
   // Make the request
-  http.get(AGENCY.config.build.updateURL, function(response) {
+  client.get(AGENCY.config.build.updateURL, function(response) {
     let serverLastModified = response.headers['last-modified'];
     response.pipe(zip);
 
