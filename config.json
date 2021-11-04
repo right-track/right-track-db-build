@@ -10,6 +10,7 @@
       "port": 25,
       "secure": false,
       "requireTLS": false,
+      "tls": {"rejectUnauthorized": false},
       "auth": {
         "user": "",
         "pass": ""
