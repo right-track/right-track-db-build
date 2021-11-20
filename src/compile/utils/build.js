@@ -13,7 +13,7 @@
 const rl = require('readline');
 const fs = require('fs');
 const path = require('path');
-const split = require('csv-split-easy');
+const split = require('csv-split-easy').splitEasy;
 const log = require('../../helpers/log.js');
 const errors = require('../../helpers/errors.js');
 
