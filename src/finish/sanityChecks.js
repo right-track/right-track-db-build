@@ -24,7 +24,7 @@ const MIN_ZIP_SIZE = 250000;
 /**
  * List of sanity checks to perform on the agency database.  Each object in this
  * array contains three properties that define the sanity check.
- * @type {object[]} List of Sanity Checks
+ * @type {object[]}
  * @property {string} name Check Name
  * @property {string} select SQL Select statement to perform
  * @property {function} test Function that accepts a single DB row and returns a boolean (pass/fail)

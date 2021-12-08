@@ -1,7 +1,6 @@
 Right Track Database Builder
 ============================
 
-**node module:** [right-track-db-build](https://www.npmjs.com/package/right-track-db-build)  
 **GitHub repo:** [right-track/right-track-db-build](https://github.com/right-track/right-track-db-build)
 
 ---
