@@ -7,7 +7,7 @@
   "main": "src/run.js",
   "bin": "src/cli.js",
   "scripts": {
-    "docs": "jsdoc -c jsdoc.json --readme README.md --template $NODE_PATH/@dwaring87/docdash"
+    "docs": "jsdoc -c jsdoc.json"
   },
   "dependencies": {
     "archiver": "^2.1.1",
@@ -20,7 +20,7 @@
     "sqlite3": "^4.0.6"
   },
   "devDependencies": {
-    "@dwaring87/docdash": "^0.4.1",
+    "foodoc": "^0.0.9",
     "jsdoc": "^3.6.3"
   },
   "homepage": "https://righttrack.io",
