@@ -6,6 +6,12 @@ const build = require('../utils/build.js');
 const log = require('../../helpers/log.js');
 
 /**
+ * The maximum number of allowed hours in a day
+ * @private
+ */
+const MAX_HOURS = 36;
+
+/**
  * gtfs_stop_times table definition
  * @type {RTTableSchema}
  * @private
@@ -104,7 +110,9 @@ function buildTable(db, agency, callback) {
     _setDefaults(db, function() {
       _calcArrivalSecs(db, function() {
         _calcDepartureSecs(db, function() {
-          callback();
+          _fixTimes(db, function() {
+            callback();
+          });
         });
       });
     });
@@ -241,7 +249,66 @@ function _convertTimeToSecs(time) {
 }
 
 
+/**
+ * Fix any times that have an hour greater than MAX_HOURS
+ * @private
+ */
+ function _fixTimes(db, callback) {
+  log("        ... Fixing times with hours greater than " + MAX_HOURS);
+  let max_seconds = MAX_HOURS*3600;
 
+  db.all("SELECT trip_id, stop_id, arrival_time, departure_time, arrival_time_seconds, departure_time_seconds FROM " + TABLE.name + " WHERE arrival_time_seconds > " + max_seconds + " OR departure_time_seconds > " + max_seconds + ";",
+    function(err, rows) {
+      if ( rows && rows.length > 0 ) {
+        log("            Fixing " + rows.length + " stop_times");
+        db.exec("BEGIN TRANSACTION", function() {
+          _updateTimeRow(db, rows, 0, function() {
+            db.exec("COMMIT", function() {
+              return callback();
+            });
+          });
+        });
+      }
+    }
+  );
+}
+
+
+/**
+ * Fix the departure/arrival times for the specified row
+ * @param db RightTrackDB
+ * @param rows Rows of times to fix
+ * @param count Row counter
+ * @param callback callback function
+ * @private
+ */
+ function _updateTimeRow(db, rows, count, callback) {
+  if ( count < rows.length ) {
+    let row = rows[count];
+    let tid = row.trip_id;
+    let sid = row.stop_id;
+    let at = row.arrival_time;
+    let dt = row.departure_time;
+    let as = row.arrival_time_seconds;
+    let ds = row.departure_time_seconds;
+
+    let nas = as - (24*3600);
+    let nds = ds - (24*3600);
+    let nah = Math.floor(nas/(3600));
+    let ndh = Math.floor(nds/(3600));
+    let nat = at.replace(/^[0-9]+:/, `${nah}:`);
+    let ndt = dt.replace(/^[0-9]+:/, `${ndh}:`);
+
+    db.exec("UPDATE " + TABLE.name + " SET arrival_time = '" + nat + "', departure_time = '" + ndt + "', arrival_time_seconds = " + nas + ", departure_time_seconds = " + nds + " WHERE trip_id = '" + tid + "' AND stop_id = '" + sid + "';",
+      function() {
+        _updateTimeRow(db, rows, count+1, callback);
+      }
+    );
+  }
+  else {
+    return callback();
+  }
+}
 
 
 module.exports = buildTable;
