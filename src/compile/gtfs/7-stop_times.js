@@ -269,6 +269,9 @@ function _convertTimeToSecs(time) {
           });
         });
       }
+      else {
+        return callback();
+      }
     }
   );
 }
