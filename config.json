@@ -49,7 +49,8 @@
       "routes": "gtfs_routes",
       "stops": "gtfs_stops",
       "stop_times": "gtfs_stop_times",
-      "trips": "gtfs_trips"
+      "trips": "gtfs_trips",
+      "shapes": "gtfs_shapes"
     },
     "rt": {
       "about": "rt_about",

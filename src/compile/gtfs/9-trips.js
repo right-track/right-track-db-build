@@ -57,7 +57,11 @@ const TABLE = {
     },
     {
       "name": "shape_id",
-      "type": "TEXT"
+      "type": "TEXT",
+      "foreignKey": {
+        "table": "gtfs_shapes",
+        "field": "shape_id"
+      }
     },
     {
       "name": "wheelchair_accessible",
@@ -92,7 +96,9 @@ function buildTable(db, agency, callback) {
   build.init(db, TABLE, agency, function() {
     _checkTripHeadsigns(db, function() {
       _setTripPeak(db, agency.agency, function() {
-        callback();
+        _removeUnusedShapes(db, function() {
+          callback();
+        });
       });
     });
   });
@@ -262,6 +268,19 @@ function _updateTripPeak(db, agency, rows, count, callback) {
   function _next() {
     _updateTripPeak(db, agency, rows, count+1, callback);
   }
+}
+
+
+/**
+ * Remove any shapes from the gtfs_shapes table that are not used by 
+ * trips in the gtfs_trips table
+ * @param db RightTrackDB (SQLite3 implementation)
+ * @param callback Callback function
+ * @private
+ */
+function _removeUnusedShapes(db, callback) {
+  console.log("        ... Removing unused shapes");
+  db.exec("DELETE FROM " + config.tables.gtfs.shapes + " WHERE shape_id NOT IN (SELECT DISTINCT(shape_id) FROM " + config.tables.gtfs.trips + ");", callback)
 }
 
 
