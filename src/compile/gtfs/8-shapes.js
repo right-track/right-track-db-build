@@ -2,6 +2,7 @@
 
 const config = require('../../../config.json');
 const build = require('../utils/build.js');
+const log = require('../../helpers/log.js');
 
 /**
  * gtfs_shapes table definition
@@ -48,10 +49,21 @@ const TABLE = {
  */
 function buildTable(db, agencyOptions, callback) {
   build.init(db, TABLE, agencyOptions, function() {
-    callback();
+    _removeInvalidPositions(db, function() {
+      callback();
+    });
   });
 }
 
+
+/**
+ * Remove positions with invalid lat/lon
+ * @private
+ */
+function _removeInvalidPositions(db, callback) {
+  log("        ... Removing invalid positions");
+  db.exec("DELETE FROM " + config.tables.gtfs.shapes + " WHERE shape_pt_lat < -90 OR shape_pt_lat > 90 OR shape_pt_lon < -180 OR shape_pt_lon > 180;", callback)
+}
 
 
 

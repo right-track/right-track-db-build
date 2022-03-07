@@ -279,7 +279,7 @@ function _updateTripPeak(db, agency, rows, count, callback) {
  * @private
  */
 function _removeUnusedShapes(db, callback) {
-  console.log("        ... Removing unused shapes");
+  log("        ... Removing unused shapes");
   db.exec("DELETE FROM " + config.tables.gtfs.shapes + " WHERE shape_id NOT IN (SELECT DISTINCT(shape_id) FROM " + config.tables.gtfs.trips + ");", callback)
 }
 
